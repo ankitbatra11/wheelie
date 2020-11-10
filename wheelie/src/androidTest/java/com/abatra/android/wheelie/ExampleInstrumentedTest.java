@@ -1,4 +1,4 @@
-package com.abatra.android.wheelie.lifecycle;
+package com.abatra.android.wheelie;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.abatra.android.wheelie.lifecycle.test", appContext.getPackageName());
+        assertEquals("com.abatra.android.wheelie.test", appContext.getPackageName());
     }
 }
