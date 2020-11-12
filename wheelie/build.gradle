@@ -33,6 +33,7 @@ android {
 
 dependencies {
 
+    api 'com.jakewharton.timber:timber:4.7.1'
     implementation group: 'androidx.lifecycle', name: 'lifecycle-extensions', version: '2.2.0'
 
     testImplementation 'junit:junit:4.13.1'
