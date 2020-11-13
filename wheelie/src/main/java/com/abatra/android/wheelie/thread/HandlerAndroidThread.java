@@ -3,8 +3,6 @@ package com.abatra.android.wheelie.thread;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import androidx.annotation.Nullable;
-
 import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
@@ -12,11 +10,7 @@ import timber.log.Timber;
 public class HandlerAndroidThread implements AndroidThread {
 
     private final String name;
-
-    @Nullable
     private HandlerThread handlerThread;
-
-    @Nullable
     private RunnableTrackerHandler handler;
 
     public HandlerAndroidThread(String name) {
@@ -31,10 +25,12 @@ public class HandlerAndroidThread implements AndroidThread {
     }
 
     @Override
+    public void postRunnable(Runnable runnable) {
+        handler.post(runnable);
+    }
+
+    @Override
     public void postRunnableWithScheduledInterval(Runnable runnable, long intervalDuration, TimeUnit intervalUnit) {
-        if (handler == null) {
-            throw new IllegalStateException("Must call start android thread before posting a message");
-        }
         Runnable decoratedRunnable = new Runnable() {
             @Override
             public void run() {
