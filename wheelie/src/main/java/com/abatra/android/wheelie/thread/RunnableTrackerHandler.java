@@ -11,7 +11,7 @@ import timber.log.Timber;
 public class RunnableTrackerHandler {
 
     private final Handler handler;
-    private final Set<Runnable> runnables = new HashSet<>();
+    private final Collection<Runnable> runnables = new HashSet<>();
 
     private RunnableTrackerHandler(Handler handler) {
         this.handler = handler;
