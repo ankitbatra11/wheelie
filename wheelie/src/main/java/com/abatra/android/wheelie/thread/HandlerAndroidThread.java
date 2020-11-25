@@ -30,6 +30,11 @@ public class HandlerAndroidThread implements AndroidThread {
     }
 
     @Override
+    public void postRunnableWithDelay(Runnable runnable, long delayDuration, TimeUnit durationUnit) {
+        handler.postDelayed(runnable, durationUnit.toMillis(delayDuration));
+    }
+
+    @Override
     public void postRunnableWithScheduledInterval(Runnable runnable, long intervalDuration, TimeUnit intervalUnit) {
         Runnable decoratedRunnable = new Runnable() {
             @Override

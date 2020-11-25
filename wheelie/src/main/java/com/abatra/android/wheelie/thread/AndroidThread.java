@@ -8,6 +8,8 @@ public interface AndroidThread {
 
     void postRunnable(Runnable runnable);
 
+    void postRunnableWithDelay(Runnable runnable, long delayDuration, TimeUnit durationUnit);
+
     void postRunnableWithScheduledInterval(Runnable runnable, long intervalDuration, TimeUnit intervalUnit);
 
     void stopAndroidThread();
