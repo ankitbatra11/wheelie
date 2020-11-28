@@ -22,7 +22,7 @@ public class NotificationBuilder extends NotificationCompat.Builder {
         return this;
     }
 
-    public NotificationCompat.Builder setContentActivityIntent(Intent intent) {
+    public NotificationBuilder setContentActivityIntent(Intent intent) {
         setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
         return this;
     }
