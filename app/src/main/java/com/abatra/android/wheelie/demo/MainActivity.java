@@ -18,7 +18,9 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        IntentMediaPicker.getInstance().pickMedia(PickMediaRequest.builder()
+        IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
+        intentMediaPicker.setActivityResultRegistrar(this);
+        intentMediaPicker.pickMedia(PickMediaRequest.builder()
                 .pick(PickMediaCount.MULTIPLE)
                 .ofType(PickableMediaType.IMAGE)
                 .withActivityResultRegistrar(this)
