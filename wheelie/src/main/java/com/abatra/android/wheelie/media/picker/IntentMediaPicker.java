@@ -7,15 +7,17 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
+import com.abatra.android.wheelie.activity.ActivityResultRegistrarPresenter;
 import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
 
 import java.util.List;
 
-public class IntentMediaPicker implements MediaPicker, ILifecycleObserver {
+public class IntentMediaPicker implements MediaPicker, ILifecycleObserver, ActivityResultRegistrarPresenter {
 
     ActivityResultLauncher<String> getMultipleContentLauncher;
     private ActivityResultCallback<List<Uri>> multipleContentResultCallback;
 
+    @Override
     public void setActivityResultRegistrar(ActivityResultRegistrar activityResultRegistrar) {
         activityResultRegistrar.getLifecycle().addObserver(this);
         ActivityResultContracts.GetMultipleContents contract = new ActivityResultContracts.GetMultipleContents();
