@@ -17,6 +17,9 @@ public class IntentImagePrinter implements ImagePrinter {
     public void print(PrintImageRequest printImageRequest) {
         IntentPrintImageRequest request = (IntentPrintImageRequest) printImageRequest;
         PrintHelper printHelper = new PrintHelper(request.getContext());
+        printHelper.setScaleMode(request.getScaleMode());
+        printHelper.setOrientation(request.getOrientation());
+        printHelper.setColorMode(request.getColorMode());
         printHelper.printBitmap(request.getJobName(), request.getBitmap());
     }
 }
