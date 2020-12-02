@@ -6,6 +6,10 @@ import androidx.lifecycle.OnLifecycleEvent;
 
 public interface ILifecycleObserver extends LifecycleObserver {
 
+    default void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+        lifecycleOwner.getLifecycle().addObserver(this);
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     default void onCreate() {
     }
