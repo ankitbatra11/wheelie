@@ -36,7 +36,7 @@ public class IntentShareMediaRequest implements ShareMediaRequest {
 
         private Uri mediaUri;
         private String mimeType;
-        private MediaShareCompletionListener completionListener;
+        private MediaShareCompletionListener shareCompletionListener;
 
         public Builder setMediaUri(Uri mediaUri) {
             this.mediaUri = mediaUri;
@@ -63,8 +63,9 @@ public class IntentShareMediaRequest implements ShareMediaRequest {
             return setMimeType(MimeTypes.VIDEO_MP4);
         }
 
-        public void setCompletionListener(MediaShareCompletionListener completionListener) {
-            this.completionListener = completionListener;
+        public Builder setShareCompletionListener(MediaShareCompletionListener shareCompletionListener) {
+            this.shareCompletionListener = shareCompletionListener;
+            return this;
         }
 
         public IntentShareMediaRequest build() {
@@ -73,7 +74,7 @@ public class IntentShareMediaRequest implements ShareMediaRequest {
                     Preconditions.checkNotNull(mediaUri, "Must provide media uri!"),
                     Preconditions.checkNotNull(mimeType, "Must provide mime type!"));
 
-            intentShareMediaRequest.shareCompletionListener = completionListener;
+            intentShareMediaRequest.shareCompletionListener = shareCompletionListener;
 
             return intentShareMediaRequest;
         }
