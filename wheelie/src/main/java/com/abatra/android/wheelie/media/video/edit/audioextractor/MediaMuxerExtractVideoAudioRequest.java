@@ -1,7 +1,15 @@
 package com.abatra.android.wheelie.media.video.edit.audioextractor;
 
-import com.abatra.android.wheelie.media.video.edit.transcoder.FilePathTranscodeVideoResult;
+import android.content.Context;
+import android.media.MediaExtractor;
+import android.net.Uri;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.abatra.android.wheelie.media.video.edit.transcoder.TranscodableVideo;
+import com.abatra.android.wheelie.media.video.edit.transcoder.UriTranscodableVideo;
+import com.google.common.base.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,6 +43,23 @@ public class MediaMuxerExtractVideoAudioRequest implements ExtractVideoAudioRequ
 
         public Builder setAudioExtractableVideo(AudioExtractableVideo audioExtractableVideo) {
             this.audioExtractableVideo = audioExtractableVideo;
+            return this;
+        }
+
+        public Builder setAudioExtractableVideo(Uri videoUri) {
+            TranscodableVideo transcodableVideo = new UriTranscodableVideo(videoUri);
+            this.audioExtractableVideo = new AudioExtractableVideo() {
+                @Override
+                public void setDataSource(Context context, MediaExtractor mediaExtractor) {
+                    transcodableVideo.setDataSource(context, mediaExtractor);
+                }
+
+                @Override
+                @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+                public Optional<String> getRotationDegrees(Context context) {
+                    return transcodableVideo.getRotationDegrees(context);
+                }
+            };
             return this;
         }
 
