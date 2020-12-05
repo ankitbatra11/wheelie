@@ -10,6 +10,8 @@ import android.os.Build;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import com.abatra.android.wheelie.media.video.edit.AudioNotFoundException;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -60,6 +62,7 @@ public class MediaMuxerVideoTranscoder implements VideoTranscoder {
         // Set up the tracks and retrieve the max buffer size for selected
         // tracks.
         HashMap<Integer, Integer> indexMap = new HashMap<>(trackCount);
+        boolean audioTrackSelected = false;
         int bufferSize = -1;
         for (int i = 0; i < trackCount; i++) {
             MediaFormat format = extractor.getTrackFormat(i);
@@ -68,6 +71,7 @@ public class MediaMuxerVideoTranscoder implements VideoTranscoder {
             if (mime != null) {
                 if (mime.startsWith("audio/") && request.isTranscodeAudio()) {
                     selectCurrentTrack = true;
+                    audioTrackSelected = true;
                 } else if (mime.startsWith("video/") && request.isTranscodeVideo()) {
                     selectCurrentTrack = true;
                 }
@@ -82,10 +86,12 @@ public class MediaMuxerVideoTranscoder implements VideoTranscoder {
                 }
             }
         }
+        if (transcodeOnlyAudio(request) && !audioTrackSelected) {
+            throw new AudioNotFoundException();
+        }
         if (bufferSize < 0) {
             bufferSize = DEFAULT_BUFFER_SIZE;
         }
-
         String degreesString = request.getTranscodableVideo().getRotationDegrees(context).orNull();
         if (degreesString != null) {
             int degrees = Integer.parseInt(degreesString);
@@ -139,6 +145,10 @@ public class MediaMuxerVideoTranscoder implements VideoTranscoder {
         } finally {
             muxer.release();
         }
+    }
+
+    private boolean transcodeOnlyAudio(MediaMuxerTranscodeVideoRequest request) {
+        return request.isTranscodeAudio() && !request.isTranscodeVideo();
     }
 
     private boolean includeBufferInResult(@Nullable Integer trackIndex,
