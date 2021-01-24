@@ -1,5 +1,6 @@
 package com.abatra.android.wheelie.demo;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,5 +27,10 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
                 .withActivityResultRegistrar(this)
                 .withMultipleMediaResultCallback(result -> Timber.d("result=%s", result))
                 .build());
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 }

@@ -39,14 +39,14 @@ dependencies {
     api 'com.jakewharton.timber:timber:4.7.1'
     api group: 'com.google.guava', name: 'guava', version: '29.0-android'
 
-    def daggerVersion = '2.30.1'
+    def daggerVersion = '2.31.1'
     implementation group: 'com.google.dagger', name: 'dagger', version: daggerVersion
     implementation group: 'com.google.dagger', name: 'dagger-android', version: daggerVersion
     implementation group: 'com.google.dagger', name: 'dagger-android-support', version: daggerVersion
 
     implementation group: 'androidx.lifecycle', name: 'lifecycle-extensions', version: '2.2.0'
     implementation group: 'androidx.core', name: 'core', version: '1.3.2'
-    implementation group: 'androidx.fragment', name: 'fragment', version: '1.3.0-beta01'
+    implementation group: 'androidx.fragment', name: 'fragment', version: '1.3.0-rc01'
     implementation group: 'androidx.print', name: 'print', version: '1.0.0'
 
     testImplementation 'junit:junit:4.13.1'
