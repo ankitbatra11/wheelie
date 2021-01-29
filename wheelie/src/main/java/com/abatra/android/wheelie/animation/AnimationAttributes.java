@@ -1,6 +1,7 @@
 package com.abatra.android.wheelie.animation;
 
 import android.os.Build;
+import android.transition.Transition;
 import android.view.View;
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ public class AnimationAttributes {
         return this;
     }
 
-    public void set(android.transition.Transition transition) {
+    public void set(Transition transition) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             for (Integer targetViewId : targetViewIds) {
                 transition.addTarget(targetViewId);
@@ -38,6 +39,15 @@ public class AnimationAttributes {
             for (View targetView : targetViews) {
                 transition.addTarget(targetView);
             }
+        }
+    }
+
+    public void set(androidx.transition.Transition transition) {
+        for (Integer targetViewId : targetViewIds) {
+            transition.addTarget(targetViewId);
+        }
+        for (View targetView : targetViews) {
+            transition.addTarget(targetView);
         }
     }
 }
