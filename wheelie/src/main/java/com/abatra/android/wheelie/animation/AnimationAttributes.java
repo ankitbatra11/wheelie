@@ -29,7 +29,7 @@ public class AnimationAttributes {
         return this;
     }
 
-    public void set(Transition transition) {
+    void set(Transition transition) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             for (Integer targetViewId : targetViewIds) {
                 transition.addTarget(targetViewId);
@@ -42,7 +42,7 @@ public class AnimationAttributes {
         }
     }
 
-    public void set(androidx.transition.Transition transition) {
+    void set(androidx.transition.Transition transition) {
         for (Integer targetViewId : targetViewIds) {
             transition.addTarget(targetViewId);
         }
