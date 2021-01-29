@@ -5,14 +5,28 @@ import android.os.Build;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.transition.platform.MaterialSharedAxis;
 
 public class SharedAxisMotion implements MaterialMotion {
 
-    public static final SharedAxisMotion X = new SharedAxisMotion();
+    public static final SharedAxisMotion X, Y, Z;
 
-    private SharedAxisMotion() {
+    static {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            X = new SharedAxisMotion(MaterialSharedAxis.X);
+            Y = new SharedAxisMotion(MaterialSharedAxis.Y);
+            Z = new SharedAxisMotion(MaterialSharedAxis.Z);
+        } else {
+            X = Y = Z = new SharedAxisMotion(0);
+        }
+    }
+
+    private final int axis;
+
+    private SharedAxisMotion(int axis) {
+        this.axis = axis;
     }
 
     @Override
@@ -35,7 +49,7 @@ public class SharedAxisMotion implements MaterialMotion {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private MaterialSharedAxis createMaterialSharedAxis(boolean forward, @Nullable AnimationAttributes animationAttributes) {
-        MaterialSharedAxis materialSharedAxis = new MaterialSharedAxis(MaterialSharedAxis.X, forward);
+        MaterialSharedAxis materialSharedAxis = new MaterialSharedAxis(axis, forward);
         materialSharedAxis.excludeTarget(android.R.id.statusBarBackground, true);
         materialSharedAxis.excludeTarget(android.R.id.navigationBarBackground, true);
         if (animationAttributes != null) {
@@ -50,6 +64,22 @@ public class SharedAxisMotion implements MaterialMotion {
             activity.getWindow().setEnterTransition(createMaterialSharedAxis(true, animationAttributes));
             activity.getWindow().setReturnTransition(createMaterialSharedAxis(false, animationAttributes));
             activity.getWindow().setAllowEnterTransitionOverlap(true);
+        }
+    }
+
+    @Override
+    public void setEnterAnimation(Fragment fragment) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.setEnterTransition(createMaterialSharedAxis(true, null));
+            fragment.setReturnTransition(createMaterialSharedAxis(false, null));
+        }
+    }
+
+    @Override
+    public void setExitAnimation(Fragment fragment) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.setExitTransition(createMaterialSharedAxis(true, null));
+            fragment.setReenterTransition(createMaterialSharedAxis(false, null));
         }
     }
 }

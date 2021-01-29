@@ -5,6 +5,8 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.fragment.app.Fragment;
+
 public interface MaterialMotion {
 
     void setExitAnimation(Activity activity);
@@ -14,6 +16,10 @@ public interface MaterialMotion {
     void setExitAnimation(Activity activity, AnimationAttributes animationAttributes);
 
     void setEnterAnimation(Activity activity, AnimationAttributes animationAttributes);
+
+    void setEnterAnimation(Fragment fragment);
+
+    void setExitAnimation(Fragment fragment);
 
     default void startActivityWithAnimation(Intent intent, Activity activity) {
         Bundle options = null;
