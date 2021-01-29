@@ -3,21 +3,17 @@ package com.abatra.android.wheelie.animation;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.RequiresApi;
 
 public interface MaterialMotion {
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    static MaterialMotion sharedXAxis() {
-        return XSharedAxisMotion.getInstance();
-    }
+    void setExitAnimation(Activity activity);
 
-    void applyExitAnimation(Activity activity, AnimationAttributes animationAttributes);
+    void setEnterAnimation(Activity activity);
 
-    void applyEnterAnimation(Activity activity, AnimationAttributes animationAttributes);
+    void setExitAnimation(Activity activity, AnimationAttributes animationAttributes);
+
+    void setEnterAnimation(Activity activity, AnimationAttributes animationAttributes);
 
     default void startActivityWithAnimation(Intent intent, Activity activity) {
         Bundle options = null;

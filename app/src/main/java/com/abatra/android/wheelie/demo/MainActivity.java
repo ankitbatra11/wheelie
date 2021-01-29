@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
 import com.abatra.android.wheelie.animation.AnimationAttributes;
 import com.abatra.android.wheelie.animation.MaterialMotion;
+import com.abatra.android.wheelie.animation.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
 import com.abatra.android.wheelie.media.picker.IntentMediaPicker;
 import com.abatra.android.wheelie.media.picker.PickMediaCount;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             requestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-            MaterialMotion.sharedXAxis().applyExitAnimation(this, AnimationAttributes.defaultAttributes());
+            SharedAxisMotion.X.setExitAnimation(this);
         }
 
         super.onCreate(savedInstanceState);
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
         binding.launchEnterAnimatedScreen.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Intent intent = new Intent(v.getContext(), EnterAnimatedActivity.class);
-                MaterialMotion.sharedXAxis().startActivityWithAnimation(intent, MainActivity.this);
+                SharedAxisMotion.X.startActivityWithAnimation(intent, MainActivity.this);
             }
         });
     }

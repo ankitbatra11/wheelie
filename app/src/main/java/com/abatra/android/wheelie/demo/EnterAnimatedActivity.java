@@ -8,8 +8,7 @@ import android.view.Window;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.abatra.android.wheelie.animation.AnimationAttributes;
-import com.abatra.android.wheelie.animation.MaterialMotion;
+import com.abatra.android.wheelie.animation.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityEnterAnimatedBinding;
 
 public class EnterAnimatedActivity extends AppCompatActivity {
@@ -19,7 +18,7 @@ public class EnterAnimatedActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             requestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-            MaterialMotion.sharedXAxis().applyEnterAnimation(this, AnimationAttributes.defaultAttributes());
+            SharedAxisMotion.X.setEnterAnimation(this);
         }
 
         super.onCreate(savedInstanceState);
