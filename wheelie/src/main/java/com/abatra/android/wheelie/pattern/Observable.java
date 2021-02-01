@@ -27,4 +27,6 @@ public interface Observable<O> {
     void removeObserver(O observer);
 
     void forEachObserver(Consumer<O> observerConsumer);
+
+    void removeObservers();
 }

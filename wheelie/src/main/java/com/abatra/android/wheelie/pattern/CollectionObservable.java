@@ -34,4 +34,9 @@ public class CollectionObservable<O> implements Observable<O> {
             }
         }
     }
+
+    @Override
+    public void removeObservers() {
+        collection.clear();
+    }
 }
