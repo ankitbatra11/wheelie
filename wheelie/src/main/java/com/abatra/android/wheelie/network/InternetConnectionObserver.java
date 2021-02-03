@@ -18,6 +18,8 @@ public interface InternetConnectionObserver extends ILifecycleObserver, Observab
 
     boolean isConnectedToInternet();
 
+    void isConnectedToInternet(Listener listener);
+
     interface Listener {
         void onInternetConnectivityChanged(boolean connected);
     }

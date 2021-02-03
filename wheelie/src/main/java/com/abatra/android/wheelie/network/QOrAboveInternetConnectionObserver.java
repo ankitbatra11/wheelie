@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Build;
 
@@ -23,6 +24,10 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
     static {
         INTENT_FILTER.addAction(ACTION_CONNECTIVITY_CHANGE);
     }
+
+    private static final NetworkRequest NETWORK_REQUEST = new NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build();
 
     private final Context context;
     private final Observable<Listener> listeners = Observable.copyOnWriteArraySet();
@@ -49,8 +54,11 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
 
     @Override
     public void onCreate() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), networkCallback);
+        getConnectivityManager().registerNetworkCallback(NETWORK_REQUEST, networkCallback);
+    }
+
+    private ConnectivityManager getConnectivityManager() {
+        return (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     @Override
@@ -66,6 +74,23 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
     @Override
     public boolean isConnectedToInternet() {
         return isConnected.get();
+    }
+
+    @Override
+    public void isConnectedToInternet(Listener listener) {
+        getConnectivityManager().requestNetwork(NETWORK_REQUEST, new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onUnavailable() {
+                super.onUnavailable();
+                listener.onInternetConnectivityChanged(false);
+            }
+
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                super.onAvailable(network);
+                listener.onInternetConnectivityChanged(true);
+            }
+        });
     }
 
     @Override
