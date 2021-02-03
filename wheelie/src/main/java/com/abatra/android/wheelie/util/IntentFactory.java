@@ -16,4 +16,12 @@ public final class IntentFactory {
         }
         return result;
     }
+
+    public static Intent createWirelessSettingsScreenIntent(Context context) {
+        Intent result = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+        if (!IntentUtils.isLaunchable(result, context)) {
+            result = new Intent(Settings.ACTION_SETTINGS);
+        }
+        return result;
+    }
 }

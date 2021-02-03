@@ -17,6 +17,7 @@ import com.abatra.android.wheelie.media.picker.PickMediaCount;
 import com.abatra.android.wheelie.media.picker.PickMediaRequest;
 import com.abatra.android.wheelie.media.picker.PickableMediaType;
 import com.abatra.android.wheelie.network.InternetConnectionObserver;
+import com.abatra.android.wheelie.util.IntentFactory;
 import com.google.android.material.snackbar.Snackbar;
 
 import timber.log.Timber;
@@ -62,6 +63,11 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
         binding.checkInternetConnectionBtn.setOnClickListener(v -> {
             String message = String.valueOf(connectionObserver.isConnectedToInternet());
             Snackbar.make(v, message, Snackbar.LENGTH_SHORT).show();
+        });
+
+        binding.launchWirelessSettingsBtn.setOnClickListener(v -> {
+            Context context = v.getContext();
+            context.startActivity(IntentFactory.createWirelessSettingsScreenIntent(context));
         });
     }
 
