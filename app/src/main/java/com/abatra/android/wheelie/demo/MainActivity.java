@@ -10,20 +10,21 @@ import android.view.Window;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
-import com.abatra.android.wheelie.animation.AnimationAttributes;
-import com.abatra.android.wheelie.animation.MaterialMotion;
 import com.abatra.android.wheelie.animation.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
 import com.abatra.android.wheelie.media.picker.IntentMediaPicker;
 import com.abatra.android.wheelie.media.picker.PickMediaCount;
 import com.abatra.android.wheelie.media.picker.PickMediaRequest;
 import com.abatra.android.wheelie.media.picker.PickableMediaType;
+import com.abatra.android.wheelie.network.InternetConnectionObserver;
+import com.google.android.material.snackbar.Snackbar;
 
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements ActivityResultRegistrar {
 
     private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
+    private final InternetConnectionObserver connectionObserver = InternetConnectionObserver.newInstance(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,12 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
                 Intent intent = new Intent(v.getContext(), EnterAnimatedActivity.class);
                 SharedAxisMotion.X.startActivityWithAnimation(intent, MainActivity.this);
             }
+        });
+
+        connectionObserver.observeLifecycle(this);
+        binding.checkInternetConnectionBtn.setOnClickListener(v -> {
+            String message = String.valueOf(connectionObserver.isConnectedToInternet());
+            Snackbar.make(v, message, Snackbar.LENGTH_SHORT).show();
         });
     }
 

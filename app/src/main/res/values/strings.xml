@@ -3,4 +3,5 @@
     <string name="pick_image">Pick Image</string>
     <string name="launch_enter_animated_activity">Launch enter animated activity</string>
     <string name="enter_animated_activity">Enter animated activity</string>
+    <string name="check_internet_connection">Check internet connection</string>
 </resources>
