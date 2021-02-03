@@ -13,7 +13,8 @@ import androidx.annotation.RequiresApi;
 
 import com.abatra.android.wheelie.pattern.Observable;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @RequiresApi(api = Build.VERSION_CODES.Q)
 public class QOrAboveInternetConnectionObserver implements InternetConnectionObserver {
@@ -31,20 +32,21 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
 
     private final Context context;
     private final Observable<Listener> listeners = Observable.copyOnWriteArraySet();
-    private final AtomicBoolean isConnected = new AtomicBoolean(false);
+    private final Set<Network> availableNetworks = new CopyOnWriteArraySet<>();
     private final ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
+
         @Override
         public void onAvailable(@NonNull Network network) {
             super.onAvailable(network);
-            isConnected.set(true);
-            listeners.forEachObserver(type -> type.onInternetConnectivityChanged(isConnected.get()));
+            availableNetworks.add(network);
+            listeners.forEachObserver(type -> type.onInternetConnectivityChanged(isConnectedToInternet()));
         }
 
         @Override
-        public void onUnavailable() {
-            super.onUnavailable();
-            isConnected.set(false);
-            listeners.forEachObserver(type -> type.onInternetConnectivityChanged(isConnected.get()));
+        public void onLost(@NonNull Network network) {
+            super.onLost(network);
+            availableNetworks.remove(network);
+            listeners.forEachObserver(type -> type.onInternetConnectivityChanged(isConnectedToInternet()));
         }
     };
 
@@ -73,7 +75,7 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
 
     @Override
     public boolean isConnectedToInternet() {
-        return isConnected.get();
+        return !availableNetworks.isEmpty();
     }
 
     @Override
@@ -96,6 +98,7 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
     @Override
     public void onDestroy() {
 
+        availableNetworks.clear();
         listeners.removeObservers();
 
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
