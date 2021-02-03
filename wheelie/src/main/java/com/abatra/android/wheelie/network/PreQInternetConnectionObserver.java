@@ -55,6 +55,11 @@ public class PreQInternetConnectionObserver implements InternetConnectionObserve
     }
 
     @Override
+    public void isConnectedToInternet(Listener listener) {
+        listener.onInternetConnectivityChanged(isConnectedToInternet());
+    }
+
+    @Override
     public void onDestroy() {
         context.unregisterReceiver(broadcastReceiver);
     }
