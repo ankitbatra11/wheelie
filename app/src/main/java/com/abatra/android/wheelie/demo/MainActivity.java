@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Window;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
+import com.abatra.android.wheelie.activity.ResultContracts;
 import com.abatra.android.wheelie.animation.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
 import com.abatra.android.wheelie.media.picker.IntentMediaPicker;
@@ -17,7 +20,6 @@ import com.abatra.android.wheelie.media.picker.PickMediaCount;
 import com.abatra.android.wheelie.media.picker.PickMediaRequest;
 import com.abatra.android.wheelie.media.picker.PickableMediaType;
 import com.abatra.android.wheelie.network.InternetConnectionObserver;
-import com.abatra.android.wheelie.util.IntentFactory;
 import com.google.android.material.snackbar.Snackbar;
 
 import timber.log.Timber;
@@ -29,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             requestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
             SharedAxisMotion.X.setExitAnimation(this);
@@ -65,10 +66,11 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
             Snackbar.make(v, message, Snackbar.LENGTH_SHORT).show();
         });
 
-        binding.launchWirelessSettingsBtn.setOnClickListener(v -> {
-            Context context = v.getContext();
-            context.startActivity(IntentFactory.createWirelessSettingsScreenIntent(context));
+        ActivityResultLauncher<Void> launcher = registerForActivityResult(ResultContracts.SettingsScreen.wirelessSettings(), result -> {
+            ConstraintLayout view = binding.getRoot();
+            Snackbar.make(view, R.string.wireless_settings_result_msg, Snackbar.LENGTH_SHORT).show();
         });
+        binding.launchWirelessSettingsBtn.setOnClickListener(v -> launcher.launch(null));
     }
 
     @Override
