@@ -8,15 +8,13 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
-import com.abatra.android.wheelie.activity.ActivityResultRegistrarPresenter;
 import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
+import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 
 import javax.inject.Inject;
 
-public class IntentMediaSharer implements MediaSharer, ActivityResultRegistrarPresenter, ILifecycleObserver {
+public class IntentMediaSharer implements MediaSharer, ILifecycleObserver {
 
-    private ActivityResultRegistrar activityResultRegistrar;
     private ActivityResultLauncher<IntentShareMediaRequest> activityResultLauncher;
     private MediaShareCompletionListener shareCompletionListener;
 
@@ -25,10 +23,8 @@ public class IntentMediaSharer implements MediaSharer, ActivityResultRegistrarPr
     }
 
     @Override
-    public void setActivityResultRegistrar(ActivityResultRegistrar activityResultRegistrar) {
-        this.activityResultRegistrar = activityResultRegistrar;
-        this.activityResultRegistrar.getLifecycle().addObserver(this);
-        activityResultLauncher = this.activityResultRegistrar.registerForActivityResult(ShareMediaContract.INSTANCE, result -> {
+    public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+        activityResultLauncher = lifecycleOwner.registerForActivityResult(ShareMediaContract.INSTANCE, result -> {
             if (shareCompletionListener != null) {
                 shareCompletionListener.mediaShareCompleted();
             }
@@ -46,7 +42,6 @@ public class IntentMediaSharer implements MediaSharer, ActivityResultRegistrarPr
     public void onDestroy() {
         shareCompletionListener = null;
         activityResultLauncher = null;
-        activityResultRegistrar = null;
     }
 
     private static class ShareMediaContract extends ActivityResultContract<IntentShareMediaRequest, Void> {

@@ -1,6 +1,6 @@
 package com.abatra.android.wheelie.demo;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,10 +11,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
 import com.abatra.android.wheelie.activity.ResultContracts;
 import com.abatra.android.wheelie.animation.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
+import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 import com.abatra.android.wheelie.media.picker.IntentMediaPicker;
 import com.abatra.android.wheelie.media.picker.PickMediaCount;
 import com.abatra.android.wheelie.media.picker.PickMediaRequest;
@@ -24,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements ActivityResultRegistrar {
+public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
     private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
     private final InternetConnectionObserver connectionObserver = InternetConnectionObserver.newInstance(this);
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
         ActivityMainBinding binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
 
-        intentMediaPicker.setActivityResultRegistrar(this);
+        intentMediaPicker.observeLifecycle(this);
         binding.pickImage.setOnClickListener(v -> {
 
             PickMediaRequest pickMediaRequest = PickMediaRequest.builder()
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements ActivityResultReg
     }
 
     @Override
-    public Context getContext() {
+    public Activity getActivity() {
         return this;
     }
 }
