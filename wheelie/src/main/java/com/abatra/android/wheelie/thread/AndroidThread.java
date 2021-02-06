@@ -1,8 +1,10 @@
 package com.abatra.android.wheelie.thread;
 
+import com.abatra.android.wheelie.media.Pausable;
+
 import java.util.concurrent.TimeUnit;
 
-public interface AndroidThread {
+public interface AndroidThread extends Pausable {
 
     void startAndroidThread();
 

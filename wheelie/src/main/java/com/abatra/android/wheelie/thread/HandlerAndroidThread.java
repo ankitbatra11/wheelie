@@ -3,6 +3,8 @@ package com.abatra.android.wheelie.thread;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+import com.abatra.android.wheelie.media.Pausable;
+
 import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
@@ -10,6 +12,7 @@ import timber.log.Timber;
 public class HandlerAndroidThread implements AndroidThread {
 
     private final String name;
+    private final Pausable pausable = Pausable.atomicBoolean();
     private HandlerThread handlerThread;
     private RunnableTrackerHandler handler;
 
@@ -40,7 +43,9 @@ public class HandlerAndroidThread implements AndroidThread {
             @Override
             public void run() {
                 try {
-                    runnable.run();
+                    if (!pausable.isPaused()) {
+                        runnable.run();
+                    }
                 } catch (Throwable t) {
                     Timber.e(t);
                 } finally {
@@ -53,6 +58,21 @@ public class HandlerAndroidThread implements AndroidThread {
             }
         };
         handler.post(decoratedRunnable);
+    }
+
+    @Override
+    public void pause() {
+        pausable.pause();
+    }
+
+    @Override
+    public boolean isPaused() {
+        return pausable.isPaused();
+    }
+
+    @Override
+    public void resume() {
+        pausable.resume();
     }
 
     @Override
