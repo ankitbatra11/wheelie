@@ -3,6 +3,7 @@ package com.abatra.android.wheelie.media.picker;
 import android.net.Uri;
 
 import androidx.activity.result.ActivityResultCallback;
+import androidx.annotation.Nullable;
 
 import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
 
@@ -12,20 +13,26 @@ public class PickMediaRequest {
 
     private final PickableMediaType pickableMediaType;
     private final PickMediaCount pickMediaCount;
-    private ActivityResultRegistrar activityResultRegistrar;
+
+    @Nullable
     private ActivityResultCallback<List<Uri>> multipleMediaResultCallback;
+
+    @Nullable
+    private ActivityResultCallback<Uri> mediaResultCallback;
 
     private PickMediaRequest(PickableMediaType pickableMediaType, PickMediaCount pickMediaCount) {
         this.pickableMediaType = pickableMediaType;
         this.pickMediaCount = pickMediaCount;
     }
 
+    @Nullable
     public ActivityResultCallback<List<Uri>> getMultipleMediaResultCallback() {
         return multipleMediaResultCallback;
     }
 
-    public ActivityResultRegistrar getActivityResultRegistrar() {
-        return activityResultRegistrar;
+    @Nullable
+    public ActivityResultCallback<Uri> getMediaResultCallback() {
+        return mediaResultCallback;
     }
 
     public PickableMediaType getPickableMediaType() {
@@ -44,8 +51,8 @@ public class PickMediaRequest {
 
         private PickableMediaType pickableMediaType;
         private PickMediaCount pickMediaCount;
-        private ActivityResultRegistrar activityResultRegistrar;
         private ActivityResultCallback<List<Uri>> multipleMediaResultCallback;
+        private ActivityResultCallback<Uri> mediaResultCallback;
 
         public Builder pick(PickMediaCount pickMediaCount) {
             this.pickMediaCount = pickMediaCount;
@@ -57,20 +64,20 @@ public class PickMediaRequest {
             return this;
         }
 
-        public Builder withActivityResultRegistrar(ActivityResultRegistrar activityResultRegistrar) {
-            this.activityResultRegistrar = activityResultRegistrar;
-            return this;
-        }
-
         public Builder withMultipleMediaResultCallback(ActivityResultCallback<List<Uri>> multipleMediaResultCallback) {
             this.multipleMediaResultCallback = multipleMediaResultCallback;
             return this;
         }
 
+        public Builder withMediaResultCallback(ActivityResultCallback<Uri> mediaResultCallback) {
+            this.mediaResultCallback = mediaResultCallback;
+            return this;
+        }
+
         public PickMediaRequest build() {
             PickMediaRequest pickMediaRequest = new PickMediaRequest(pickableMediaType, pickMediaCount);
-            pickMediaRequest.activityResultRegistrar = activityResultRegistrar;
             pickMediaRequest.multipleMediaResultCallback = multipleMediaResultCallback;
+            pickMediaRequest.mediaResultCallback = mediaResultCallback;
             return pickMediaRequest;
         }
     }

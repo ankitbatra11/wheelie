@@ -6,7 +6,13 @@ public enum PickMediaCount {
     MULTIPLE {
         @Override
         public ActivityResultLauncher<String> getActivityResultLauncher(IntentMediaPicker intentMediaPicker) {
-            return intentMediaPicker.getMultipleContentLauncher;
+            return intentMediaPicker.getGetMultipleContentLauncher();
+        }
+    },
+    SINGLE {
+        @Override
+        public ActivityResultLauncher<String> getActivityResultLauncher(IntentMediaPicker intentMediaPicker) {
+            return intentMediaPicker.getGetContentLauncher();
         }
     };
 

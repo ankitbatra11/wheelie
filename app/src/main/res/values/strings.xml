@@ -6,4 +6,5 @@
     <string name="check_internet_connection">Check internet connection</string>
     <string name="launch_wireless_settings">Launch Wireless Settings</string>
     <string name="wireless_settings_result_msg">Wireless settings result</string>
+    <string name="print_image">Print Image</string>
 </resources>
