@@ -43,7 +43,9 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     public static final String PRINT_JOB_NAME = "print picked image";
     private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
     private final InternetConnectionObserver connectionObserver = InternetConnectionObserver.newInstance(this);
-    private ActivityResultLauncher<ResultContracts.AttachData.Data> attachDataLauncher;
+    private ActivityResultLauncher<ResultContracts.MediaInfo> attachDataLauncher;
+    private ActivityResultLauncher<ResultContracts.MediaInfo> openMediaLauncher;
+    private ActivityResultLauncher<ResultContracts.MediaInfo> shareMediaLauncher;
     private ActivityMainBinding binding;
 
     @Override
@@ -57,6 +59,12 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
         attachDataLauncher = registerForActivityResult(new ResultContracts.AttachData(),
                 result -> showMessage("Attach data result callback"));
+
+        openMediaLauncher = registerForActivityResult(new ResultContracts.OpenMedia(),
+                result -> showMessage("open media result callback"));
+
+        shareMediaLauncher = registerForActivityResult(new ResultContracts.ShareMedia(),
+                result -> showMessage("share media result callback"));
 
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
@@ -105,10 +113,17 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
                 }
             });
         }));
-
         binding.setImageAsWallpaper.setOnClickListener(v -> pickImage(result -> {
-            ResultContracts.AttachData.Data image = ResultContracts.AttachData.Data.image(result);
+            ResultContracts.MediaInfo image = ResultContracts.MediaInfo.image(result);
             attachDataLauncher.launch(image);
+        }));
+        binding.openImage.setOnClickListener(v -> pickImage(result -> {
+            ResultContracts.MediaInfo image = ResultContracts.MediaInfo.image(result);
+            openMediaLauncher.launch(image);
+        }));
+        binding.shareImage.setOnClickListener(v -> pickImage(result -> {
+            ResultContracts.MediaInfo image = ResultContracts.MediaInfo.image(result);
+            shareMediaLauncher.launch(image);
         }));
     }
 

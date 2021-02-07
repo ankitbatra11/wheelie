@@ -25,11 +25,61 @@ public final class ResultContracts {
         }
     }
 
-    public static class AttachData extends ActivityResultActivityResultContract<AttachData.Data> {
+    public static class MediaInfo {
+
+        private final String mimeType;
+        private final Uri uri;
+
+        public MediaInfo(String mimeType, Uri uri) {
+            this.mimeType = mimeType;
+            this.uri = uri;
+        }
+
+        public static MediaInfo mp4Video(Uri uri) {
+            return new MediaInfo(MimeTypes.VIDEO_MP4, uri);
+        }
+
+        public static MediaInfo image(Uri uri) {
+            return new MediaInfo(MimeTypes.IMAGE_ANY, uri);
+        }
+
+        public String getMimeType() {
+            return mimeType;
+        }
+
+        public Uri getUri() {
+            return uri;
+        }
+    }
+
+    public static class OpenMedia extends ActivityResultActivityResultContract<MediaInfo> {
 
         @NonNull
         @Override
-        public Intent createIntent(@NonNull Context context, Data input) {
+        public Intent createIntent(@NonNull Context context, MediaInfo input) {
+            return new Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(input.getUri(), input.getMimeType())
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+    }
+
+    public static class ShareMedia extends ActivityResultActivityResultContract<MediaInfo> {
+
+        @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, MediaInfo input) {
+            return new Intent(Intent.ACTION_SEND)
+                    .setType(input.getMimeType())
+                    .putExtra(Intent.EXTRA_STREAM, input.getUri())
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+    }
+
+    public static class AttachData extends ActivityResultActivityResultContract<MediaInfo> {
+
+        @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, MediaInfo input) {
             return new Intent(Intent.ACTION_ATTACH_DATA)
                     .setDataAndType(input.getUri(), input.getMimeType())
                     .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -40,32 +90,7 @@ public final class ResultContracts {
             return new ActivityResult(resultCode, intent);
         }
 
-        public static class Data {
 
-            private final String mimeType;
-            private final Uri uri;
-
-            public Data(String mimeType, Uri uri) {
-                this.mimeType = mimeType;
-                this.uri = uri;
-            }
-
-            public static Data mp4Video(Uri uri) {
-                return new Data(MimeTypes.VIDEO_MP4, uri);
-            }
-
-            public static Data image(Uri uri) {
-                return new Data(MimeTypes.IMAGE_ANY, uri);
-            }
-
-            public String getMimeType() {
-                return mimeType;
-            }
-
-            public Uri getUri() {
-                return uri;
-            }
-        }
     }
 
     public static class OpenSettingsScreen extends ActivityResultActivityResultContract<Void> {
