@@ -89,8 +89,6 @@ public final class ResultContracts {
         public ActivityResult parseResult(int resultCode, @Nullable Intent intent) {
             return new ActivityResult(resultCode, intent);
         }
-
-
     }
 
     public static class OpenSettingsScreen extends ActivityResultActivityResultContract<Void> {
