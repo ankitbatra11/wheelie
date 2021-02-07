@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     public static final String PRINT_JOB_NAME = "print picked image";
     private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
     private final InternetConnectionObserver connectionObserver = InternetConnectionObserver.newInstance(this);
+    private ActivityResultLauncher<ResultContracts.AttachData.Data> attachDataLauncher;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +55,10 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
         super.onCreate(savedInstanceState);
 
-        ActivityMainBinding binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
+        attachDataLauncher = registerForActivityResult(new ResultContracts.AttachData(),
+                result -> showMessage("Attach data result callback"));
+
+        binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
 
         intentMediaPicker.observeLifecycle(this);
@@ -80,51 +85,58 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             Snackbar.make(v, message, Snackbar.LENGTH_SHORT).show();
         });
 
-        ActivityResultLauncher<Void> launcher = registerForActivityResult(ResultContracts.SettingsScreen.wirelessSettings(), result -> {
+        ActivityResultLauncher<Void> launcher = registerForActivityResult(ResultContracts.OpenSettingsScreen.wirelessSettings(), result -> {
             ConstraintLayout view = binding.getRoot();
             Snackbar.make(view, R.string.wireless_settings_result_msg, Snackbar.LENGTH_SHORT).show();
         });
         binding.launchWirelessSettingsBtn.setOnClickListener(v -> launcher.launch(null));
 
-        binding.printImage.setOnClickListener(v -> {
+        binding.printImage.setOnClickListener(v -> pickImage(result -> {
+            RequestManager requestManager = Glide.with(MainActivity.this);
+            requestManager.asBitmap().load(result).into(new CustomTarget<Bitmap>() {
 
-            ActivityResultCallback<Uri> uriActivityResultCallback = result -> {
-                RequestManager requestManager = Glide.with(MainActivity.this);
-                requestManager.asBitmap().load(result).into(new CustomTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                    print(resource);
+                }
 
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                @Override
+                public void onLoadCleared(@Nullable Drawable placeholder) {
+                }
+            });
+        }));
 
-                        IntentPrintImageRequest printImageRequest = new IntentPrintImageRequest.Builder()
-                                .setContext(MainActivity.this)
-                                .setScaleMode(PrintHelper.SCALE_MODE_FIT)
-                                .setJobName(PRINT_JOB_NAME)
-                                .setBitmap(resource)
-                                .setOrientation(PrintHelper.ORIENTATION_PORTRAIT)
-                                .setColorMode(PrintHelper.COLOR_MODE_COLOR)
-                                .build();
+        binding.setImageAsWallpaper.setOnClickListener(v -> pickImage(result -> {
+            ResultContracts.AttachData.Data image = ResultContracts.AttachData.Data.image(result);
+            attachDataLauncher.launch(image);
+        }));
+    }
 
-                        ImagePrinter.Listener listener = () -> {
-                            Snackbar snackbar = Snackbar.make(binding.getRoot(), "Print image finished.", Snackbar.LENGTH_SHORT);
-                            snackbar.show();
-                        };
-                        new IntentImagePrinter().print(printImageRequest, listener);
-                    }
+    private void print(Bitmap resource) {
 
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
-                    }
-                });
-            };
+        IntentPrintImageRequest printImageRequest = new IntentPrintImageRequest.Builder()
+                .setContext(MainActivity.this)
+                .setScaleMode(PrintHelper.SCALE_MODE_FIT)
+                .setJobName(PRINT_JOB_NAME)
+                .setBitmap(resource)
+                .setOrientation(PrintHelper.ORIENTATION_PORTRAIT)
+                .setColorMode(PrintHelper.COLOR_MODE_COLOR)
+                .build();
 
-            PickMediaRequest pickMediaRequest = PickMediaRequest.builder()
-                    .ofType(PickableMediaType.IMAGE)
-                    .pick(PickMediaCount.SINGLE)
-                    .withMediaResultCallback(uriActivityResultCallback)
-                    .build();
+        ImagePrinter.Listener listener = () -> showMessage("print image result callback");
+        new IntentImagePrinter().print(printImageRequest, listener);
+    }
 
-            intentMediaPicker.pickMedia(pickMediaRequest);
-        });
+    private void showMessage(String message) {
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void pickImage(ActivityResultCallback<Uri> uriActivityResultCallback) {
+        intentMediaPicker.pickMedia(PickMediaRequest.builder()
+                .ofType(PickableMediaType.IMAGE)
+                .pick(PickMediaCount.SINGLE)
+                .withMediaResultCallback(uriActivityResultCallback)
+                .build());
     }
 
     @Override
