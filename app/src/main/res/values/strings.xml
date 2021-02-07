@@ -8,4 +8,6 @@
     <string name="wireless_settings_result_msg">Wireless settings result</string>
     <string name="print_image">Print Image</string>
     <string name="set_image_as_wallpaper">Set image as wallpaper</string>
+    <string name="open_image">Open Image</string>
+    <string name="share_image">Share image</string>
 </resources>
