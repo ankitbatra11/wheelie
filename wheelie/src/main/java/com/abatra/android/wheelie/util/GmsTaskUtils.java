@@ -1,4 +1,4 @@
-package com.abatra.android.wheelie.chameleon.utils;
+package com.abatra.android.wheelie.util;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

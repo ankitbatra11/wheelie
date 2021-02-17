@@ -8,8 +8,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 
 import timber.log.Timber;
 
-import static com.abatra.android.wheelie.chameleon.utils.GmsTaskUtils.logOnCompleteListener;
-import static com.abatra.android.wheelie.chameleon.utils.GmsTaskUtils.logTask;
+import static com.abatra.android.wheelie.util.GmsTaskUtils.logOnCompleteListener;
+import static com.abatra.android.wheelie.util.GmsTaskUtils.logTask;
 
 public class FirebaseDynamicConfig implements DynamicConfig {
 
