@@ -10,4 +10,5 @@
     <string name="set_image_as_wallpaper">Set image as wallpaper</string>
     <string name="open_image">Open Image</string>
     <string name="share_image">Share image</string>
+    <string name="request_camera_permission">Request camera permission</string>
 </resources>
