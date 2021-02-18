@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     }
 
     @Override
-    public AppCompatActivity getActivity() {
+    public AppCompatActivity getAppCompatActivity() {
         return this;
     }
 }

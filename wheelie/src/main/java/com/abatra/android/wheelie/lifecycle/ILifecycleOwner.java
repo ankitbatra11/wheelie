@@ -12,14 +12,14 @@ public interface ILifecycleOwner extends LifecycleOwner, ActivityResultRegistrar
 
     default Context getContext() {
         Fragment fragment = getFragment();
-        return fragment != null ? fragment.requireContext() : getActivity();
+        return fragment != null ? fragment.requireContext() : getAppCompatActivity();
     }
 
     default Fragment getFragment() {
         return null;
     }
 
-    default AppCompatActivity getActivity() {
+    default AppCompatActivity getAppCompatActivity() {
         return getFragment() != null
                 ? getFragment().getActivity() instanceof AppCompatActivity
                 ? (AppCompatActivity) getFragment().getActivity()

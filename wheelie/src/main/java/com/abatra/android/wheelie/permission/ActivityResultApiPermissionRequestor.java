@@ -34,7 +34,7 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
             } else {
                 Optional<ILifecycleOwner> ownerOptional = getLifecycleOwner();
                 ownerOptional.ifPresent(lo -> {
-                    boolean showRationaleAfterRequest = shouldShowRequestPermissionRationale(lo.getActivity(), callback.getPermission());
+                    boolean showRationaleAfterRequest = shouldShowRequestPermissionRationale(lo.getAppCompatActivity(), callback.getPermission());
                     if (showRationaleAfterRequest) {
                         callback.onPermissionDenied();
                     } else {
@@ -63,7 +63,7 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
 
     @Override
     public void onCreate() {
-        singlePermissionActivityResultLauncher = lifecycleOwner.getActivity().registerForActivityResult(
+        singlePermissionActivityResultLauncher = lifecycleOwner.getAppCompatActivity().registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 singlePermissionActivityResultCallback);
     }
