@@ -1,8 +1,8 @@
 package com.abatra.android.wheelie.lifecycle;
 
-import android.app.Activity;
 import android.content.Context;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
@@ -19,7 +19,11 @@ public interface ILifecycleOwner extends LifecycleOwner, ActivityResultRegistrar
         return null;
     }
 
-    default Activity getActivity() {
-        return getFragment() != null ? getFragment().requireActivity() : null;
+    default AppCompatActivity getActivity() {
+        return getFragment() != null
+                ? getFragment().getActivity() instanceof AppCompatActivity
+                ? (AppCompatActivity) getFragment().getActivity()
+                : null
+                : null;
     }
 }

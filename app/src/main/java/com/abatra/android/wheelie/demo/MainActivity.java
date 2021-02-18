@@ -1,6 +1,6 @@
 package com.abatra.android.wheelie.demo;
 
-import android.app.Activity;
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -30,6 +30,8 @@ import com.abatra.android.wheelie.media.printer.ImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentPrintImageRequest;
 import com.abatra.android.wheelie.network.InternetConnectionObserver;
+import com.abatra.android.wheelie.permission.ActivityResultApiPermissionRequestor;
+import com.abatra.android.wheelie.permission.PermissionRequestor;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -40,7 +42,8 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
-    public static final String PRINT_JOB_NAME = "print picked image";
+    private static final String PRINT_JOB_NAME = "print picked image";
+
     private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
     private final InternetConnectionObserver connectionObserver = InternetConnectionObserver.newInstance(this);
     private ActivityResultLauncher<ResultContracts.MediaInfo> attachDataLauncher;
@@ -125,6 +128,34 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             ResultContracts.MediaInfo image = ResultContracts.MediaInfo.image(result);
             shareMediaLauncher.launch(image);
         }));
+
+        ActivityResultApiPermissionRequestor permissionRequestor = new ActivityResultApiPermissionRequestor();
+        permissionRequestor.observeLifecycle(this);
+        binding.reqCameraPermission.setOnClickListener(v -> {
+            String permission = Manifest.permission.CAMERA;
+            permissionRequestor.requestSystemPermission(permission, new PermissionRequestor.SinglePermissionRequestCallback() {
+
+                @Override
+                public void onPermissionGranted() {
+                    showMessage("onPermissionGranted");
+                }
+
+                @Override
+                public void onPermissionDenied() {
+                    showMessage("onPermissionDenied");
+                }
+
+                @Override
+                public void onPermissionHandlerActivityNotFound() {
+                    showMessage("onPermissionHandlerActivityNotFound");
+                }
+
+                @Override
+                public void onPermissionPermanentlyDenied() {
+                    showMessage("onPermissionPermanentlyDenied");
+                }
+            });
+        });
     }
 
     private void print(Bitmap resource) {
@@ -155,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     }
 
     @Override
-    public Activity getActivity() {
+    public AppCompatActivity getActivity() {
         return this;
     }
 }
