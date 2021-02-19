@@ -1,14 +1,11 @@
 package com.abatra.android.wheelie.permission;
 
 import android.content.ActivityNotFoundException;
-import android.content.pm.PackageManager;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.core.content.ContextCompat;
 
 import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 
@@ -19,11 +16,7 @@ import static androidx.core.app.ActivityCompat.shouldShowRequestPermissionRation
 public class ActivityResultApiPermissionRequestor implements PermissionRequestor {
 
     private ActivityResultLauncher<String> singlePermissionActivityResultLauncher;
-
-    @Nullable
     private SinglePermissionRequestCallbackDelegator singlePermissionRequestCallbackDelegator;
-
-    @Nullable
     private ILifecycleOwner lifecycleOwner;
 
     private final ActivityResultCallback<Boolean> singlePermissionActivityResultCallback = result -> {
@@ -63,15 +56,14 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
 
     @Override
     public void onCreate() {
-        singlePermissionActivityResultLauncher = lifecycleOwner.getAppCompatActivity().registerForActivityResult(
+        singlePermissionActivityResultLauncher = lifecycleOwner.registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 singlePermissionActivityResultCallback);
     }
 
     @Override
-    public void requestSystemPermission(String permission,
-                                        SinglePermissionRequestCallback singlePermissionRequestCallback) {
-        if (isPermissionGranted(permission)) {
+    public void requestSystemPermission(String permission, SinglePermissionRequestCallback singlePermissionRequestCallback) {
+        if (PermissionUtils.isPermissionGranted(lifecycleOwner.getContext(), permission)) {
             singlePermissionRequestCallback.onPermissionGranted();
         } else {
             singlePermissionRequestCallbackDelegator = new SinglePermissionRequestCallbackDelegator(permission,
@@ -82,10 +74,6 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
                 singlePermissionRequestCallbackDelegator.onPermissionHandlerActivityNotFound();
             }
         }
-    }
-
-    private boolean isPermissionGranted(String permission) {
-        return ContextCompat.checkSelfPermission(lifecycleOwner.getContext(), permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override

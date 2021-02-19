@@ -63,7 +63,7 @@ public class ActivityResultApiPermissionRequestorTest {
     public void setup() {
 
         when(mockedLifecycleOwner.getLifecycle()).thenReturn(mockedLifecycle);
-        when(mockedLifecycleOwner.getActivity()).thenReturn(mockedActivity);
+        when(mockedLifecycleOwner.getAppCompatActivity()).thenReturn(mockedActivity);
         permissionRequestor.observeLifecycle(mockedLifecycleOwner);
 
         mockedContextCompat = mockStatic(ContextCompat.class);
@@ -93,7 +93,7 @@ public class ActivityResultApiPermissionRequestorTest {
         permissionRequestor.onCreate();
 
         //noinspection unchecked
-        verify(mockedActivity, times(1)).registerForActivityResult(
+        verify(mockedLifecycleOwner, times(1)).registerForActivityResult(
                 ArgumentMatchers.any(ActivityResultContracts.RequestPermission.class),
                 ArgumentMatchers.any(ActivityResultCallback.class));
     }
@@ -160,7 +160,7 @@ public class ActivityResultApiPermissionRequestorTest {
     @Test
     public void testOnDestroy() {
 
-        permissionRequestor.requestSystemPermission("p",mockedSinglePermissionRequestCallback);
+        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
         assertTrue(permissionRequestor.getSinglePermissionRequestCallbackDelegator().isPresent());
 
         assertTrue(permissionRequestor.getLifecycleOwner().isPresent());
