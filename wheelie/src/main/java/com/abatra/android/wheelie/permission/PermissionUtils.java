@@ -2,6 +2,8 @@ package com.abatra.android.wheelie.permission;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.Settings;
 
 import androidx.core.content.ContextCompat;
 
@@ -16,8 +18,15 @@ public final class PermissionUtils {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public static boolean allGranted(Context context, String[] permissions) {
+    public static boolean allPermissionsGranted(Context context, String[] permissions) {
         return Arrays.stream(permissions)
                 .allMatch(p -> isPermissionGranted(context, p));
+    }
+
+    public static boolean canDrawOverlays(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return Settings.canDrawOverlays(context);
+        }
+        return true;
     }
 }

@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Window;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,15 +33,17 @@ import com.abatra.android.wheelie.media.printer.ImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentPrintImageRequest;
 import com.abatra.android.wheelie.network.InternetConnectionObserver;
-import com.abatra.android.wheelie.permission.ActivityResultApiPermissionRequestor;
-import com.abatra.android.wheelie.permission.PermissionRequestor;
+import com.abatra.android.wheelie.permission.ManageOverlayPermissionRequestor;
+import com.abatra.android.wheelie.permission.ManifestMultiplePermissionsRequestor;
+import com.abatra.android.wheelie.permission.ManifestPermissionRequestor;
+import com.abatra.android.wheelie.permission.ManifestSinglePermissionRequestor;
+import com.abatra.android.wheelie.permission.MultiplePermissionsGrantResult;
+import com.abatra.android.wheelie.permission.MultiplePermissionsRequestor;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.snackbar.Snackbar;
-
-import java.util.Map;
 
 import timber.log.Timber;
 
@@ -65,13 +68,13 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         super.onCreate(savedInstanceState);
 
         attachDataLauncher = registerForActivityResult(new ResultContracts.AttachData(),
-                result -> showMessage("Attach data result callback"));
+                result -> showSnackbarMessage("Attach data result callback"));
 
         openMediaLauncher = registerForActivityResult(new ResultContracts.OpenMedia(),
-                result -> showMessage("open media result callback"));
+                result -> showSnackbarMessage("open media result callback"));
 
         shareMediaLauncher = registerForActivityResult(new ResultContracts.ShareMedia(),
-                result -> showMessage("share media result callback"));
+                result -> showSnackbarMessage("share media result callback"));
 
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
@@ -133,50 +136,36 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             shareMediaLauncher.launch(image);
         }));
 
-        ActivityResultApiPermissionRequestor permissionRequestor = new ActivityResultApiPermissionRequestor();
+        ManifestPermissionRequestor permissionRequestor = new ManifestPermissionRequestor(
+                new ManifestSinglePermissionRequestor(),
+                new ManifestMultiplePermissionsRequestor());
+
         permissionRequestor.observeLifecycle(this);
         binding.reqCameraPermission.setOnClickListener(v -> {
             String permission = Manifest.permission.CAMERA;
-            permissionRequestor.requestSystemPermission(permission, new PermissionRequestor.SinglePermissionRequestCallback() {
+            permissionRequestor.requestSystemPermission(permission, grantResult -> showToastMessage("grantResult=" + grantResult));
+        });
 
-                @Override
-                public void onPermissionGranted() {
-                    showMessage("onPermissionGranted");
-                }
+        InputLessActivityResultContract contract = new InputLessActivityResultContract(IntentFactory::openAppDetailsSettings);
+        ActivityResultLauncher<Void> appDetailsLauncher = registerForActivityResult(contract,
+                result -> showToastMessage("app details result=" + result));
 
-                @Override
-                public void onPermissionDenied() {
-                    showMessage("onPermissionDenied");
-                }
+        binding.launchAppDetailsSettings.setOnClickListener(v -> appDetailsLauncher.launch(null));
 
+        binding.reqMultiplePermissions.setOnClickListener(v -> {
+            String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
+            permissionRequestor.requestSystemPermissions(permissions, new MultiplePermissionsRequestor.Callback() {
                 @Override
-                public void onPermissionHandlerActivityNotFound() {
-                    showMessage("onPermissionHandlerActivityNotFound");
-                }
-
-                @Override
-                public void onPermissionPermanentlyDenied(boolean permanentlyDeniedJustNow) {
-                    showMessage("onPermissionPermanentlyDenied permanentlyDeniedJustNow=" + permanentlyDeniedJustNow);
+                public void onPermissionResult(MultiplePermissionsGrantResult multiplePermissionsGrantResult) {
+                    showToastMessage("grantResult=" + multiplePermissionsGrantResult);
                 }
             });
         });
 
-        InputLessActivityResultContract contract = new InputLessActivityResultContract(IntentFactory::openAppDetailsSettings);
-        ActivityResultLauncher<Void> appDetailsLauncher = registerForActivityResult(contract, result -> showMessage("app details result=" + result));
-        binding.launchAppDetailsSettings.setOnClickListener(v -> appDetailsLauncher.launch(null));
-
-        binding.reqMultiplePermissions.setOnClickListener(v -> permissionRequestor.requestSystemPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, new PermissionRequestor.MultiplePermissionsRequestCallback() {
-
-            @Override
-            public void onPermissionResult(Map<String, Boolean> grantResultByPermission) {
-                showMessage("multiple permissions request result=" + grantResultByPermission);
-            }
-
-            @Override
-            public void onPermissionHandlerActivityNotFound() {
-
-            }
-        }));
+        ManageOverlayPermissionRequestor manageOverlayPermissionRequestor = new ManageOverlayPermissionRequestor();
+        manageOverlayPermissionRequestor.observeLifecycle(this);
+        binding.reqManageOverlayPermission.setOnClickListener(v -> manageOverlayPermissionRequestor.requestSystemPermission(
+                null, grantResult -> showToastMessage("manage overlay permission grantResult=" + grantResult)));
     }
 
     private void print(Bitmap resource) {
@@ -190,12 +179,16 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
                 .setColorMode(PrintHelper.COLOR_MODE_COLOR)
                 .build();
 
-        ImagePrinter.Listener listener = () -> showMessage("print image result callback");
+        ImagePrinter.Listener listener = () -> showSnackbarMessage("print image result callback");
         new IntentImagePrinter().print(printImageRequest, listener);
     }
 
-    private void showMessage(String message) {
+    private void showSnackbarMessage(String message) {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showToastMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     private void pickImage(ActivityResultCallback<Uri> uriActivityResultCallback) {
