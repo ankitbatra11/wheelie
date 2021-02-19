@@ -5,47 +5,30 @@ import android.content.ActivityNotFoundException;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions;
 import androidx.annotation.VisibleForTesting;
 
 import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale;
 
 public class ActivityResultApiPermissionRequestor implements PermissionRequestor {
 
-    private ActivityResultLauncher<String> singlePermissionActivityResultLauncher;
-    private SinglePermissionRequestCallbackDelegator singlePermissionRequestCallbackDelegator;
     private ILifecycleOwner lifecycleOwner;
 
-    private final ActivityResultCallback<Boolean> singlePermissionActivityResultCallback = result -> {
-        Optional<SinglePermissionRequestCallbackDelegator> requestCallback = getSinglePermissionRequestCallbackDelegator();
-        requestCallback.ifPresent(callback -> {
-            if (result) {
-                callback.onPermissionGranted();
-            } else {
-                Optional<ILifecycleOwner> ownerOptional = getLifecycleOwner();
-                ownerOptional.ifPresent(lo -> {
-                    boolean showRationaleAfterRequest = shouldShowRequestPermissionRationale(lo.getAppCompatActivity(), callback.getPermission());
-                    if (showRationaleAfterRequest) {
-                        callback.onPermissionDenied();
-                    } else {
-                        callback.onPermissionPermanentlyDenied();
-                    }
-                });
-            }
-        });
-    };
+    private ActivityResultLauncher<String> singlePermissionRequestor;
+    private SinglePermissionRequestCallbackDelegator singlePermissionRequestCallbackDelegator;
+
+    private ActivityResultLauncher<String[]> multiplePermissionsRequestor;
+    private MultiplePermissionsRequestCallback multiplePermissionsRequestCallback;
 
     @VisibleForTesting
     Optional<ILifecycleOwner> getLifecycleOwner() {
         return Optional.ofNullable(lifecycleOwner);
-    }
-
-    @VisibleForTesting
-    Optional<SinglePermissionRequestCallbackDelegator> getSinglePermissionRequestCallbackDelegator() {
-        return Optional.ofNullable(singlePermissionRequestCallbackDelegator);
     }
 
     @Override
@@ -56,20 +39,56 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
 
     @Override
     public void onCreate() {
-        singlePermissionActivityResultLauncher = lifecycleOwner.registerForActivityResult(
+        ActivityResultCallback<Boolean> singlePermissionActivityResultCallback = result -> {
+            Optional<SinglePermissionRequestCallbackDelegator> requestCallback = getSinglePermissionRequestCallbackDelegator();
+            requestCallback.ifPresent(callback -> {
+                if (result) {
+                    callback.onPermissionGranted();
+                } else {
+                    Optional<ILifecycleOwner> ownerOptional = getLifecycleOwner();
+                    ownerOptional.ifPresent(lo -> {
+                        boolean showRationaleAfterRequest = shouldShowRequestPermissionRationale(lo.getAppCompatActivity(), callback.getPermission());
+                        if (showRationaleAfterRequest) {
+                            callback.onPermissionDenied();
+                        } else {
+                            callback.onPermissionPermanentlyDenied();
+                        }
+                    });
+                }
+            });
+        };
+        singlePermissionRequestor = lifecycleOwner.registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 singlePermissionActivityResultCallback);
+
+        multiplePermissionsRequestor = lifecycleOwner.registerForActivityResult(new RequestMultiplePermissions(), result -> {
+            Optional<MultiplePermissionsRequestCallback> callback = getMultiplePermissionsRequestCallback();
+            callback.ifPresent(c -> c.onPermissionResult(result));
+        });
+    }
+
+    @VisibleForTesting
+    Optional<SinglePermissionRequestCallbackDelegator> getSinglePermissionRequestCallbackDelegator() {
+        return Optional.ofNullable(singlePermissionRequestCallbackDelegator);
+    }
+
+    @VisibleForTesting
+    Optional<MultiplePermissionsRequestCallback> getMultiplePermissionsRequestCallback() {
+        return Optional.ofNullable(multiplePermissionsRequestCallback);
     }
 
     @Override
-    public void requestSystemPermission(String permission, SinglePermissionRequestCallback singlePermissionRequestCallback) {
+    public void requestSystemPermission(String permission,
+                                        SinglePermissionRequestCallback singlePermissionRequestCallback) {
+
+        singlePermissionRequestCallbackDelegator = new SinglePermissionRequestCallbackDelegator(permission,
+                singlePermissionRequestCallback);
+
         if (PermissionUtils.isPermissionGranted(lifecycleOwner.getContext(), permission)) {
-            singlePermissionRequestCallback.onPermissionGranted();
+            singlePermissionRequestCallbackDelegator.onPermissionGranted();
         } else {
-            singlePermissionRequestCallbackDelegator = new SinglePermissionRequestCallbackDelegator(permission,
-                    singlePermissionRequestCallback);
             try {
-                singlePermissionActivityResultLauncher.launch(permission);
+                singlePermissionRequestor.launch(permission);
             } catch (ActivityNotFoundException e) {
                 singlePermissionRequestCallbackDelegator.onPermissionHandlerActivityNotFound();
             }
@@ -77,20 +96,51 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
     }
 
     @Override
+    public void requestSystemPermissions(String[] permissions,
+                                         MultiplePermissionsRequestCallback multiplePermissionsRequestCallback) {
+
+        this.multiplePermissionsRequestCallback = multiplePermissionsRequestCallback;
+
+        if (PermissionUtils.allGranted(lifecycleOwner.getContext(), permissions)) {
+            this.multiplePermissionsRequestCallback.onPermissionResult(createAllGrantedResult(permissions));
+        } else {
+            this.multiplePermissionsRequestCallback = multiplePermissionsRequestCallback;
+            try {
+                multiplePermissionsRequestor.launch(permissions);
+            } catch (ActivityNotFoundException e) {
+                this.multiplePermissionsRequestCallback.onPermissionHandlerActivityNotFound();
+            }
+        }
+    }
+
+    private Map<String, Boolean> createAllGrantedResult(String[] permissions) {
+        Map<String, Boolean> result = new HashMap<>();
+        for (String permission : permissions) {
+            result.put(permission, true);
+        }
+        return result;
+    }
+
+    @Override
     public void onDestroy() {
+
+        multiplePermissionsRequestCallback = null;
+        multiplePermissionsRequestor = null;
+
         singlePermissionRequestCallbackDelegator = null;
-        singlePermissionActivityResultLauncher = null;
+        singlePermissionRequestor = null;
+
         lifecycleOwner = null;
     }
 
     /* Testing */
 
-    void setSinglePermissionActivityResultLauncher(ActivityResultLauncher<String> singlePermissionActivityResultLauncher) {
-        this.singlePermissionActivityResultLauncher = singlePermissionActivityResultLauncher;
+    ActivityResultLauncher<String> getSinglePermissionRequestor() {
+        return singlePermissionRequestor;
     }
 
-    ActivityResultCallback<Boolean> getSinglePermissionActivityResultCallback() {
-        return singlePermissionActivityResultCallback;
+    ActivityResultLauncher<String[]> getMultiplePermissionsRequestor() {
+        return multiplePermissionsRequestor;
     }
 
     private static class SinglePermissionRequestCallbackDelegator implements SinglePermissionRequestCallback {
@@ -127,4 +177,5 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
             return permission;
         }
     }
+
 }

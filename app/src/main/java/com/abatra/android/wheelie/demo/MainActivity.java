@@ -40,6 +40,8 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Map;
+
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
@@ -162,6 +164,19 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         InputLessActivityResultContract contract = new InputLessActivityResultContract(IntentFactory::openAppDetailsSettings);
         ActivityResultLauncher<Void> appDetailsLauncher = registerForActivityResult(contract, result -> showMessage("app details result=" + result));
         binding.launchAppDetailsSettings.setOnClickListener(v -> appDetailsLauncher.launch(null));
+
+        binding.reqMultiplePermissions.setOnClickListener(v -> permissionRequestor.requestSystemPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, new PermissionRequestor.MultiplePermissionsRequestCallback() {
+
+            @Override
+            public void onPermissionResult(Map<String, Boolean> grantResultByPermission) {
+                showMessage("multiple permissions request result=" + grantResultByPermission);
+            }
+
+            @Override
+            public void onPermissionHandlerActivityNotFound() {
+
+            }
+        }));
     }
 
     private void print(Bitmap resource) {
