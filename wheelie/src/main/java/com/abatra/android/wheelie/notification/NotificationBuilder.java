@@ -16,14 +16,16 @@ public class NotificationBuilder extends NotificationCompat.Builder {
         this.context = context;
     }
 
-    public NotificationBuilder headsUpNotification() {
+    public void headsUpNotification() {
         setPriority(NotificationCompat.PRIORITY_HIGH);
         setVibrate(new long[0]);
-        return this;
     }
 
-    public NotificationBuilder setContentActivityIntent(Intent intent) {
-        setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
-        return this;
+    public void setContentActivityIntent(Intent intent) {
+        setContentActivityIntent(intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public void setContentActivityIntent(Intent intent, int pendingIntentFlag) {
+        setContentIntent(PendingIntent.getActivity(context, 0, intent, pendingIntentFlag));
     }
 }
