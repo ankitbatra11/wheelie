@@ -46,19 +46,19 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ActivityResultApiPermissionRequestorTest {
+public class ManifestPermissionRequestorTest {
 
     @Mock
     private ILifecycleOwner mockedLifecycleOwner;
 
     @InjectMocks
-    private ActivityResultApiPermissionRequestor permissionRequestor;
+    private ManifestPermissionRequestor permissionRequestor;
 
     @Mock
     private Lifecycle mockedLifecycle;
 
     @Mock
-    private PermissionRequestor.SinglePermissionRequestCallback mockedSinglePermissionRequestCallback;
+    private SinglePermissionRequestor.Callback mockedCallback;
 
     @Mock
     private ActivityResultLauncher<String> mockedSinglePermissionRequestor;
@@ -138,10 +138,10 @@ public class ActivityResultApiPermissionRequestorTest {
         mockedContextCompat.when(() -> ContextCompat.checkSelfPermission(ArgumentMatchers.any(), anyString()))
                 .thenReturn(PackageManager.PERMISSION_GRANTED);
 
-        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
+        permissionRequestor.requestSystemPermission("p", mockedCallback);
 
-        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionGranted();
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verify(mockedCallback, times(1)).onPermissionGranted();
+        verifyNoMoreInteractions(mockedCallback);
     }
 
     @Test
@@ -149,57 +149,57 @@ public class ActivityResultApiPermissionRequestorTest {
 
         doThrow(new ActivityNotFoundException()).when(mockedSinglePermissionRequestor).launch(anyString());
 
-        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
+        permissionRequestor.requestSystemPermission("p", mockedCallback);
 
-        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionHandlerActivityNotFound();
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verify(mockedCallback, times(1)).onPermissionHandlerActivityNotFound();
+        verifyNoMoreInteractions(mockedCallback);
     }
 
     @Test
     public void testRequestSystemPermission_permissionDenied_permissionGranted() {
 
-        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
+        permissionRequestor.requestSystemPermission("p", mockedCallback);
 
         singlePermissionActivityResultCallbackArgumentCaptor.getValue().onActivityResult(true);
 
-        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionGranted();
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verify(mockedCallback, times(1)).onPermissionGranted();
+        verifyNoMoreInteractions(mockedCallback);
     }
 
     @Test
     public void testRequestSystemPermission_permissionDenied_permissionDenied() {
 
-        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
+        permissionRequestor.requestSystemPermission("p", mockedCallback);
 
         singlePermissionActivityResultCallbackArgumentCaptor.getValue().onActivityResult(false);
 
-        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionDenied();
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verify(mockedCallback, times(1)).onPermissionDenied();
+        verifyNoMoreInteractions(mockedCallback);
     }
 
     @Test
     public void testRequestSystemPermission_permissionDenied_permissionDeniedPermanently_justNow() {
 
         mockedActivityCompat.when(() -> ActivityCompat.shouldShowRequestPermissionRationale(ArgumentMatchers.any(), anyString())).thenReturn(true);
-        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
+        permissionRequestor.requestSystemPermission("p", mockedCallback);
 
         mockedActivityCompat.when(() -> ActivityCompat.shouldShowRequestPermissionRationale(ArgumentMatchers.any(), anyString())).thenReturn(false);
         singlePermissionActivityResultCallbackArgumentCaptor.getValue().onActivityResult(false);
 
-        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionPermanentlyDenied(true);
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verify(mockedCallback, times(1)).onPermissionPermanentlyDenied(true);
+        verifyNoMoreInteractions(mockedCallback);
     }
 
     @Test
     public void testRequestSystemPermission_permissionDenied_permissionDeniedPermanently_previously() {
 
         mockedActivityCompat.when(() -> ActivityCompat.shouldShowRequestPermissionRationale(ArgumentMatchers.any(), anyString())).thenReturn(false);
-        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
+        permissionRequestor.requestSystemPermission("p", mockedCallback);
 
         singlePermissionActivityResultCallbackArgumentCaptor.getValue().onActivityResult(false);
 
-        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionPermanentlyDenied(false);
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verify(mockedCallback, times(1)).onPermissionPermanentlyDenied(false);
+        verifyNoMoreInteractions(mockedCallback);
     }
 
     @Test
@@ -208,7 +208,7 @@ public class ActivityResultApiPermissionRequestorTest {
         assertTrue(permissionRequestor.getLifecycleOwner().isPresent());
         assertThat(permissionRequestor.getSinglePermissionRequestor(), notNullValue());
 
-        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
+        permissionRequestor.requestSystemPermission("p", mockedCallback);
         assertTrue(permissionRequestor.getSinglePermissionRequestCallbackDelegator().isPresent());
 
         assertTrue(permissionRequestor.getMultiplePermissionsRequestCallback().isPresent());
@@ -232,7 +232,7 @@ public class ActivityResultApiPermissionRequestorTest {
         permissionRequestor.requestSystemPermissions(new String[]{"pa", "pb"}, mockedMultiplePermissionsRequestCallback);
 
         verify(mockedMultiplePermissionsRequestCallback, times(1)).onPermissionResult(grantResultByPermissionArgumentCaptor.capture());
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verifyNoMoreInteractions(mockedCallback);
         assertThat(grantResultByPermissionArgumentCaptor.getValue().entrySet(), hasSize(2));
         assertThat(grantResultByPermissionArgumentCaptor.getValue().get("pa"), equalTo(true));
         assertThat(grantResultByPermissionArgumentCaptor.getValue().get("pb"), equalTo(true));
@@ -250,7 +250,7 @@ public class ActivityResultApiPermissionRequestorTest {
                 .onActivityResult(ImmutableMap.of("pa", true, "pb", false));
 
         verify(mockedMultiplePermissionsRequestCallback, times(1)).onPermissionResult(grantResultByPermissionArgumentCaptor.capture());
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verifyNoMoreInteractions(mockedCallback);
         assertThat(grantResultByPermissionArgumentCaptor.getValue().entrySet(), hasSize(2));
         assertThat(grantResultByPermissionArgumentCaptor.getValue().get("pa"), equalTo(true));
         assertThat(grantResultByPermissionArgumentCaptor.getValue().get("pb"), equalTo(false));
@@ -266,6 +266,6 @@ public class ActivityResultApiPermissionRequestorTest {
         permissionRequestor.requestSystemPermissions(new String[]{"a", "b"}, mockedMultiplePermissionsRequestCallback);
 
         verify(mockedMultiplePermissionsRequestCallback, times(1)).onPermissionHandlerActivityNotFound();
-        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+        verifyNoMoreInteractions(mockedCallback);
     }
 }
