@@ -19,8 +19,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.print.PrintHelper;
 
 import com.abatra.android.wheelie.activity.ResultContracts;
+import com.abatra.android.wheelie.activity.ResultContracts.InputLessActivityResultContract;
 import com.abatra.android.wheelie.animation.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
+import com.abatra.android.wheelie.intent.IntentFactory;
 import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 import com.abatra.android.wheelie.media.picker.IntentMediaPicker;
 import com.abatra.android.wheelie.media.picker.PickMediaCount;
@@ -156,6 +158,10 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
                 }
             });
         });
+
+        InputLessActivityResultContract contract = new InputLessActivityResultContract(IntentFactory::openAppDetailsSettings);
+        ActivityResultLauncher<Void> appDetailsLauncher = registerForActivityResult(contract, result -> showMessage("app details result=" + result));
+        binding.launchAppDetailsSettings.setOnClickListener(v -> appDetailsLauncher.launch(null));
     }
 
     private void print(Bitmap resource) {
