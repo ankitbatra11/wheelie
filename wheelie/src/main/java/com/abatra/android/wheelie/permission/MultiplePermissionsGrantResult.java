@@ -41,8 +41,8 @@ public class MultiplePermissionsGrantResult {
 
         void beforeRequestingPermissions(String[] permissions, Activity activity) {
             for (String permission : permissions) {
-                SinglePermissionGrantResult.Builder builder = new SinglePermissionGrantResult.Builder(permission);
-                builder.beforeRequestingPermission(activity);
+                SinglePermissionGrantResult.Builder builder = new ManifestSinglePermissionGrantResultBuilder();
+                builder.beforeRequestingPermission(permission, activity);
                 buildersByPermission.put(permission, builder);
             }
         }
@@ -52,7 +52,7 @@ public class MultiplePermissionsGrantResult {
             for (Map.Entry<String, SinglePermissionGrantResult.Builder> builderByPermission : buildersByPermission.entrySet()) {
                 //noinspection ConstantConditions
                 boolean granted = grantResult.getOrDefault(builderByPermission.getKey(), false);
-                SinglePermissionGrantResult value = builderByPermission.getValue().onPermissionGrantResult(activity, granted);
+                SinglePermissionGrantResult value = builderByPermission.getValue().onPermissionGrantResult(granted, activity);
                 grantResultByPermission.put(builderByPermission.getKey(), value);
             }
             return new MultiplePermissionsGrantResult(grantResultByPermission);

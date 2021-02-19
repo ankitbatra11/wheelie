@@ -33,6 +33,7 @@ import com.abatra.android.wheelie.media.printer.ImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentPrintImageRequest;
 import com.abatra.android.wheelie.network.InternetConnectionObserver;
+import com.abatra.android.wheelie.permission.ManageOverlayPermissionRequestor;
 import com.abatra.android.wheelie.permission.ManifestMultiplePermissionsRequestor;
 import com.abatra.android.wheelie.permission.ManifestPermissionRequestor;
 import com.abatra.android.wheelie.permission.ManifestSinglePermissionRequestor;
@@ -160,6 +161,11 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
                 }
             });
         });
+
+        ManageOverlayPermissionRequestor manageOverlayPermissionRequestor = new ManageOverlayPermissionRequestor();
+        manageOverlayPermissionRequestor.observeLifecycle(this);
+        binding.reqManageOverlayPermission.setOnClickListener(v -> manageOverlayPermissionRequestor.requestSystemPermission(
+                null, grantResult -> showToastMessage("manage overlay permission grantResult=" + grantResult)));
     }
 
     private void print(Bitmap resource) {
