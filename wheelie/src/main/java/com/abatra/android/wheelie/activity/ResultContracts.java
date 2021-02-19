@@ -13,15 +13,32 @@ import androidx.annotation.Nullable;
 import com.abatra.android.wheelie.media.MimeTypes;
 import com.abatra.android.wheelie.util.IntentUtils;
 
+import java.util.function.Function;
+
 public final class ResultContracts {
 
     private ResultContracts() {
     }
 
-    private static abstract class ActivityResultActivityResultContract<I> extends ActivityResultContract<I, ActivityResult> {
+    public static abstract class ActivityResultActivityResultContract<I> extends ActivityResultContract<I, ActivityResult> {
         @Override
         public ActivityResult parseResult(int resultCode, @Nullable Intent intent) {
             return new ActivityResult(resultCode, intent);
+        }
+    }
+
+    public static class InputLessActivityResultContract extends ActivityResultActivityResultContract<Void> {
+
+        private final Function<Context, Intent> intentSupplier;
+
+        public InputLessActivityResultContract(Function<Context, Intent> intentSupplier) {
+            this.intentSupplier = intentSupplier;
+        }
+
+        @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, Void input) {
+            return intentSupplier.apply(context);
         }
     }
 
