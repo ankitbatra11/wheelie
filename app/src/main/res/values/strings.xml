@@ -12,4 +12,5 @@
     <string name="share_image">Share image</string>
     <string name="request_camera_permission">Request camera permission</string>
     <string name="launch_app_details_settings">Launch app details settings</string>
+    <string name="req_multiple_permissions">Request multiple permissions</string>
 </resources>
