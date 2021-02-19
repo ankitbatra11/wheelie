@@ -26,11 +26,6 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
     private ActivityResultLauncher<String[]> multiplePermissionsRequestor;
     private MultiplePermissionsRequestCallback multiplePermissionsRequestCallback;
 
-    @VisibleForTesting
-    Optional<ILifecycleOwner> getLifecycleOwner() {
-        return Optional.ofNullable(lifecycleOwner);
-    }
-
     @Override
     public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
         this.lifecycleOwner = lifecycleOwner;
@@ -51,7 +46,7 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
                         if (showRationaleAfterRequest) {
                             callback.onPermissionDenied();
                         } else {
-                            callback.onPermissionPermanentlyDenied();
+                            callback.onPermissionPermanentlyDenied(callback.shouldShowPermissionRationaleBeforeRequest());
                         }
                     });
                 }
@@ -68,6 +63,11 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
     }
 
     @VisibleForTesting
+    Optional<ILifecycleOwner> getLifecycleOwner() {
+        return Optional.ofNullable(lifecycleOwner);
+    }
+
+    @VisibleForTesting
     Optional<SinglePermissionRequestCallbackDelegator> getSinglePermissionRequestCallbackDelegator() {
         return Optional.ofNullable(singlePermissionRequestCallbackDelegator);
     }
@@ -80,13 +80,12 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
     @Override
     public void requestSystemPermission(String permission,
                                         SinglePermissionRequestCallback singlePermissionRequestCallback) {
-
-        singlePermissionRequestCallbackDelegator = new SinglePermissionRequestCallbackDelegator(permission,
-                singlePermissionRequestCallback);
-
         if (PermissionUtils.isPermissionGranted(lifecycleOwner.getContext(), permission)) {
-            singlePermissionRequestCallbackDelegator.onPermissionGranted();
+            singlePermissionRequestCallback.onPermissionGranted();
         } else {
+            singlePermissionRequestCallbackDelegator = new SinglePermissionRequestCallbackDelegator(permission,
+                    singlePermissionRequestCallback,
+                    shouldShowRequestPermissionRationale(lifecycleOwner.getAppCompatActivity(), permission));
             try {
                 singlePermissionRequestor.launch(permission);
             } catch (ActivityNotFoundException e) {
@@ -147,10 +146,14 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
 
         private final String permission;
         private final SinglePermissionRequestCallback delegate;
+        private final boolean shouldShowPermissionRationaleBeforeRequest;
 
-        private SinglePermissionRequestCallbackDelegator(String permission, SinglePermissionRequestCallback delegate) {
+        private SinglePermissionRequestCallbackDelegator(String permission,
+                                                         SinglePermissionRequestCallback delegate,
+                                                         boolean shouldShowPermissionRationaleBeforeRequest) {
             this.permission = permission;
             this.delegate = delegate;
+            this.shouldShowPermissionRationaleBeforeRequest = shouldShowPermissionRationaleBeforeRequest;
         }
 
         @Override
@@ -169,12 +172,16 @@ public class ActivityResultApiPermissionRequestor implements PermissionRequestor
         }
 
         @Override
-        public void onPermissionPermanentlyDenied() {
-            delegate.onPermissionPermanentlyDenied();
+        public void onPermissionPermanentlyDenied(boolean shouldShowPermissionRationaleBeforeRequest) {
+            delegate.onPermissionPermanentlyDenied(shouldShowPermissionRationaleBeforeRequest);
         }
 
         public String getPermission() {
             return permission;
+        }
+
+        public boolean shouldShowPermissionRationaleBeforeRequest() {
+            return shouldShowPermissionRationaleBeforeRequest;
         }
     }
 

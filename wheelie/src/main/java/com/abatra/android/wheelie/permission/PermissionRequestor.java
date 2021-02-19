@@ -21,7 +21,7 @@ public interface PermissionRequestor extends ILifecycleObserver {
         default void onPermissionHandlerActivityNotFound() {
         }
 
-        default void onPermissionPermanentlyDenied() {
+        default void onPermissionPermanentlyDenied(boolean permanentlyDeniedJustNow) {
         }
     }
 
