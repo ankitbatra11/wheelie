@@ -155,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
                 }
 
                 @Override
-                public void onPermissionPermanentlyDenied() {
-                    showMessage("onPermissionPermanentlyDenied");
+                public void onPermissionPermanentlyDenied(boolean permanentlyDeniedJustNow) {
+                    showMessage("onPermissionPermanentlyDenied permanentlyDeniedJustNow=" + permanentlyDeniedJustNow);
                 }
             });
         });

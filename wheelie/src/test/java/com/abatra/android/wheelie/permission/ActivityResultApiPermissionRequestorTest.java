@@ -178,15 +178,27 @@ public class ActivityResultApiPermissionRequestorTest {
     }
 
     @Test
-    public void testRequestSystemPermission_permissionDenied_permissionDeniedPermanently() {
+    public void testRequestSystemPermission_permissionDenied_permissionDeniedPermanently_justNow() {
+
+        mockedActivityCompat.when(() -> ActivityCompat.shouldShowRequestPermissionRationale(ArgumentMatchers.any(), anyString())).thenReturn(true);
+        permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
 
         mockedActivityCompat.when(() -> ActivityCompat.shouldShowRequestPermissionRationale(ArgumentMatchers.any(), anyString())).thenReturn(false);
+        singlePermissionActivityResultCallbackArgumentCaptor.getValue().onActivityResult(false);
 
+        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionPermanentlyDenied(true);
+        verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
+    }
+
+    @Test
+    public void testRequestSystemPermission_permissionDenied_permissionDeniedPermanently_previously() {
+
+        mockedActivityCompat.when(() -> ActivityCompat.shouldShowRequestPermissionRationale(ArgumentMatchers.any(), anyString())).thenReturn(false);
         permissionRequestor.requestSystemPermission("p", mockedSinglePermissionRequestCallback);
 
         singlePermissionActivityResultCallbackArgumentCaptor.getValue().onActivityResult(false);
 
-        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionPermanentlyDenied();
+        verify(mockedSinglePermissionRequestCallback, times(1)).onPermissionPermanentlyDenied(false);
         verifyNoMoreInteractions(mockedSinglePermissionRequestCallback);
     }
 
