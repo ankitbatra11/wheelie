@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 @Config(sdk = Build.VERSION_CODES.P)
 public class IntentFactoryTest {
 
-    public static final String EXP_PACKAGE_PREFIX = "package:";
+    private static final String EXP_PACKAGE_PREFIX = "package:";
 
     @Test
     public void testOpenAppDetailsSettings() {
@@ -26,6 +26,15 @@ public class IntentFactoryTest {
         Intent intent = IntentFactory.openAppDetailsSettings(getApplicationContext());
 
         assertThat(intent.getAction(), equalTo(Settings.ACTION_APPLICATION_DETAILS_SETTINGS));
+        assertThat(intent.getData(), equalTo(Uri.parse(EXP_PACKAGE_PREFIX + getApplicationContext().getPackageName())));
+    }
+
+    @Test
+    public void testManageOverlayPermission() {
+
+        Intent intent = IntentFactory.manageOverlayPermission(getApplicationContext());
+
+        assertThat(intent.getAction(), equalTo(Settings.ACTION_MANAGE_OVERLAY_PERMISSION));
         assertThat(intent.getData(), equalTo(Uri.parse(EXP_PACKAGE_PREFIX + getApplicationContext().getPackageName())));
     }
 }

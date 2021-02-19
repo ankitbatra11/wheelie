@@ -23,7 +23,7 @@ public class MultiplePermissionsGrantResult {
         return new MultiplePermissionsGrantResult(map);
     }
 
-    public SinglePermissionGrantResult geSinglePermissionGrantResult(String permission) {
+    public SinglePermissionGrantResult getSinglePermissionGrantResult(String permission) {
         return grantResultByPermission.get(permission);
     }
 

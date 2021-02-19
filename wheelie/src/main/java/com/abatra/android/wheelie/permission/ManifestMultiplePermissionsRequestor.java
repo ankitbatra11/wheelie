@@ -12,7 +12,7 @@ import java.util.Optional;
 public class ManifestMultiplePermissionsRequestor implements MultiplePermissionsRequestor {
 
     private ILifecycleOwner lifecycleOwner;
-    private ActivityResultLauncher<String[]> multiplePermissionsRequestor;
+    private ActivityResultLauncher<String[]> multiplePermissionsActivityResultLauncher;
     private CallbackDelegator callbackDelegator;
 
     @Override
@@ -23,7 +23,8 @@ public class ManifestMultiplePermissionsRequestor implements MultiplePermissions
 
     @Override
     public void onCreate() {
-        multiplePermissionsRequestor = lifecycleOwner.registerForActivityResult(new RequestMultiplePermissions(), result -> {
+        RequestMultiplePermissions contract = new RequestMultiplePermissions();
+        multiplePermissionsActivityResultLauncher = lifecycleOwner.registerForActivityResult(contract, result -> {
             Optional<CallbackDelegator> callbackDelegator = getCallbackDelegator();
             callbackDelegator.ifPresent(multiplePermissionsRequestCallbackDelegator -> {
                 Optional<ILifecycleOwner> lifecycleOwner = getLifecycleOwner();
@@ -42,7 +43,7 @@ public class ManifestMultiplePermissionsRequestor implements MultiplePermissions
     }
 
     @VisibleForTesting
-    Optional<CallbackDelegator> getCallbackDelegator() {
+    Optional<CallbackDelegator>  getCallbackDelegator() {
         return Optional.ofNullable(callbackDelegator);
     }
 
@@ -54,21 +55,21 @@ public class ManifestMultiplePermissionsRequestor implements MultiplePermissions
             MultiplePermissionsGrantResult.Builder builder = new MultiplePermissionsGrantResult.Builder();
             builder.beforeRequestingPermissions(permissions, lifecycleOwner.getAppCompatActivity());
             callbackDelegator = new CallbackDelegator(builder, callback);
-            multiplePermissionsRequestor.launch(permissions);
+            multiplePermissionsActivityResultLauncher.launch(permissions);
         }
     }
 
     @Override
     public void onDestroy() {
         callbackDelegator = null;
-        multiplePermissionsRequestor = null;
+        multiplePermissionsActivityResultLauncher = null;
         lifecycleOwner = null;
     }
 
     /* Testing */
 
-    ActivityResultLauncher<String[]> getMultiplePermissionsRequestor() {
-        return multiplePermissionsRequestor;
+    ActivityResultLauncher<String[]> getMultiplePermissionsActivityResultLauncher() {
+        return multiplePermissionsActivityResultLauncher;
     }
 
     private static class CallbackDelegator implements Callback {
