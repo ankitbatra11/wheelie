@@ -16,12 +16,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import timber.log.Timber;
 
-@Singleton
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMuxerVideoTranscoder implements VideoTranscoder {
 
@@ -30,8 +26,7 @@ public class MediaMuxerVideoTranscoder implements VideoTranscoder {
 
     private final Context context;
 
-    @Inject
-    MediaMuxerVideoTranscoder(Context context) {
+    public MediaMuxerVideoTranscoder(Context context) {
         this.context = context;
     }
 

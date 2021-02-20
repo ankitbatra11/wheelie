@@ -39,4 +39,9 @@ public class CollectionObservable<O> implements Observable<O> {
     public void removeObservers() {
         collection.clear();
     }
+
+    /* Testing */
+    Collection<O> getCollection() {
+        return collection;
+    }
 }

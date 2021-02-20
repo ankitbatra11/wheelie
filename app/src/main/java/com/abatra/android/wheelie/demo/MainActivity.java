@@ -35,7 +35,6 @@ import com.abatra.android.wheelie.media.printer.IntentPrintImageRequest;
 import com.abatra.android.wheelie.network.InternetConnectionObserver;
 import com.abatra.android.wheelie.permission.ManageOverlayPermissionRequestor;
 import com.abatra.android.wheelie.permission.ManifestMultiplePermissionsRequestor;
-import com.abatra.android.wheelie.permission.ManifestPermissionRequestor;
 import com.abatra.android.wheelie.permission.ManifestSinglePermissionRequestor;
 import com.abatra.android.wheelie.permission.MultiplePermissionsGrantResult;
 import com.abatra.android.wheelie.permission.MultiplePermissionsRequestor;
@@ -46,6 +45,8 @@ import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.snackbar.Snackbar;
 
 import timber.log.Timber;
+
+import static com.abatra.android.wheelie.activity.ResultContracts.OpenSettingsScreen.wirelessSettings;
 
 public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             Snackbar.make(v, message, Snackbar.LENGTH_SHORT).show();
         });
 
-        ActivityResultLauncher<Void> launcher = registerForActivityResult(ResultContracts.OpenSettingsScreen.wirelessSettings(), result -> {
+        ActivityResultLauncher<Void> launcher = registerForActivityResult(wirelessSettings(), result -> {
             ConstraintLayout view = binding.getRoot();
             Snackbar.make(view, R.string.wireless_settings_result_msg, Snackbar.LENGTH_SHORT).show();
         });
@@ -136,14 +137,12 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             shareMediaLauncher.launch(image);
         }));
 
-        ManifestPermissionRequestor permissionRequestor = new ManifestPermissionRequestor(
-                new ManifestSinglePermissionRequestor(),
-                new ManifestMultiplePermissionsRequestor());
+        ManifestSinglePermissionRequestor singlePermissionRequestor = new ManifestSinglePermissionRequestor();
 
-        permissionRequestor.observeLifecycle(this);
+        singlePermissionRequestor.observeLifecycle(this);
         binding.reqCameraPermission.setOnClickListener(v -> {
             String permission = Manifest.permission.CAMERA;
-            permissionRequestor.requestSystemPermission(permission, grantResult -> showToastMessage("grantResult=" + grantResult));
+            singlePermissionRequestor.requestSystemPermission(permission, grantResult -> showToastMessage("grantResult=" + grantResult));
         });
 
         InputLessActivityResultContract contract = new InputLessActivityResultContract(IntentFactory::openAppDetailsSettings);
@@ -152,9 +151,11 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
         binding.launchAppDetailsSettings.setOnClickListener(v -> appDetailsLauncher.launch(null));
 
+        ManifestMultiplePermissionsRequestor multiplePermissionsRequestor = new ManifestMultiplePermissionsRequestor();
+        multiplePermissionsRequestor.observeLifecycle(this);
         binding.reqMultiplePermissions.setOnClickListener(v -> {
             String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
-            permissionRequestor.requestSystemPermissions(permissions, new MultiplePermissionsRequestor.Callback() {
+            multiplePermissionsRequestor.requestSystemPermissions(permissions, new MultiplePermissionsRequestor.Callback() {
                 @Override
                 public void onPermissionResult(MultiplePermissionsGrantResult multiplePermissionsGrantResult) {
                     showToastMessage("grantResult=" + multiplePermissionsGrantResult);

@@ -12,6 +12,8 @@ import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class IntentMediaPicker implements MediaPicker, ILifecycleObserver {
 
     @Nullable
@@ -23,6 +25,10 @@ public class IntentMediaPicker implements MediaPicker, ILifecycleObserver {
     private ActivityResultLauncher<String> getContentLauncher;
     @Nullable
     private ActivityResultCallback<Uri> getContentResultCallback;
+
+    @Inject
+    public IntentMediaPicker() {
+    }
 
     @Nullable
     ActivityResultLauncher<String> getGetMultipleContentLauncher() {
