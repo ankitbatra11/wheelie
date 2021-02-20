@@ -94,8 +94,6 @@ public class ManifestMultiplePermissionsRequestorTest {
         assertThat(permissionRequestor.getLifecycleOwner().get(), sameInstance(mockedLifecycleOwner));
         verify(mockedLifecycle, times(1)).addObserver(permissionRequestor);
 
-        permissionRequestor.onCreate();
-
         assertNotNull(permissionRequestor.getMultiplePermissionsActivityResultLauncher());
 
         verify(mockedLifecycleOwner, times(1)).registerForActivityResult(

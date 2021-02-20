@@ -17,18 +17,16 @@ public class ManifestMultiplePermissionsRequestor implements MultiplePermissions
 
     @Override
     public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+
         this.lifecycleOwner = lifecycleOwner;
         this.lifecycleOwner.getLifecycle().addObserver(this);
-    }
 
-    @Override
-    public void onCreate() {
         RequestMultiplePermissions contract = new RequestMultiplePermissions();
         multiplePermissionsActivityResultLauncher = lifecycleOwner.registerForActivityResult(contract, result -> {
             Optional<CallbackDelegator> callbackDelegator = getCallbackDelegator();
             callbackDelegator.ifPresent(multiplePermissionsRequestCallbackDelegator -> {
-                Optional<ILifecycleOwner> lifecycleOwner = getLifecycleOwner();
-                lifecycleOwner.ifPresent(lo -> {
+                Optional<ILifecycleOwner> lifecycleOwnerOptional = getLifecycleOwner();
+                lifecycleOwnerOptional.ifPresent(lo -> {
                     AppCompatActivity appCompatActivity = lo.getAppCompatActivity();
                     MultiplePermissionsGrantResult grantResult = this.callbackDelegator.builder.onMultiplePermissionsGrantResult(result, appCompatActivity);
                     this.callbackDelegator.onPermissionResult(grantResult);
