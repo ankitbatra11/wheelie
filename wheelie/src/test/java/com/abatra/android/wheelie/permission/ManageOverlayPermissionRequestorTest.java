@@ -1,6 +1,7 @@
 package com.abatra.android.wheelie.permission;
 
 import android.os.Build;
+import android.provider.Settings;
 
 import androidx.lifecycle.Lifecycle;
 
@@ -47,9 +48,18 @@ public class ManageOverlayPermissionRequestorTest {
     }
 
     @Test
+    public void test_isPermissionGranted_true_marshmallowOrAbove() {
+        try (MockedStatic<Settings> settingsMockedStatic = mockStatic(Settings.class)) {
+            settingsMockedStatic.when(() -> Settings.canDrawOverlays(any())).thenReturn(true);
+            assertTrue(permissionRequestor.isPermissionGranted("p"));
+        }
+    }
+
+    @Test
+    @Config(sdk = Build.VERSION_CODES.LOLLIPOP)
     public void test_isPermissionGranted_true() {
-        try (MockedStatic<PermissionUtils> permissionUtilsMockedStatic = mockStatic(PermissionUtils.class)) {
-            permissionUtilsMockedStatic.when(() -> PermissionUtils.canDrawOverlays(any())).thenReturn(true);
+        try (MockedStatic<Settings> settingsMockedStatic = mockStatic(Settings.class)) {
+            settingsMockedStatic.verifyNoInteractions();
             assertTrue(permissionRequestor.isPermissionGranted("p"));
         }
     }
@@ -60,12 +70,6 @@ public class ManageOverlayPermissionRequestorTest {
             permissionUtilsMockedStatic.when(() -> PermissionUtils.canDrawOverlays(any())).thenReturn(false);
             assertFalse(permissionRequestor.isPermissionGranted("p"));
         }
-    }
-
-    @Test(expected = IllegalStateException.class)
-    @Config(sdk = Build.VERSION_CODES.LOLLIPOP)
-    public void test_createRequestPermissionActivityResultContract_illegalStateException() {
-        permissionRequestor.createRequestPermissionActivityResultContract();
     }
 
     @Test

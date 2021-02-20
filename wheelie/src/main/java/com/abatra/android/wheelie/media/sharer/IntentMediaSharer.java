@@ -19,7 +19,7 @@ public class IntentMediaSharer implements MediaSharer, ILifecycleObserver {
     private MediaShareCompletionListener shareCompletionListener;
 
     @Inject
-    IntentMediaSharer() {
+    public IntentMediaSharer() {
     }
 
     @Override

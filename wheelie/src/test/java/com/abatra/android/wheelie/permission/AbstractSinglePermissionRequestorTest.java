@@ -84,8 +84,6 @@ public class AbstractSinglePermissionRequestorTest {
         assertThat(permissionRequestor.getLifecycleOwner(), sameInstance(mockedLifecycleOwner));
         verify(mockedLifecycle, times(1)).addObserver(permissionRequestor);
 
-        permissionRequestor.onCreate();
-
         verify(mockedLifecycleOwner, times(1)).registerForActivityResult(same(mockedActivityResultContract),
                 singlePermissionActivityResultCallbackArgumentCaptor.capture());
 

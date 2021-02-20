@@ -7,12 +7,10 @@ import android.os.Build;
 import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 import com.abatra.android.wheelie.intent.IntentFactory;
 import com.abatra.android.wheelie.permission.PermissionUtils;
 
-@RequiresApi(api = Build.VERSION_CODES.M)
 public class RequestManageOverlayPermission extends ActivityResultContract<String, Boolean> {
 
     private final Context context;
@@ -24,7 +22,10 @@ public class RequestManageOverlayPermission extends ActivityResultContract<Strin
     @NonNull
     @Override
     public Intent createIntent(@NonNull Context context, String input) {
-        return IntentFactory.manageOverlayPermission(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return IntentFactory.manageOverlayPermission(context);
+        }
+        return new Intent();
     }
 
     @Override

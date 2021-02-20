@@ -21,12 +21,10 @@ abstract class AbstractSinglePermissionRequestor implements SinglePermissionRequ
 
     @Override
     public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+
         this.lifecycleOwner = lifecycleOwner;
         this.lifecycleOwner.getLifecycle().addObserver(this);
-    }
 
-    @Override
-    public void onCreate() {
         ActivityResultCallback<Boolean> activityResultCallback = result -> {
             Optional<CallbackDelegator> requestCallback = getCallbackDelegator();
             requestCallback.ifPresent(callback -> {
