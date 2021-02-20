@@ -7,13 +7,11 @@ import com.abatra.android.wheelie.media.video.edit.transcoder.VideoTranscoder;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Singleton
 public class MediaMuxerVideoMiddleCutter implements VideoMiddleCutter {
 
     private final VideoTranscoder videoTranscoder;
 
-    @Inject
-    MediaMuxerVideoMiddleCutter(MediaMuxerVideoTranscoder mediaMuxerVideoTranscoder) {
+    public MediaMuxerVideoMiddleCutter(MediaMuxerVideoTranscoder mediaMuxerVideoTranscoder) {
         videoTranscoder = mediaMuxerVideoTranscoder;
     }
 

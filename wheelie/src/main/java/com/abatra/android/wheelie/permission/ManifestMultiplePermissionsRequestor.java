@@ -9,11 +9,17 @@ import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 public class ManifestMultiplePermissionsRequestor implements MultiplePermissionsRequestor {
 
     private ILifecycleOwner lifecycleOwner;
     private ActivityResultLauncher<String[]> multiplePermissionsActivityResultLauncher;
     private CallbackDelegator callbackDelegator;
+
+    @Inject
+    public ManifestMultiplePermissionsRequestor() {
+    }
 
     @Override
     public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
@@ -41,7 +47,7 @@ public class ManifestMultiplePermissionsRequestor implements MultiplePermissions
     }
 
     @VisibleForTesting
-    Optional<CallbackDelegator>  getCallbackDelegator() {
+    Optional<CallbackDelegator> getCallbackDelegator() {
         return Optional.ofNullable(callbackDelegator);
     }
 
