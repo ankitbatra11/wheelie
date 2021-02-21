@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 import timber.log.Timber;
 
-public class RunnableTrackerHandler {
+class RunnableTrackerHandler {
 
     private final Handler handler;
     private final Collection<Runnable> runnables = new HashSet<>();
@@ -16,21 +16,21 @@ public class RunnableTrackerHandler {
         this.handler = handler;
     }
 
-    public static RunnableTrackerHandler wrap(Handler handler) {
+    static RunnableTrackerHandler wrap(Handler handler) {
         return new RunnableTrackerHandler(handler);
     }
 
-    public void post(Runnable runnable) {
+    void post(Runnable runnable) {
         runnables.add(runnable);
         handler.post(runnable);
     }
 
-    public void postDelayed(Runnable runnable, long delayMillis) {
+    void postDelayed(Runnable runnable, long delayMillis) {
         runnables.add(runnable);
         handler.postDelayed(runnable, delayMillis);
     }
 
-    public void removeAllCallbacks() {
+    void removeAllCallbacks() {
         for (Runnable runnable : runnables) {
             try {
                 handler.removeCallbacks(runnable);
