@@ -1,5 +1,5 @@
 
-name: Draft a release on milestone completion
+name: Create Release ${{ github.ref }}
 
 # Trigger
 on:
