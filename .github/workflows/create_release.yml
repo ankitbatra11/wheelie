@@ -1,5 +1,5 @@
 
-name: Create Release ${{ github.ref }}
+name: Create Release
 
 # Trigger
 on:
