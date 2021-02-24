@@ -18,12 +18,6 @@ import java.util.concurrent.Callable;
 import bolts.Continuation;
 import bolts.Task;
 
-import static com.abatra.android.wheelie.thread.Bolts.callOnBackgroundThread;
-import static com.abatra.android.wheelie.thread.Bolts.callOnUiThread;
-import static com.abatra.android.wheelie.thread.Bolts.continueWithBackgroundThread;
-import static com.abatra.android.wheelie.thread.Bolts.continueWithUiThread;
-import static com.abatra.android.wheelie.thread.Bolts.getTaskOptionalResult;
-import static com.abatra.android.wheelie.thread.Bolts.getTaskResult;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -34,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.P)
-public class BoltsTest {
+public class SaferTaskTest {
 
     @Mock
     private Callable<Object> mockedCallable;
@@ -65,7 +59,7 @@ public class BoltsTest {
 
         when(mockedCallable.call()).thenThrow(new IllegalArgumentException());
 
-        Task<Object> objectTask = callOnBackgroundThread(mockedCallable);
+        SaferTask<Object> objectTask = SaferTask.backgroundTask(mockedCallable);
         objectTask.waitForCompletion();
 
         assertThat(objectTask.getError(), instanceOf(IllegalArgumentException.class));
@@ -77,7 +71,7 @@ public class BoltsTest {
 
         when(mockedCallable.call()).thenThrow(new OutOfMemoryError());
 
-        Task<Object> objectTask = callOnBackgroundThread(mockedCallable);
+        SaferTask<Object> objectTask = SaferTask.backgroundTask(mockedCallable);
         objectTask.waitForCompletion();
 
         assertThat(objectTask.getError(), instanceOf(RuntimeException.class));
@@ -88,7 +82,7 @@ public class BoltsTest {
     @Test
     public void test_callOnBackgroundThread_callIsSuccessful() throws InterruptedException {
 
-        Task<Object> objectTask = callOnBackgroundThread(mockedCallable);
+        SaferTask<Object> objectTask = SaferTask.backgroundTask(mockedCallable);
         objectTask.waitForCompletion();
 
         assertThat(objectTask.getResult(), sameInstance(mockedObject));
@@ -100,7 +94,7 @@ public class BoltsTest {
 
         when(mockedCallable.call()).thenThrow(new OutOfMemoryError());
 
-        Task<Optional<Object>> objectTask = callOnUiThread(mockedCallable);
+        SaferTask<Optional<Object>> objectTask = SaferTask.uiTask(mockedCallable);
         Robolectric.flushForegroundThreadScheduler();
 
         await().untilAsserted(() -> {
@@ -113,7 +107,7 @@ public class BoltsTest {
     @Test
     public void test_callOnUiThread_doesNotThrowException() {
 
-        Task<Optional<Object>> objectTask = callOnUiThread(mockedCallable);
+        SaferTask<Optional<Object>> objectTask = SaferTask.uiTask(mockedCallable);
         Robolectric.flushForegroundThreadScheduler();
 
         await().untilAsserted(() -> {
@@ -126,12 +120,12 @@ public class BoltsTest {
     @Test
     public void test_getTaskResult_withValue() {
 
-        Task<Object> objectTask = callOnBackgroundThread(mockedCallable);
+        SaferTask<Object> objectTask = SaferTask.backgroundTask(mockedCallable);
 
         await().untilAsserted(() -> {
             assertThat(objectTask.isCompleted(), equalTo(true));
-            assertThat(getTaskResult(objectTask).isPresent(), equalTo(true));
-            assertThat(getTaskResult(objectTask).get(), sameInstance(mockedObject));
+            assertThat(objectTask.getOptionalResult().isPresent(), equalTo(true));
+            assertThat(objectTask.getOptionalResult().get(), sameInstance(mockedObject));
         });
     }
 
@@ -140,24 +134,25 @@ public class BoltsTest {
 
         when(mockedCallable.call()).thenThrow(new OutOfMemoryError());
 
-        Task<Object> objectTask = callOnBackgroundThread(mockedCallable);
+        SaferTask<Object> objectTask = SaferTask.backgroundTask(mockedCallable);
 
         await().untilAsserted(() -> {
             assertThat(objectTask.isCompleted(), equalTo(true));
-            assertThat(getTaskResult(objectTask).isPresent(), equalTo(false));
+            assertThat(objectTask.getOptionalResult().isPresent(), equalTo(false));
         });
     }
 
     @Test
     public void test_getTaskOptionalResult_withValue() {
 
-        Task<Optional<Object>> objectTask = callOnUiThread(mockedCallable);
+        SaferTask<Optional<Object>> objectTask = SaferTask.uiTask(mockedCallable);
         Robolectric.flushForegroundThreadScheduler();
 
         await().untilAsserted(() -> {
             assertThat(objectTask.isCompleted(), equalTo(true));
-            assertThat(getTaskOptionalResult(objectTask).isPresent(), equalTo(true));
-            assertThat(getTaskOptionalResult(objectTask).get(), sameInstance(mockedObject));
+            assertThat(objectTask.getOptionalResult().isPresent(), equalTo(true));
+            assertThat(objectTask.getOptionalResult().get().isPresent(), equalTo(true));
+            assertThat(objectTask.getOptionalResult().get().get(), sameInstance(mockedObject));
         });
     }
 
@@ -166,12 +161,13 @@ public class BoltsTest {
 
         when(mockedCallable.call()).thenThrow(new OutOfMemoryError());
 
-        Task<Optional<Object>> objectTask = callOnUiThread(mockedCallable);
+        SaferTask<Optional<Object>> objectTask = SaferTask.uiTask(mockedCallable);
         Robolectric.flushForegroundThreadScheduler();
 
         await().untilAsserted(() -> {
             assertThat(objectTask.isCompleted(), equalTo(true));
-            assertThat(getTaskOptionalResult(objectTask).isPresent(), equalTo(false));
+            assertThat(objectTask.getOptionalResult().isPresent(), equalTo(true));
+            assertThat(objectTask.getOptionalResult().get().isPresent(), equalTo(false));
         });
     }
 
@@ -181,7 +177,7 @@ public class BoltsTest {
         //noinspection unchecked
         when(mockedContinuation.then(ArgumentMatchers.any(Task.class))).thenThrow(new IllegalStateException());
 
-        Task<Object> objectTask = callOnBackgroundThread(mockedCallable).continueWith(continueWithBackgroundThread(mockedContinuation));
+        SaferTask<Object> objectTask = SaferTask.backgroundTask(mockedCallable).continueOnBackgroundThread(mockedContinuation);
         objectTask.waitForCompletion();
 
         assertThat(objectTask.getError(), instanceOf(IllegalStateException.class));
@@ -194,7 +190,7 @@ public class BoltsTest {
         //noinspection unchecked
         when(mockedContinuation.then(ArgumentMatchers.any(Task.class))).thenThrow(new AssertionError());
 
-        Task<Object> objectTask = callOnBackgroundThread(mockedCallable).continueWith(continueWithBackgroundThread(mockedContinuation));
+        SaferTask<Object> objectTask = SaferTask.backgroundTask(mockedCallable).continueOnBackgroundThread(mockedContinuation);
         objectTask.waitForCompletion();
 
         assertThat(objectTask.getError(), instanceOf(RuntimeException.class));
@@ -205,7 +201,7 @@ public class BoltsTest {
     @Test
     public void test_continueWithBackgroundThread_noError() throws InterruptedException {
 
-        Task<Object> objectTask = callOnBackgroundThread(mockedCallable).continueWith(continueWithBackgroundThread(mockedContinuation));
+        SaferTask<Object> objectTask = SaferTask.backgroundTask(mockedCallable).continueOnBackgroundThread(mockedContinuation);
         objectTask.waitForCompletion();
 
         assertThat(objectTask.getError(), nullValue());
@@ -218,8 +214,7 @@ public class BoltsTest {
         //noinspection unchecked
         when(mockedOptionalTaskContinuation.then(ArgumentMatchers.any(Task.class))).thenThrow(new AssertionError());
 
-        Task<Optional<Object>> objectTask = callOnUiThread(mockedCallable)
-                .continueWith(continueWithUiThread(mockedOptionalTaskContinuation));
+        SaferTask<Optional<Object>> objectTask = SaferTask.uiTask(mockedCallable).continueOnUiThread(mockedOptionalTaskContinuation);
 
         Robolectric.flushForegroundThreadScheduler();
 
@@ -230,13 +225,34 @@ public class BoltsTest {
     @Test
     public void test_continueWithUiThread_noError() {
 
-        Task<Optional<Object>> objectTask = callOnUiThread(mockedCallable)
-                .continueWith(continueWithUiThread(mockedOptionalTaskContinuation));
+        SaferTask<Optional<Object>> objectTask = SaferTask.uiTask(mockedCallable).continueOnUiThread(mockedOptionalTaskContinuation);
 
         Robolectric.flushForegroundThreadScheduler();
 
         assertThat(objectTask.getError(), nullValue());
         assertThat(objectTask.getResult().isPresent(), equalTo(true));
         assertThat(objectTask.getResult().get(), sameInstance(mockedObject));
+    }
+
+    @Test
+    public void test_getResultOr() throws Exception {
+
+        when(mockedCallable.call()).thenReturn(null);
+
+        SaferTask<Object> task = SaferTask.backgroundTask(mockedCallable);
+        task.waitForCompletion();
+
+        assertThat(task.getResultOr(mockedObject), sameInstance(mockedObject));
+    }
+
+    @Test
+    public void test_getResultOrGet() throws Exception {
+
+        when(mockedCallable.call()).thenReturn(null);
+
+        SaferTask<Object> task = SaferTask.backgroundTask(mockedCallable);
+        task.waitForCompletion();
+
+        assertThat(task.getResultOrGet(() -> mockedObject), sameInstance(mockedObject));
     }
 }
