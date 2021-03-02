@@ -7,6 +7,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Optional;
 
+import bolts.Task;
+
+import static com.abatra.android.wheelie.thread.BoltsUtils.getOptionalResultTaskResult;
+import static com.abatra.android.wheelie.thread.BoltsUtils.getResult;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.sameInstance;
@@ -18,12 +22,18 @@ public class BoltsUtilsTest {
     @Mock
     private SaferTask<Optional<Object>> mockedSaferTask;
 
+    @Mock
+    private Task<Optional<Object>> mockedOptionalTask;
+
+    @Mock
+    private Task<Object> mockedObjectTask;
+
     @Test
     public void test_getOptionalResultTaskResult_taskResultIsNull_emptyOptionalShouldBeReturned() {
 
         when(mockedSaferTask.getResult()).thenReturn(null);
 
-        assertThat(BoltsUtils.getOptionalResultTaskResult(mockedSaferTask).isPresent(), equalTo(false));
+        assertThat(getOptionalResultTaskResult(mockedSaferTask).isPresent(), equalTo(false));
     }
 
     @Test
@@ -32,6 +42,30 @@ public class BoltsUtilsTest {
         Optional<Object> result = Optional.of(new Object());
         when(mockedSaferTask.getResult()).thenReturn(result);
 
-        assertThat(BoltsUtils.getOptionalResultTaskResult(mockedSaferTask), sameInstance(result));
+        assertThat(getOptionalResultTaskResult(mockedSaferTask), sameInstance(result));
+    }
+
+    @Test
+    public void test_getOptionalResultTaskResult_task() {
+
+        Optional<Object> empty = Optional.empty();
+        when(mockedOptionalTask.getResult()).thenReturn(empty);
+        assertThat(getOptionalResultTaskResult(mockedOptionalTask), sameInstance(empty));
+
+        when(mockedOptionalTask.getResult()).thenReturn(Optional.of(1));
+        assertThat(getOptionalResultTaskResult(mockedOptionalTask).isPresent(), equalTo(true));
+        assertThat(getOptionalResultTaskResult(mockedOptionalTask).get().toString(), equalTo("1"));
+    }
+
+    @Test
+    public void test_getResult() {
+
+        assertThat(getResult(mockedObjectTask).isPresent(), equalTo(false));
+
+        String result = "result";
+        when(mockedObjectTask.getResult()).thenReturn(result);
+
+        assertThat(getResult(mockedObjectTask).isPresent(), equalTo(true));
+        assertThat(getResult(mockedObjectTask).get(), equalTo(result));
     }
 }
