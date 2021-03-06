@@ -1,9 +1,12 @@
 package com.abatra.android.wheelie.chronicle.firebase;
 
+import com.abatra.android.wheelie.chronicle.BeginCheckoutEventParams;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class FirebaseCheckoutEventParams implements FirebasePriceParam<FirebaseCheckoutEventParams> {
+public class FirebaseBeginCheckoutEventParams implements BeginCheckoutEventParams,
+        FirebasePriceParam<FirebaseBeginCheckoutEventParams> {
 
     private String coupon;
     private FirebasePrice price;
@@ -13,13 +16,13 @@ public class FirebaseCheckoutEventParams implements FirebasePriceParam<FirebaseC
         return coupon;
     }
 
-    public FirebaseCheckoutEventParams setCoupon(String coupon) {
+    public FirebaseBeginCheckoutEventParams setCoupon(String coupon) {
         this.coupon = coupon;
         return this;
     }
 
     @Override
-    public FirebaseCheckoutEventParams setFirebasePrice(FirebasePrice firebasePrice) {
+    public FirebaseBeginCheckoutEventParams setFirebasePrice(FirebasePrice firebasePrice) {
         price = firebasePrice;
         return this;
     }
@@ -29,7 +32,7 @@ public class FirebaseCheckoutEventParams implements FirebasePriceParam<FirebaseC
         return price;
     }
 
-    public FirebaseCheckoutEventParams addCheckedOutItem(FirebasePurchasableItem item) {
+    public FirebaseBeginCheckoutEventParams addCheckedOutItem(FirebasePurchasableItem item) {
         items.add(item);
         return this;
     }

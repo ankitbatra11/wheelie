@@ -10,7 +10,7 @@ public abstract class EventBuilder<T extends EventBuilder<T>> {
 
     public abstract Event buildScreenViewEvent(Fragment fragment);
 
-    public abstract Event buildBeginCheckoutEvent(CheckoutEventParams checkoutEventParams);
+    public abstract Event buildBeginCheckoutEvent(BeginCheckoutEventParams beginCheckoutEventParams);
 
     public abstract Event buildPurchaseEvent(PurchaseEventParams purchaseEventParams);
 

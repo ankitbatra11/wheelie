@@ -72,4 +72,17 @@ public class FirebasePurchasableItem {
     long getQuantity() {
         return quantity;
     }
+
+    @Override
+    public String toString() {
+        return "FirebasePurchasableItem{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", category='" + category + '\'' +
+                ", variant='" + variant + '\'' +
+                ", brand='" + brand + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

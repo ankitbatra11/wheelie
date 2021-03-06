@@ -17,4 +17,12 @@ public class FirebasePrice {
     String getCurrency() {
         return currency;
     }
+
+    @Override
+    public String toString() {
+        return "FirebasePrice{" +
+                "value=" + value +
+                ", currency='" + currency + '\'' +
+                '}';
+    }
 }

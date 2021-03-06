@@ -15,9 +15,13 @@ public class Chronicle {
     }
 
     public static void initializeForFirebase(Context context) {
-        config = new ChronicleConfig(context,
+        setConfig(new ChronicleConfig(context,
                 FirebaseEventBuilder.Factory.INSTANCE,
-                FirebaseEventRecorder.Supplier.INSTANCE);
+                FirebaseEventRecorder.Supplier.INSTANCE));
+    }
+
+    static void setConfig(ChronicleConfig config) {
+        Chronicle.config = config;
     }
 
     public static EventBuilder<?> eventBuilder() {
@@ -36,12 +40,12 @@ public class Chronicle {
         eventRecorder().record(event);
     }
 
-    private static EventRecorder eventRecorder() {
+    static EventRecorder eventRecorder() {
         return config.getEventRecorderSupplier().getEventRecorder(config.getContext());
     }
 
-    public static void recordBeginCheckoutEvent(CheckoutEventParams checkoutEventParams) {
-        record(eventBuilder().buildBeginCheckoutEvent(checkoutEventParams));
+    public static void recordBeginCheckoutEvent(BeginCheckoutEventParams beginCheckoutEventParams) {
+        record(eventBuilder().buildBeginCheckoutEvent(beginCheckoutEventParams));
     }
 
     public static void recordPurchaseEvent(PurchaseEventParams purchaseEventParams) {

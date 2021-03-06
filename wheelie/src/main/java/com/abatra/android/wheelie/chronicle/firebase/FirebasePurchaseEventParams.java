@@ -79,4 +79,17 @@ public class FirebasePurchaseEventParams implements PurchaseEventParams, Firebas
     List<FirebasePurchasableItem> getItems() {
         return items;
     }
+
+    @Override
+    public String toString() {
+        return "FirebasePurchaseEventParams{" +
+                "transactionId='" + transactionId + '\'' +
+                ", affiliation='" + affiliation + '\'' +
+                ", price=" + price +
+                ", tax=" + tax +
+                ", shipping=" + shipping +
+                ", coupon='" + coupon + '\'' +
+                ", items=" + items +
+                '}';
+    }
 }

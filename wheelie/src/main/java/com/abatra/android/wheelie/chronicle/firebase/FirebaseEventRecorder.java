@@ -16,7 +16,7 @@ public class FirebaseEventRecorder implements EventRecorder {
         this.firebaseAnalytics = firebaseAnalytics;
     }
 
-    private static FirebaseEventRecorder getInstance(Context context) {
+    static FirebaseEventRecorder getInstance(Context context) {
         if (gInstance == null) {
             synchronized (FirebaseEventRecorder.class) {
                 if (gInstance == null) {

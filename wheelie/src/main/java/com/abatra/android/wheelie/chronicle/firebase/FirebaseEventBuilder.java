@@ -3,9 +3,10 @@ package com.abatra.android.wheelie.chronicle.firebase;
 import android.os.Bundle;
 import android.os.Parcelable;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.abatra.android.wheelie.chronicle.CheckoutEventParams;
+import com.abatra.android.wheelie.chronicle.BeginCheckoutEventParams;
 import com.abatra.android.wheelie.chronicle.Event;
 import com.abatra.android.wheelie.chronicle.EventBuilder;
 import com.abatra.android.wheelie.chronicle.EventParams;
@@ -13,6 +14,7 @@ import com.abatra.android.wheelie.chronicle.PurchaseEventParams;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
+import java.util.Optional;
 
 import timber.log.Timber;
 
@@ -39,14 +41,25 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
     }
 
     @Override
-    public Event buildBeginCheckoutEvent(CheckoutEventParams checkoutEventParams) {
-        FirebaseCheckoutEventParams firebaseCheckoutEventParams = (FirebaseCheckoutEventParams) checkoutEventParams;
+    public Event buildBeginCheckoutEvent(BeginCheckoutEventParams beginCheckoutEventParams) {
+        FirebaseBeginCheckoutEventParams firebaseBeginCheckoutEventParams = (FirebaseBeginCheckoutEventParams) beginCheckoutEventParams;
         return withName(BEGIN_CHECKOUT)
-                .withParam(Param.COUPON, firebaseCheckoutEventParams.getCoupon())
-                .withParam(Param.VALUE, firebaseCheckoutEventParams.getValue())
-                .withParam(Param.CURRENCY, firebaseCheckoutEventParams.getCurrency())
-                .withParam(Param.ITEMS, toParcelables(firebaseCheckoutEventParams.getItems()))
+                .withParam(Param.COUPON, firebaseBeginCheckoutEventParams.getCoupon())
+                .withPriceParam(firebaseBeginCheckoutEventParams)
+                .withParam(Param.ITEMS, toParcelables(firebaseBeginCheckoutEventParams.getItems()))
                 .build();
+    }
+
+    private EventBuilder<?> withPriceParam(@Nullable FirebasePriceParam<?> firebasePriceParam) {
+        Optional.ofNullable(firebasePriceParam).ifPresent(priceParam -> {
+            if (priceParam.getCurrency() != null) {
+                withParam(Param.CURRENCY, priceParam.getCurrency());
+                withParam(Param.VALUE, priceParam.getValue());
+            } else {
+                Timber.w("Must specify currency with value and vice versa! firebasePriceParam=%s", firebasePriceParam);
+            }
+        });
+        return this;
     }
 
     private Parcelable[] toParcelables(List<FirebasePurchasableItem> items) {
@@ -79,8 +92,7 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
         return withName(PURCHASE)
                 .withParam(Param.TRANSACTION_ID, firebasePurchaseEventParams.getTransactionId())
                 .withParam(Param.AFFILIATION, firebasePurchaseEventParams.getAffiliation())
-                .withParam(Param.CURRENCY, firebasePurchaseEventParams.getCurrency())
-                .withParam(Param.VALUE, firebasePurchaseEventParams.getValue())
+                .withPriceParam(firebasePurchaseEventParams)
                 .withParam(Param.TAX, firebasePurchaseEventParams.getTax())
                 .withParam(Param.SHIPPING, firebasePurchaseEventParams.getShipping())
                 .withParam(Param.COUPON, firebasePurchaseEventParams.getCoupon())
@@ -96,7 +108,7 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
         }
 
         @Override
-        public EventBuilder<?> createEventBuilder() {
+        public FirebaseEventBuilder createEventBuilder() {
             return new FirebaseEventBuilder();
         }
     }

@@ -3,7 +3,7 @@ package com.abatra.android.wheelie.chronicle;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-class BundleEventParams implements EventParams {
+public class BundleEventParams implements EventParams {
 
     private final Bundle bundle;
 
