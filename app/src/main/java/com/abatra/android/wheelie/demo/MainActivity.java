@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.print.PrintHelper;
 
-import com.abatra.android.wheelie.activity.ResultContracts;
 import com.abatra.android.wheelie.activity.ResultContracts.InputLessActivityResultContract;
 import com.abatra.android.wheelie.animation.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
@@ -46,7 +45,12 @@ import com.google.android.material.snackbar.Snackbar;
 
 import timber.log.Timber;
 
+import static com.abatra.android.wheelie.activity.ResultContracts.AttachData;
+import static com.abatra.android.wheelie.activity.ResultContracts.GetContent;
+import static com.abatra.android.wheelie.activity.ResultContracts.MediaInfo;
+import static com.abatra.android.wheelie.activity.ResultContracts.OpenMedia;
 import static com.abatra.android.wheelie.activity.ResultContracts.OpenSettingsScreen.wirelessSettings;
+import static com.abatra.android.wheelie.activity.ResultContracts.ShareMedia;
 
 public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
@@ -54,9 +58,9 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
     private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
     private final InternetConnectionObserver connectionObserver = InternetConnectionObserver.newInstance(this);
-    private ActivityResultLauncher<ResultContracts.MediaInfo> attachDataLauncher;
-    private ActivityResultLauncher<ResultContracts.MediaInfo> openMediaLauncher;
-    private ActivityResultLauncher<ResultContracts.MediaInfo> shareMediaLauncher;
+    private ActivityResultLauncher<MediaInfo> attachDataLauncher;
+    private ActivityResultLauncher<MediaInfo> openMediaLauncher;
+    private ActivityResultLauncher<MediaInfo> shareMediaLauncher;
     private ActivityMainBinding binding;
 
     @Override
@@ -68,13 +72,13 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
         super.onCreate(savedInstanceState);
 
-        attachDataLauncher = registerForActivityResult(new ResultContracts.AttachData(),
+        attachDataLauncher = registerForActivityResult(new AttachData(),
                 result -> showSnackbarMessage("Attach data result callback"));
 
-        openMediaLauncher = registerForActivityResult(new ResultContracts.OpenMedia(),
+        openMediaLauncher = registerForActivityResult(new OpenMedia(),
                 result -> showSnackbarMessage("open media result callback"));
 
-        shareMediaLauncher = registerForActivityResult(new ResultContracts.ShareMedia(),
+        shareMediaLauncher = registerForActivityResult(new ShareMedia(),
                 result -> showSnackbarMessage("share media result callback"));
 
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
@@ -125,15 +129,15 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             });
         }));
         binding.setImageAsWallpaper.setOnClickListener(v -> pickImage(result -> {
-            ResultContracts.MediaInfo image = ResultContracts.MediaInfo.image(result);
+            MediaInfo image = MediaInfo.image(result);
             attachDataLauncher.launch(image);
         }));
         binding.openImage.setOnClickListener(v -> pickImage(result -> {
-            ResultContracts.MediaInfo image = ResultContracts.MediaInfo.image(result);
+            MediaInfo image = MediaInfo.image(result);
             openMediaLauncher.launch(image);
         }));
         binding.shareImage.setOnClickListener(v -> pickImage(result -> {
-            ResultContracts.MediaInfo image = ResultContracts.MediaInfo.image(result);
+            MediaInfo image = MediaInfo.image(result);
             shareMediaLauncher.launch(image);
         }));
 
@@ -167,6 +171,16 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         manageOverlayPermissionRequestor.observeLifecycle(this);
         binding.reqManageOverlayPermission.setOnClickListener(v -> manageOverlayPermissionRequestor.requestSystemPermission(
                 null, grantResult -> showToastMessage("manage overlay permission grantResult=" + grantResult)));
+
+        ActivityResultLauncher<Void> pickImageLauncher = registerForActivityResult(GetContent.anyImage(),
+                result -> showSnackbarMessage("picked image uri=" + result));
+
+        binding.buttonPickImageGetContent.setOnClickListener(v -> pickImageLauncher.launch(null));
+
+        ActivityResultLauncher<Void> pickVideoLauncher = registerForActivityResult(GetContent.mp4Video(),
+                result -> showSnackbarMessage("picked video uri=" + result));
+
+        binding.buttonPickVideoGetContent.setOnClickListener(v -> pickVideoLauncher.launch(null));
     }
 
     private void print(Bitmap resource) {

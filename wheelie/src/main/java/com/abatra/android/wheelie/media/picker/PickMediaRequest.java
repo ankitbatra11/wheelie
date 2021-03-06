@@ -5,8 +5,6 @@ import android.net.Uri;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.Nullable;
 
-import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
-
 import java.util.List;
 
 public class PickMediaRequest {

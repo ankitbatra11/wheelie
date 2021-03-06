@@ -103,4 +103,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/req_multiple_permissions" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_pick_image_get_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pick_image_get_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/req_manage_overlay_permission" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_pick_video_get_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pick_video_get_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_pick_image_get_content" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
