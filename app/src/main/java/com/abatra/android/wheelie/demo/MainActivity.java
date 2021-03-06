@@ -172,12 +172,12 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         binding.reqManageOverlayPermission.setOnClickListener(v -> manageOverlayPermissionRequestor.requestSystemPermission(
                 null, grantResult -> showToastMessage("manage overlay permission grantResult=" + grantResult)));
 
-        ActivityResultLauncher<Void> pickImageLauncher = registerForActivityResult(GetContent.pickAnyImage(),
+        ActivityResultLauncher<Void> pickImageLauncher = registerForActivityResult(GetContent.anyImage(),
                 result -> showSnackbarMessage("picked image uri=" + result));
 
         binding.buttonPickImageGetContent.setOnClickListener(v -> pickImageLauncher.launch(null));
 
-        ActivityResultLauncher<Void> pickVideoLauncher = registerForActivityResult(GetContent.pickMp4Video(),
+        ActivityResultLauncher<Void> pickVideoLauncher = registerForActivityResult(GetContent.mp4Video(),
                 result -> showSnackbarMessage("picked video uri=" + result));
 
         binding.buttonPickVideoGetContent.setOnClickListener(v -> pickVideoLauncher.launch(null));

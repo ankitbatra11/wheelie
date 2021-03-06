@@ -31,11 +31,11 @@ public final class ResultContracts {
             this.mimeType = mimeType;
         }
 
-        public static GetContent pickAnyImage() {
+        public static GetContent anyImage() {
             return new GetContent(MimeTypes.IMAGE_ANY);
         }
 
-        public static GetContent pickMp4Video() {
+        public static GetContent mp4Video() {
             return new GetContent(MimeTypes.VIDEO_MP4);
         }
 
