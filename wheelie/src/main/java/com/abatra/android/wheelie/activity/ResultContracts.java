@@ -7,17 +7,48 @@ import android.provider.Settings;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.abatra.android.wheelie.media.MimeTypes;
 import com.abatra.android.wheelie.util.IntentUtils;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 public final class ResultContracts {
 
     private ResultContracts() {
+    }
+
+    public static class GetContent extends ActivityResultContract<Void, Optional<Uri>> {
+
+        private final String mimeType;
+        private final ActivityResultContracts.GetContent getContent = new ActivityResultContracts.GetContent();
+
+        public GetContent(String mimeType) {
+            this.mimeType = mimeType;
+        }
+
+        public static GetContent pickAnyImage() {
+            return new GetContent(MimeTypes.IMAGE_ANY);
+        }
+
+        public static GetContent pickMp4Video() {
+            return new GetContent(MimeTypes.VIDEO_MP4);
+        }
+
+        @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, Void input) {
+            return getContent.createIntent(context, mimeType);
+        }
+
+        @Override
+        public Optional<Uri> parseResult(int resultCode, @Nullable Intent intent) {
+            return Optional.ofNullable(getContent.parseResult(resultCode, intent));
+        }
     }
 
     public static abstract class ActivityResultActivityResultContract<I> extends ActivityResultContract<I, ActivityResult> {
