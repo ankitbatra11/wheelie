@@ -62,12 +62,14 @@ dependencies {
     implementation group: 'androidx.fragment', name: 'fragment', version: '1.3.0'
     implementation group: 'androidx.print', name: 'print', version: '1.0.0'
 
-    implementation 'com.google.firebase:firebase-config:20.0.3'
+    implementation 'com.google.firebase:firebase-config:20.0.4'
     implementation 'com.google.firebase:firebase-analytics:18.0.2'
 
     implementation 'com.google.android.material:material:1.3.0'
 
     implementation 'com.parse.bolts:bolts-tasks:1.4.0'
+
+    implementation 'com.google.android.play:core:1.10.0'
 
     testImplementation group: 'org.robolectric', name: 'robolectric', version: '4.5.1'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'

@@ -199,7 +199,11 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     }
 
     private void showSnackbarMessage(String message) {
-        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
+        makeSnackbar(message).show();
+    }
+
+    private Snackbar makeSnackbar(String message) {
+        return Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT);
     }
 
     private void showToastMessage(String message) {
