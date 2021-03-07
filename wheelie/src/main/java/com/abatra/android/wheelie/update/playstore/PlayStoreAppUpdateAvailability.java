@@ -1,10 +1,13 @@
 package com.abatra.android.wheelie.update.playstore;
 
+import android.text.PrecomputedText;
+
 import androidx.annotation.NonNull;
 
 import com.abatra.android.wheelie.update.AppUpdateAvailability;
 import com.abatra.android.wheelie.update.AppUpdateType;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.install.model.UpdateAvailability;
 
 import java.util.Optional;
 
@@ -14,6 +17,11 @@ public class PlayStoreAppUpdateAvailability implements AppUpdateAvailability {
 
     public PlayStoreAppUpdateAvailability(AppUpdateInfo appUpdateInfo) {
         this.appUpdateInfo = appUpdateInfo;
+    }
+
+    @Override
+    public boolean isUpdateAvailable() {
+        return appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE;
     }
 
     @Override

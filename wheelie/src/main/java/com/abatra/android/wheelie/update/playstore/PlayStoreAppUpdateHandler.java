@@ -5,7 +5,7 @@ import android.content.Intent;
 import androidx.annotation.Nullable;
 
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
-import com.abatra.android.wheelie.update.AppUpdateCriteriaChecker;
+import com.abatra.android.wheelie.update.AppUpdateCriteria;
 import com.abatra.android.wheelie.update.AppUpdateHandler;
 import com.abatra.android.wheelie.update.AppUpdateRequest;
 import com.abatra.android.wheelie.update.AppUpdateRequestResult;
@@ -23,8 +23,8 @@ public class PlayStoreAppUpdateHandler implements AppUpdateHandler {
     }
 
     @Override
-    public void checkAppUpdateAvailability(AppUpdateCriteriaChecker appUpdateCriteriaChecker, Callback callback) {
-        appUpdateAvailabilityChecker.checkAppUpdateAvailability(appUpdateCriteriaChecker, callback);
+    public void checkAppUpdateAvailability(AppUpdateCriteria appUpdateCriteria, Callback callback) {
+        appUpdateAvailabilityChecker.checkAppUpdateAvailability(appUpdateCriteria, callback);
     }
 
     @Override
