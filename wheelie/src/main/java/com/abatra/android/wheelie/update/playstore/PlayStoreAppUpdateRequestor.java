@@ -3,48 +3,50 @@ package com.abatra.android.wheelie.update.playstore;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentSender;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.abatra.android.wheelie.pattern.Observable;
 import com.abatra.android.wheelie.update.AppUpdateRequest;
 import com.abatra.android.wheelie.update.AppUpdateRequestResult;
 import com.abatra.android.wheelie.update.AppUpdateRequestor;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.install.InstallState;
 import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.ActivityResult;
 import com.google.android.play.core.install.model.InstallStatus;
-
-import java.util.Optional;
+import com.google.android.play.core.tasks.Task;
 
 import timber.log.Timber;
 
 public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallStateUpdatedListener {
 
     private final AppUpdateManager appUpdateManager;
-    @Nullable
-    private PlayStoreAppUpdateRequest updateAppRequest;
+    private final Observable<Observer> observers = Observable.copyOnWriteArraySet();
 
     public PlayStoreAppUpdateRequestor(AppUpdateManager appUpdateManager) {
         this.appUpdateManager = appUpdateManager;
     }
 
     @Override
+    public void addObserver(Observer observer) {
+        observers.addObserver(observer);
+    }
+
+    @Override
     public void requestAppUpdate(AppUpdateRequest appUpdateRequest) {
-        this.updateAppRequest = (PlayStoreAppUpdateRequest) appUpdateRequest;
-        this.updateAppRequest.getRequestedAppUpdateType().beforeStartingAppUpdateFlow(this);
         try {
-
+            PlayStoreAppUpdateRequest storeAppUpdateRequest = (PlayStoreAppUpdateRequest) appUpdateRequest;
             appUpdateManager.startUpdateFlowForResult(
-                    this.updateAppRequest.getAppUpdateAvailability().getAppUpdateInfo(),
-                    this.updateAppRequest.getRequestedAppUpdateType().getPlayStoreAppUpdateType(),
-                    this.updateAppRequest.getActivity(),
-                    this.updateAppRequest.getReqCode());
-
-        } catch (IntentSender.SendIntentException e) {
-            throw new RuntimeException(e);
+                    storeAppUpdateRequest.getAppUpdateAvailability().getAppUpdateInfo(),
+                    storeAppUpdateRequest.getRequestedAppUpdateType().getPlayStoreAppUpdateType(),
+                    storeAppUpdateRequest.getActivity(),
+                    storeAppUpdateRequest.getReqCode());
+        } catch (Throwable error) {
+            Timber.e(error);
+            observers.forEachObserver(Observer::onAppUpdateInstallFailed);
         }
     }
 
@@ -71,24 +73,22 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
     @Override
     @SuppressLint("SwitchIntDef")
     public void onStateUpdate(@NonNull InstallState state) {
-
         Timber.d("installStatus=%d", state.installStatus());
-
-        Optional.ofNullable(updateAppRequest)
-                .flatMap(AppUpdateRequest::getObserver)
-                .ifPresent(observer -> {
-                    switch (state.installStatus()) {
-                        case InstallStatus.DOWNLOADED:
-                            observer.onAppUpdateDownloaded();
-                            break;
-                        case InstallStatus.DOWNLOADING:
-                            observer.onAppUpdateDownloadProgressChanged(state.bytesDownloaded(), state.totalBytesToDownload());
-                            break;
-                        case InstallStatus.FAILED:
-                            observer.onAppUpdateInstallFailed();
-                            break;
-                    }
+        switch (state.installStatus()) {
+            case InstallStatus.DOWNLOADED:
+                observers.forEachObserver(Observer::onAppUpdateDownloaded);
+                break;
+            case InstallStatus.DOWNLOADING:
+                observers.forEachObserver(type -> {
+                    long bytesDownloaded = state.bytesDownloaded();
+                    long totalBytesToDownload = state.totalBytesToDownload();
+                    type.onAppUpdateDownloadProgressChanged(bytesDownloaded, totalBytesToDownload);
                 });
+                break;
+            case InstallStatus.FAILED:
+                observers.forEachObserver(Observer::onAppUpdateInstallFailed);
+                break;
+        }
     }
 
     @Override
@@ -102,8 +102,19 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
     }
 
     @Override
+    public void onResume() {
+        Task<AppUpdateInfo> appUpdateInfo = appUpdateManager.getAppUpdateInfo();
+        appUpdateInfo.addOnFailureListener(e -> Timber.e(e, "onResume: appUpdateManager.getAppUpdateInfo failed!"))
+                .addOnSuccessListener(result -> {
+                    if (result.installStatus() == InstallStatus.DOWNLOADED) {
+                        observers.forEachObserver(Observer::onAppUpdateDownloaded);
+                    }
+                });
+    }
+
+    @Override
     public void onDestroy() {
         appUpdateManager.unregisterListener(this);
-        updateAppRequest = null;
+        observers.removeObservers();
     }
 }
