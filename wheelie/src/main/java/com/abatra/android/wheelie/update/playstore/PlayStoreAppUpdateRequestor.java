@@ -3,6 +3,7 @@ package com.abatra.android.wheelie.update.playstore;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentSender;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,16 +39,21 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
     @Override
     public void requestAppUpdate(AppUpdateRequest appUpdateRequest) {
         try {
-            PlayStoreAppUpdateRequest storeAppUpdateRequest = (PlayStoreAppUpdateRequest) appUpdateRequest;
-            appUpdateManager.startUpdateFlowForResult(
-                    storeAppUpdateRequest.getAppUpdateAvailability().getAppUpdateInfo(),
-                    storeAppUpdateRequest.getRequestedAppUpdateType().getPlayStoreAppUpdateType(),
-                    storeAppUpdateRequest.getActivity(),
-                    storeAppUpdateRequest.getReqCode());
+            tryStartingAppUpdateFlow(appUpdateRequest);
         } catch (Throwable error) {
             Timber.e(error);
             observers.forEachObserver(Observer::onAppUpdateInstallFailed);
         }
+    }
+
+    private void tryStartingAppUpdateFlow(AppUpdateRequest appUpdateRequest) throws IntentSender.SendIntentException {
+        PlayStoreAppUpdateRequest storeAppUpdateRequest = (PlayStoreAppUpdateRequest) appUpdateRequest;
+        storeAppUpdateRequest.getRequestedAppUpdateType().beforeStartingAppUpdateFlow(this);
+        appUpdateManager.startUpdateFlowForResult(
+                storeAppUpdateRequest.getAppUpdateAvailability().getAppUpdateInfo(),
+                storeAppUpdateRequest.getRequestedAppUpdateType().getPlayStoreAppUpdateType(),
+                storeAppUpdateRequest.getActivity(),
+                storeAppUpdateRequest.getReqCode());
     }
 
     @Override
