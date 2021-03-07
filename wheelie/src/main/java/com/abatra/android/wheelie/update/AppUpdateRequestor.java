@@ -4,9 +4,9 @@ import android.content.Intent;
 
 import androidx.annotation.Nullable;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
+import com.abatra.android.wheelie.lifecycle.LifecycleObserverObservable;
 
-public interface AppUpdateRequestor extends ILifecycleObserver {
+public interface AppUpdateRequestor extends LifecycleObserverObservable<AppUpdateRequestor.Observer> {
 
     void requestAppUpdate(AppUpdateRequest appUpdateRequest);
 
