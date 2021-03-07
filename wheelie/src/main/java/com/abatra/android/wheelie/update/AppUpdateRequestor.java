@@ -4,13 +4,17 @@ import android.content.Intent;
 
 import androidx.annotation.Nullable;
 
-public interface AppUpdateRequestor {
+import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
+
+public interface AppUpdateRequestor extends ILifecycleObserver {
 
     void requestAppUpdate(AppUpdateRequest appUpdateRequest);
 
     AppUpdateRequestResult onAppUpdateRequestResult(int resultCode, @Nullable Intent intent);
 
     void registerInstallStatusListener();
+
+    void installDownloadedUpdate();
 
     interface Observer {
 

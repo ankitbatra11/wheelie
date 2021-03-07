@@ -8,7 +8,6 @@ import android.content.IntentSender;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
 import com.abatra.android.wheelie.update.AppUpdateRequest;
 import com.abatra.android.wheelie.update.AppUpdateRequestResult;
 import com.abatra.android.wheelie.update.AppUpdateRequestor;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 import timber.log.Timber;
 
-public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallStateUpdatedListener, ILifecycleObserver {
+public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallStateUpdatedListener {
 
     private final AppUpdateManager appUpdateManager;
     @Nullable
@@ -95,6 +94,11 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
     @Override
     public void registerInstallStatusListener() {
         appUpdateManager.registerListener(this);
+    }
+
+    @Override
+    public void installDownloadedUpdate() {
+        appUpdateManager.completeUpdate().addOnFailureListener(e -> Timber.e(e, "appUpdateManager.completeUpdate failed!"));
     }
 
     @Override
