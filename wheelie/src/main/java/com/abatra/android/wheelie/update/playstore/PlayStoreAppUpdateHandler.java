@@ -41,4 +41,9 @@ public class PlayStoreAppUpdateHandler implements AppUpdateHandler {
     public void registerInstallStatusListener() {
         appUpdateRequestor.registerInstallStatusListener();
     }
+
+    @Override
+    public void installDownloadedUpdate() {
+        appUpdateRequestor.installDownloadedUpdate();
+    }
 }
