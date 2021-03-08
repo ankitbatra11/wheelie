@@ -22,12 +22,16 @@ import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.tasks.Task;
 
+import java.util.Optional;
+
 import timber.log.Timber;
 
 public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallStateUpdatedListener {
 
     private final AppUpdateManager appUpdateManager;
     private final Observable<Observer> observers = Observable.copyOnWriteArraySet();
+    @Nullable
+    private Integer installingOrDownloadingInstallStatus;
 
     public PlayStoreAppUpdateRequestor(AppUpdateManager appUpdateManager) {
         this.appUpdateManager = appUpdateManager;
@@ -105,6 +109,7 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
         Timber.d("installStatus=%d", state.installStatus());
         switch (state.installStatus()) {
             case InstallStatus.DOWNLOADING:
+                installingOrDownloadingInstallStatus = InstallStatus.DOWNLOADING;
                 observers.forEachObserver(type -> {
                     long bytesDownloaded = state.bytesDownloaded();
                     long totalBytesToDownload = state.totalBytesToDownload();
@@ -115,10 +120,20 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
                 observers.forEachObserver(Observer::onAppUpdateDownloaded);
                 break;
             case InstallStatus.INSTALLING:
+                installingOrDownloadingInstallStatus = InstallStatus.INSTALLING;
                 observers.forEachObserver(Observer::onInstallingAppUpdate);
                 break;
             case InstallStatus.FAILED:
-                observers.forEachObserver(Observer::onAppUpdateInstallFailure);
+                Optional<Integer> installingOrDownloadingInstallStatus = Optional.ofNullable(this.installingOrDownloadingInstallStatus);
+                if (installingOrDownloadingInstallStatus.isPresent()) {
+                    if (installingOrDownloadingInstallStatus.get() == InstallStatus.INSTALLING) {
+                        observers.forEachObserver(Observer::onAppUpdateInstallFailure);
+                    } else {
+                        observers.forEachObserver(Observer::onAppUpdateDownloadFailure);
+                    }
+                } else {
+                    observers.forEachObserver(type -> forEachObserver(Observer::onAppUpdateUnknownFailure));
+                }
                 break;
             case InstallStatus.INSTALLED:
                 observers.forEachObserver(Observer::onAppUpdateInstalled);

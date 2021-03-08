@@ -5,10 +5,10 @@ import android.content.Context;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
 import com.abatra.android.wheelie.update.AppUpdateHandler;
 import com.abatra.android.wheelie.update.AppUpdateRequestor;
+import com.abatra.android.wheelie.update.AppUpdateType;
 import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateAvailabilityChecker;
 import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateHandler;
 import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager;
-import com.google.android.play.core.install.model.AppUpdateType;
 
 public class FakePlayStoreAppUpdateHandlerFactory {
 
@@ -18,10 +18,25 @@ public class FakePlayStoreAppUpdateHandlerFactory {
         this.context = context;
     }
 
+    public AppUpdateHandler simulateFlexibleUpdateAvailableToDownloadButInstall() {
+        FakeAppUpdateManager fakeAppUpdateManager = makeAppUpdateAvailable(AppUpdateType.FLEXIBLE);
+        return createAppUpdateHandler(fakeAppUpdateManager, new InstallFailsFlexibleFakePlayStoreAppUpdateRequestor(fakeAppUpdateManager));
+    }
+
+    public AppUpdateHandler simulateFlexibleUpdateAvailableToDownloadButDownloadFails() {
+        FakeAppUpdateManager fakeAppUpdateManager = makeAppUpdateAvailable(AppUpdateType.FLEXIBLE);
+        return createAppUpdateHandler(fakeAppUpdateManager, new DownloadFailsFlexibleFakePlayStoreAppUpdateRequestor(fakeAppUpdateManager));
+    }
+
     public AppUpdateHandler simulateFlexibleUpdateAvailableToDownloadAndInstall() {
+        FakeAppUpdateManager fakeAppUpdateManager = makeAppUpdateAvailable(AppUpdateType.FLEXIBLE);
+        return createAppUpdateHandler(fakeAppUpdateManager, new FlexibleFakePlayStoreAppUpdateRequestor(fakeAppUpdateManager));
+    }
+
+    private FakeAppUpdateManager makeAppUpdateAvailable(AppUpdateType appUpdateType) {
         FakeAppUpdateManager fakeAppUpdateManager = new FakeAppUpdateManager(context);
-        fakeAppUpdateManager.setUpdateAvailable(Integer.MAX_VALUE, AppUpdateType.FLEXIBLE);
-        return createAppUpdateHandler(fakeAppUpdateManager, new DownloadFakePlayStoreAppUpdateRequestor(fakeAppUpdateManager));
+        fakeAppUpdateManager.setUpdateAvailable(Integer.MAX_VALUE, appUpdateType.getPlayStoreAppUpdateType());
+        return fakeAppUpdateManager;
     }
 
     private AppUpdateHandler createAppUpdateHandler(FakeAppUpdateManager fakeAppUpdateManager,
@@ -31,8 +46,7 @@ public class FakePlayStoreAppUpdateHandlerFactory {
     }
 
     public AppUpdateHandler simulateImmediateUpdateAvailableToInstall() {
-        FakeAppUpdateManager fakeAppUpdateManager = new FakeAppUpdateManager(context);
-        fakeAppUpdateManager.setUpdateAvailable(Integer.MAX_VALUE, AppUpdateType.IMMEDIATE);
+        FakeAppUpdateManager fakeAppUpdateManager = makeAppUpdateAvailable(AppUpdateType.IMMEDIATE);
         return createAppUpdateHandler(fakeAppUpdateManager, new ImmediateFakePlayStoreAppUpdateRequestor(fakeAppUpdateManager));
     }
 }

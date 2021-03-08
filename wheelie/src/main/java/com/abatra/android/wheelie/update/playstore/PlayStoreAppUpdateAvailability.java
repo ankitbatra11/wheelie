@@ -1,7 +1,5 @@
 package com.abatra.android.wheelie.update.playstore;
 
-import android.text.PrecomputedText;
-
 import androidx.annotation.NonNull;
 
 import com.abatra.android.wheelie.update.AppUpdateAvailability;

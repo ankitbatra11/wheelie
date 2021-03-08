@@ -137,12 +137,28 @@
                 app:layout_constraintTop_toBottomOf="@id/button_pick_video_get_content" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_check_flexible_update_install_fails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/check_flexible_update_install_fails"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/button_check_flexible_update" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_check_flexible_update_download_fails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/check_flexible_update_download_fails"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/button_check_flexible_update_install_fails" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_check_immediate_update"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/check_immediate_update"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/button_check_flexible_update" />
+                app:layout_constraintTop_toBottomOf="@id/button_check_flexible_update_download_fails" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

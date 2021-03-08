@@ -1,37 +1,59 @@
 package com.abatra.android.wheelie.update.playstore.fake;
 
+import android.annotation.SuppressLint;
 import android.os.SystemClock;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.abatra.android.wheelie.thread.AndroidThread;
 import com.abatra.android.wheelie.thread.HandlerAndroidThread;
 import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateRequest;
 import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager;
+import com.google.android.play.core.install.InstallState;
+import com.google.android.play.core.install.model.InstallStatus;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.abatra.android.wheelie.thread.SaferTask.backgroundTask;
 import static com.abatra.android.wheelie.thread.SaferTask.uiTask;
-import static com.google.common.base.Preconditions.checkState;
 
-public class DownloadFakePlayStoreAppUpdateRequestor extends FakePlayStoreAppUpdateRequestor {
+public class FlexibleFakePlayStoreAppUpdateRequestor extends FakePlayStoreAppUpdateRequestor {
 
     public static final String THREAD_NAME = "simulateFakeAppUpdateDownloadProgress";
     @Nullable
     private DownloadProgressSimulator downloadProgressSimulator;
 
-    public DownloadFakePlayStoreAppUpdateRequestor(FakeAppUpdateManager fakeAppUpdateManager) {
+    public FlexibleFakePlayStoreAppUpdateRequestor(FakeAppUpdateManager fakeAppUpdateManager) {
         super(fakeAppUpdateManager);
     }
 
     @Override
     protected void startAppUpdateFlowOrThrow(PlayStoreAppUpdateRequest storeAppUpdateRequest) {
         super.startAppUpdateFlowOrThrow(storeAppUpdateRequest);
-        getDownloadProgressSimulator().ifPresent(DownloadProgressSimulator::stop);
-        downloadProgressSimulator = new DownloadProgressSimulator(new HandlerAndroidThread(THREAD_NAME));
-        downloadProgressSimulator.start();
+        fakeUserAcceptsUpdate();
+        startFakeAppDownload();
+    }
+
+    @Override
+    @SuppressLint("SwitchIntDef")
+    public void onStateUpdate(@NonNull InstallState state) {
+        switch (state.installStatus()) {
+            case InstallStatus.DOWNLOADED:
+            case InstallStatus.FAILED:
+                getDownloadProgressSimulator().ifPresent(DownloadProgressSimulator::stop);
+                break;
+            case InstallStatus.DOWNLOADING:
+                downloadProgressSimulator = getDownloadProgressSimulator().orElseGet(() -> {
+                    downloadProgressSimulator = new DownloadProgressSimulator(new HandlerAndroidThread(THREAD_NAME));
+                    downloadProgressSimulator.start();
+                    return downloadProgressSimulator;
+                });
+                break;
+        }
+        super.onStateUpdate(state);
+
     }
 
     private Optional<DownloadProgressSimulator> getDownloadProgressSimulator() {
@@ -48,7 +70,7 @@ public class DownloadFakePlayStoreAppUpdateRequestor extends FakePlayStoreAppUpd
 
         }).continueOnUiThread(task ->
         {
-            getFakeAppUpdateManager().installCompletes();
+            fakeInstallCompletion();
             return null;
         });
     }
@@ -71,14 +93,8 @@ public class DownloadFakePlayStoreAppUpdateRequestor extends FakePlayStoreAppUpd
         }
 
         private void start() {
-
             androidThread.stopAndroidThread();
             androidThread.startAndroidThread();
-
-            checkState(getFakeAppUpdateManager().isConfirmationDialogVisible());
-            getFakeAppUpdateManager().userAcceptsUpdate();
-            getFakeAppUpdateManager().downloadStarts();
-
             androidThread.postRunnableWithScheduledInterval(this, 1, TimeUnit.SECONDS);
         }
 
@@ -93,7 +109,6 @@ public class DownloadFakePlayStoreAppUpdateRequestor extends FakePlayStoreAppUpd
                 getFakeAppUpdateManager().setBytesDownloaded(bytesDownloaded);
                 if (bytesDownloaded == BYTES_TO_DOWNLOAD) {
                     getFakeAppUpdateManager().downloadCompletes();
-                    stop();
                 }
                 return null;
             });

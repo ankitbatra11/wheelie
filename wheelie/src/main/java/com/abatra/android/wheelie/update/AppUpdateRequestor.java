@@ -25,6 +25,8 @@ public interface AppUpdateRequestor extends LifecycleObserverObservable<AppUpdat
 
         void onAppUpdateDownloaded();
 
+        void onAppUpdateDownloadFailure();
+
         void onInstallingAppUpdate();
 
         void onAppUpdateInstalled();
@@ -32,5 +34,7 @@ public interface AppUpdateRequestor extends LifecycleObserverObservable<AppUpdat
         void onAppUpdateInstallFailure();
 
         void onImmediateAppUpdateInProgress(AppUpdateInfo result);
+
+        void onAppUpdateUnknownFailure();
     }
 }

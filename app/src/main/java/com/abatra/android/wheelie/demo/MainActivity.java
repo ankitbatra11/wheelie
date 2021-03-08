@@ -17,7 +17,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.print.PrintHelper;
 
 import com.abatra.android.wheelie.activity.ResultContracts.InputLessActivityResultContract;
@@ -196,57 +195,24 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         binding.buttonPickVideoGetContent.setOnClickListener(v -> pickVideoLauncher.launch(null));
 
         FakePlayStoreAppUpdateHandlerFactory appUpdateHandlerFactory = new FakePlayStoreAppUpdateHandlerFactory(this);
-        binding.buttonCheckFlexibleUpdate.setOnClickListener(v -> checkFlexibleUpdate(appUpdateHandlerFactory));
+        binding.buttonCheckFlexibleUpdate.setOnClickListener(v -> {
+            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateFlexibleUpdateAvailableToDownloadAndInstall();
+            checkFlexibleUpdate(appUpdateHandler);
+        });
+        binding.buttonCheckFlexibleUpdateDownloadFails.setOnClickListener(v -> {
+            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateFlexibleUpdateAvailableToDownloadButDownloadFails();
+            checkFlexibleUpdate(appUpdateHandler);
+        });
+        binding.buttonCheckFlexibleUpdateInstallFails.setOnClickListener(v -> {
+            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateFlexibleUpdateAvailableToDownloadButInstall();
+            checkFlexibleUpdate(appUpdateHandler);
+        });
         binding.buttonCheckImmediateUpdate.setOnClickListener(v -> checkImmediateUpdate(appUpdateHandlerFactory));
     }
 
     private void checkImmediateUpdate(FakePlayStoreAppUpdateHandlerFactory appUpdateHandlerFactory) {
         AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateImmediateUpdateAvailableToInstall();
         appUpdateHandler.observeLifecycle(this);
-        appUpdateHandler.addObserver(new AppUpdateRequestor.Observer() {
-
-            @Override
-            public void onAppUpdateDownloadProgressChange(long bytesDownloaded, long totalBytesToDownload) {
-                showSnackbarMessage("Downloading app update... " + bytesDownloaded + "/" + totalBytesToDownload);
-            }
-
-            @Override
-            public void onAppUpdateDownloaded() {
-                makeSnackbar("An update has been downloaded.", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Install", v -> appUpdateHandler.installDownloadedUpdate())
-                        .show();
-            }
-
-            @Override
-            public void onAppUpdateInstallFailure() {
-                showSnackbarMessage("onAppUpdateInstallFailed");
-            }
-
-            @Override
-            public void onRequestAppUpdateFailure(Throwable error) {
-                showSnackbarMessage("onAppUpdateRequestFailed\n" + Throwables.getStackTraceAsString(error));
-            }
-
-            @Override
-            public void onInstallingAppUpdate() {
-                showSnackbarMessage("Installing app update");
-            }
-
-            @Override
-            public void onAppUpdateInstalled() {
-                showSnackbarMessage("App has been successfully updated!");
-            }
-
-            @Override
-            public void onImmediateAppUpdateInProgress(AppUpdateInfo result) {
-                showSnackbarMessage("immediate app update in progress result=" + result);
-                appUpdateHandler.requestAppUpdate(new PlayStoreAppUpdateRequest(
-                        IMMEDIATE,
-                        MainActivity.this,
-                        1,
-                        new PlayStoreAppUpdateAvailability(result)));
-            }
-        });
         appUpdateHandler.checkAppUpdateAvailability(AppUpdateCriteria.isAppUpdateAllowedOfType(IMMEDIATE), new AppUpdateAvailabilityChecker.Callback() {
 
             @Override
@@ -273,81 +239,10 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         });
     }
 
-    private void checkFlexibleUpdate(FakePlayStoreAppUpdateHandlerFactory appUpdateHandlerFactory) {
-        AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateFlexibleUpdateAvailableToDownloadAndInstall();
+    private void checkFlexibleUpdate(AppUpdateHandler appUpdateHandler) {
         appUpdateHandler.observeLifecycle(this);
-        appUpdateHandler.addObserver(new AppUpdateRequestor.Observer() {
-
-            @Override
-            public void onAppUpdateDownloadProgressChange(long bytesDownloaded, long totalBytesToDownload) {
-                showSnackbarMessage("Downloading app update... " + bytesDownloaded + "/" + totalBytesToDownload);
-            }
-
-            @Override
-            public void onAppUpdateDownloaded() {
-                makeSnackbar("An update has been downloaded.", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Install", v -> appUpdateHandler.installDownloadedUpdate())
-                        .show();
-            }
-
-            @Override
-            public void onAppUpdateInstallFailure() {
-                showSnackbarMessage("onAppUpdateInstallFailed");
-            }
-
-            @Override
-            public void onRequestAppUpdateFailure(Throwable error) {
-                showSnackbarMessage("onAppUpdateRequestFailed\n" + Throwables.getStackTraceAsString(error));
-            }
-
-            @Override
-            public void onInstallingAppUpdate() {
-                showSnackbarMessage("Installing app update");
-            }
-
-            @Override
-            public void onAppUpdateInstalled() {
-                showSnackbarMessage("App has been successfully updated!");
-            }
-
-            @Override
-            public void onImmediateAppUpdateInProgress(AppUpdateInfo result) {
-                showSnackbarMessage("immediate app update in progress result=" + result);
-                appUpdateHandler.requestAppUpdate(new PlayStoreAppUpdateRequest(
-                        IMMEDIATE,
-                        MainActivity.this,
-                        1,
-                        new PlayStoreAppUpdateAvailability(result)));
-            }
-        });
-        appUpdateHandler.checkAppUpdateAvailability(AppUpdateCriteria.isAppUpdateAllowedOfType(FLEXIBLE), new AppUpdateAvailabilityChecker.Callback() {
-
-            @Override
-            public void onAppUpdateAvailable(AppUpdateAvailability appUpdateAvailability) {
-                makeSnackbar("An update is available for the app", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Download", v -> {
-
-                            PlayStoreAppUpdateRequest appUpdateRequest = new PlayStoreAppUpdateRequest(
-                                    FLEXIBLE,
-                                    MainActivity.this,
-                                    1,
-                                    (PlayStoreAppUpdateAvailability) appUpdateAvailability);
-
-                            appUpdateHandler.requestAppUpdate(appUpdateRequest);
-                        })
-                        .show();
-            }
-
-            @Override
-            public void onAppUpdateAvailableCheckFailed(Throwable error) {
-                showToastMessage(Throwables.getStackTraceAsString(error));
-            }
-
-            @Override
-            public void onAppUpdateCriteriaNotMet() {
-                showSnackbarMessage("onAppUpdateCriteriaNotMet");
-            }
-        });
+        appUpdateHandler.addObserver(new FlexibleAppUpdateObserver(appUpdateHandler));
+        appUpdateHandler.checkAppUpdateAvailability(AppUpdateCriteria.isAppUpdateAllowedOfType(FLEXIBLE), new FlexibleAppAvailabilityCallback(appUpdateHandler));
     }
 
     private void print(Bitmap resource) {
@@ -393,4 +288,102 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     public AppCompatActivity getAppCompatActivity() {
         return this;
     }
+
+    private class FlexibleAppUpdateObserver implements AppUpdateRequestor.Observer {
+
+        private final AppUpdateHandler appUpdateHandler;
+
+        private FlexibleAppUpdateObserver(AppUpdateHandler appUpdateHandler) {
+            this.appUpdateHandler = appUpdateHandler;
+        }
+
+        @Override
+        public void onAppUpdateDownloadFailure() {
+            showSnackbarMessage("onAppUpdateDownloadFailure");
+        }
+
+        @Override
+        public void onAppUpdateUnknownFailure() {
+            showSnackbarMessage("onAppUpdateUnknownFailure");
+        }
+
+        @Override
+        public void onAppUpdateDownloadProgressChange(long bytesDownloaded, long totalBytesToDownload) {
+            showSnackbarMessage("Downloading app update... " + bytesDownloaded + "/" + totalBytesToDownload);
+        }
+
+        @Override
+        public void onAppUpdateDownloaded() {
+            makeSnackbar("An update has been downloaded.", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Install", v -> appUpdateHandler.installDownloadedUpdate())
+                    .show();
+        }
+
+        @Override
+        public void onAppUpdateInstallFailure() {
+            showSnackbarMessage("onAppUpdateInstallFailed");
+        }
+
+        @Override
+        public void onRequestAppUpdateFailure(Throwable error) {
+            showSnackbarMessage("onAppUpdateRequestFailed\n" + Throwables.getStackTraceAsString(error));
+        }
+
+        @Override
+        public void onInstallingAppUpdate() {
+            showSnackbarMessage("Installing app update");
+        }
+
+        @Override
+        public void onAppUpdateInstalled() {
+            showSnackbarMessage("App has been successfully updated!");
+        }
+
+        @Override
+        public void onImmediateAppUpdateInProgress(AppUpdateInfo result) {
+            showSnackbarMessage("immediate app update in progress result=" + result);
+            appUpdateHandler.requestAppUpdate(new PlayStoreAppUpdateRequest(
+                    IMMEDIATE,
+                    MainActivity.this,
+                    1,
+                    new PlayStoreAppUpdateAvailability(result)));
+        }
+    }
+
+    private class FlexibleAppAvailabilityCallback implements AppUpdateAvailabilityChecker.Callback {
+
+        private final AppUpdateHandler appUpdateHandler;
+
+        private FlexibleAppAvailabilityCallback(AppUpdateHandler appUpdateHandler) {
+            this.appUpdateHandler = appUpdateHandler;
+        }
+
+        @Override
+        public void onAppUpdateAvailable(AppUpdateAvailability appUpdateAvailability) {
+            makeSnackbar("An update is available for the app", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Download", v -> {
+
+                        PlayStoreAppUpdateRequest appUpdateRequest = new PlayStoreAppUpdateRequest(
+                                FLEXIBLE,
+                                MainActivity.this,
+                                1,
+                                (PlayStoreAppUpdateAvailability) appUpdateAvailability);
+
+                        appUpdateHandler.requestAppUpdate(appUpdateRequest);
+                    })
+                    .show();
+        }
+
+        @Override
+        public void onAppUpdateAvailableCheckFailed(Throwable error) {
+            showToastMessage(Throwables.getStackTraceAsString(error));
+        }
+
+        @Override
+        public void onAppUpdateCriteriaNotMet() {
+            showSnackbarMessage("onAppUpdateCriteriaNotMet");
+        }
+    }
+
+
 }

@@ -18,4 +18,6 @@
     <string name="pick_video_get_content">Pick video get content</string>
     <string name="check_flexible_update">Check flexible update</string>
     <string name="check_immediate_update">Check immediate update</string>
+    <string name="check_flexible_update_install_fails">Check flexible update install fails</string>
+    <string name="check_flexible_update_download_fails">Check flexible update download fails</string>
 </resources>

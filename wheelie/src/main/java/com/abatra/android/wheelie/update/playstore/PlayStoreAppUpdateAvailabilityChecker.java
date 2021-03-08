@@ -1,18 +1,22 @@
 package com.abatra.android.wheelie.update.playstore;
 
+import com.abatra.android.wheelie.thread.SaferTask;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
 import com.abatra.android.wheelie.update.AppUpdateCriteria;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 
+import java.util.concurrent.Executor;
+
+import bolts.Task;
 import timber.log.Timber;
 
 import static com.abatra.android.wheelie.thread.BoltsUtils.getResult;
-import static com.abatra.android.wheelie.thread.SaferTask.backgroundTask;
 
 public class PlayStoreAppUpdateAvailabilityChecker implements AppUpdateAvailabilityChecker {
 
     private final AppUpdateManager appUpdateManager;
+    Executor appUpdateCriteriaCheckExecutor = Task.BACKGROUND_EXECUTOR;
 
     public PlayStoreAppUpdateAvailabilityChecker(AppUpdateManager appUpdateManager) {
         this.appUpdateManager = appUpdateManager;
@@ -35,7 +39,7 @@ public class PlayStoreAppUpdateAvailabilityChecker implements AppUpdateAvailabil
                                            Callback callback) {
         Timber.d("onGetAppUpdateInfoSuccess appUpdateInfo=%s", appUpdateInfo);
         final PlayStoreAppUpdateAvailability appUpdateAvailability = new PlayStoreAppUpdateAvailability(appUpdateInfo);
-        backgroundTask(() ->
+        SaferTask.callOn(appUpdateCriteriaCheckExecutor, () ->
         {
             AppUpdateCriteria criteria = AppUpdateCriteria.IS_UPDATE_AVAILABLE.and(appUpdateCriteria);
             return criteria.meets(new PlayStoreAppUpdateAvailability(appUpdateInfo));

@@ -2,6 +2,7 @@ package com.abatra.android.wheelie.thread;
 
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 import bolts.Continuation;
@@ -14,6 +15,10 @@ public class SaferTask<TR> {
 
     private SaferTask(Task<TR> task) {
         this.task = task;
+    }
+
+    public static <TR> SaferTask<TR> callOn(Executor executor, Callable<TR> callable) {
+        return new SaferTask<>(Task.call(backgroundThreadCallable(callable), executor));
     }
 
     public static <TR> SaferTask<TR> backgroundTask(Callable<TR> callable) {
