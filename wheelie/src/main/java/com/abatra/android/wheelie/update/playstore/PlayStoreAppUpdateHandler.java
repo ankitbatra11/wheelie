@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import androidx.annotation.Nullable;
 
+import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
 import com.abatra.android.wheelie.update.AppUpdateCriteria;
 import com.abatra.android.wheelie.update.AppUpdateHandler;
@@ -20,6 +21,26 @@ public class PlayStoreAppUpdateHandler implements AppUpdateHandler {
                                      AppUpdateRequestor appUpdateRequestor) {
         this.appUpdateAvailabilityChecker = appUpdateAvailabilityChecker;
         this.appUpdateRequestor = appUpdateRequestor;
+    }
+
+    @Override
+    public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+        appUpdateRequestor.observeLifecycle(lifecycleOwner);
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        appUpdateRequestor.addObserver(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        appUpdateRequestor.removeObserver(observer);
+    }
+
+    @Override
+    public void removeObservers() {
+        appUpdateRequestor.removeObservers();
     }
 
     @Override

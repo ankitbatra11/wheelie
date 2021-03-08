@@ -8,6 +8,7 @@ import android.content.IntentSender;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.abatra.android.wheelie.java8.Consumer;
 import com.abatra.android.wheelie.pattern.Observable;
 import com.abatra.android.wheelie.update.AppUpdateRequest;
 import com.abatra.android.wheelie.update.AppUpdateRequestResult;
@@ -18,7 +19,10 @@ import com.google.android.play.core.install.InstallState;
 import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.ActivityResult;
 import com.google.android.play.core.install.model.InstallStatus;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.tasks.Task;
+
+import java.util.Optional;
 
 import timber.log.Timber;
 
@@ -26,9 +30,15 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
 
     private final AppUpdateManager appUpdateManager;
     private final Observable<Observer> observers = Observable.copyOnWriteArraySet();
+    @Nullable
+    private Integer installingOrDownloadingInstallStatus;
 
     public PlayStoreAppUpdateRequestor(AppUpdateManager appUpdateManager) {
         this.appUpdateManager = appUpdateManager;
+    }
+
+    protected AppUpdateManager getAppUpdateManager() {
+        return appUpdateManager;
     }
 
     @Override
@@ -37,23 +47,40 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
     }
 
     @Override
+    public void forEachObserver(Consumer<Observer> observerConsumer) {
+        observers.forEachObserver(observerConsumer);
+    }
+
+    @Override
+    public void onCreate() {
+        appUpdateManager.registerListener(this);
+    }
+
+    @Override
     public void requestAppUpdate(AppUpdateRequest appUpdateRequest) {
         try {
             tryStartingAppUpdateFlow(appUpdateRequest);
         } catch (Throwable error) {
             Timber.e(error);
-            observers.forEachObserver(Observer::onAppUpdateInstallFailed);
+            observers.forEachObserver(type -> type.onRequestAppUpdateFailure(error));
         }
     }
 
-    private void tryStartingAppUpdateFlow(AppUpdateRequest appUpdateRequest) throws IntentSender.SendIntentException {
+    private void tryStartingAppUpdateFlow(AppUpdateRequest appUpdateRequest) {
         PlayStoreAppUpdateRequest storeAppUpdateRequest = (PlayStoreAppUpdateRequest) appUpdateRequest;
-        storeAppUpdateRequest.getRequestedAppUpdateType().beforeStartingAppUpdateFlow(this);
-        appUpdateManager.startUpdateFlowForResult(
-                storeAppUpdateRequest.getAppUpdateAvailability().getAppUpdateInfo(),
-                storeAppUpdateRequest.getRequestedAppUpdateType().getPlayStoreAppUpdateType(),
-                storeAppUpdateRequest.getActivity(),
-                storeAppUpdateRequest.getReqCode());
+        startAppUpdateFlowOrThrow(storeAppUpdateRequest);
+    }
+
+    protected void startAppUpdateFlowOrThrow(PlayStoreAppUpdateRequest storeAppUpdateRequest) {
+        try {
+            getAppUpdateManager().startUpdateFlowForResult(
+                    storeAppUpdateRequest.getAppUpdateAvailability().getAppUpdateInfo(),
+                    storeAppUpdateRequest.getRequestedAppUpdateType().getPlayStoreAppUpdateType(),
+                    storeAppUpdateRequest.getActivity(),
+                    storeAppUpdateRequest.getReqCode());
+        } catch (IntentSender.SendIntentException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -81,18 +108,35 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
     public void onStateUpdate(@NonNull InstallState state) {
         Timber.d("installStatus=%d", state.installStatus());
         switch (state.installStatus()) {
-            case InstallStatus.DOWNLOADED:
-                observers.forEachObserver(Observer::onAppUpdateDownloaded);
-                break;
             case InstallStatus.DOWNLOADING:
+                installingOrDownloadingInstallStatus = InstallStatus.DOWNLOADING;
                 observers.forEachObserver(type -> {
                     long bytesDownloaded = state.bytesDownloaded();
                     long totalBytesToDownload = state.totalBytesToDownload();
-                    type.onAppUpdateDownloadProgressChanged(bytesDownloaded, totalBytesToDownload);
+                    type.onAppUpdateDownloadProgressChange(bytesDownloaded, totalBytesToDownload);
                 });
                 break;
+            case InstallStatus.DOWNLOADED:
+                observers.forEachObserver(Observer::onAppUpdateDownloaded);
+                break;
+            case InstallStatus.INSTALLING:
+                installingOrDownloadingInstallStatus = InstallStatus.INSTALLING;
+                observers.forEachObserver(Observer::onInstallingAppUpdate);
+                break;
             case InstallStatus.FAILED:
-                observers.forEachObserver(Observer::onAppUpdateInstallFailed);
+                Optional<Integer> installingOrDownloadingInstallStatus = Optional.ofNullable(this.installingOrDownloadingInstallStatus);
+                if (installingOrDownloadingInstallStatus.isPresent()) {
+                    if (installingOrDownloadingInstallStatus.get() == InstallStatus.INSTALLING) {
+                        observers.forEachObserver(Observer::onAppUpdateInstallFailure);
+                    } else {
+                        observers.forEachObserver(Observer::onAppUpdateDownloadFailure);
+                    }
+                } else {
+                    observers.forEachObserver(type -> forEachObserver(Observer::onAppUpdateUnknownFailure));
+                }
+                break;
+            case InstallStatus.INSTALLED:
+                observers.forEachObserver(Observer::onAppUpdateInstalled);
                 break;
         }
     }
@@ -114,6 +158,8 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
                 .addOnSuccessListener(result -> {
                     if (result.installStatus() == InstallStatus.DOWNLOADED) {
                         observers.forEachObserver(Observer::onAppUpdateDownloaded);
+                    } else if (result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                        observers.forEachObserver(type -> type.onImmediateAppUpdateInProgress(result));
                     }
                 });
     }
