@@ -3,7 +3,7 @@ package com.abatra.android.wheelie.update.playstore;
 import android.app.Activity;
 import android.os.Build;
 
-import com.abatra.android.wheelie.update.AppUpdateCriteria;
+import com.abatra.android.wheelie.update.AppUpdateAvailabilityCriteria;
 import com.abatra.android.wheelie.update.AppUpdateRequest;
 import com.abatra.android.wheelie.update.AppUpdateRequestor;
 import com.abatra.android.wheelie.update.AppUpdateType;
@@ -35,7 +35,7 @@ public class PlayStoreAppUpdateRequestorTest {
     private FakeAppUpdateManager fakeAppUpdateManager;
 
     @Mock
-    private AppUpdateCriteria mockedAppUpdateCriteria;
+    private AppUpdateAvailabilityCriteria mockedAppUpdateAvailabilityCriteria;
 
     @Mock
     private AppUpdateRequestor.Observer mockedObserver;
@@ -48,7 +48,7 @@ public class PlayStoreAppUpdateRequestorTest {
 
         MockitoAnnotations.openMocks(this);
 
-        when(mockedAppUpdateCriteria.meets(any())).thenReturn(true);
+        when(mockedAppUpdateAvailabilityCriteria.meets(any())).thenReturn(true);
 
         fakeAppUpdateManager = new FakeAppUpdateManager(getApplicationContext());
         playStoreAppUpdateRequestor = new PlayStoreAppUpdateRequestor(fakeAppUpdateManager);
@@ -135,6 +135,7 @@ public class PlayStoreAppUpdateRequestorTest {
 
         fakeAppUpdateManager.userAcceptsUpdate();
         assertThat(fakeAppUpdateManager.isConfirmationDialogVisible(), equalTo(false));
+        verify(mockedObserver, times(1)).onAppUpdatePendingDownload();
 
         fakeAppUpdateManager.downloadStarts();
 

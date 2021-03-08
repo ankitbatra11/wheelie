@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.abatra.android.wheelie.thread.SaferTask.backgroundTask;
 import static com.abatra.android.wheelie.thread.SaferTask.uiTask;
+import static com.google.common.base.Preconditions.checkState;
 
 public class FlexibleFakePlayStoreAppUpdateRequestor extends FakePlayStoreAppUpdateRequestor {
 
@@ -32,6 +33,7 @@ public class FlexibleFakePlayStoreAppUpdateRequestor extends FakePlayStoreAppUpd
     @Override
     protected void startAppUpdateFlowOrThrow(PlayStoreAppUpdateRequest storeAppUpdateRequest) {
         super.startAppUpdateFlowOrThrow(storeAppUpdateRequest);
+        checkState(getFakeAppUpdateManager().isConfirmationDialogVisible());
         fakeUserAcceptsUpdate();
         startFakeAppDownload();
     }

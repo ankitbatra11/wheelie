@@ -20,4 +20,5 @@
     <string name="check_immediate_update">Check immediate update</string>
     <string name="check_flexible_update_install_fails">Check flexible update install fails</string>
     <string name="check_flexible_update_download_fails">Check flexible update download fails</string>
+    <string name="user_rejects_flexible_update">User rejects flexible update</string>
 </resources>

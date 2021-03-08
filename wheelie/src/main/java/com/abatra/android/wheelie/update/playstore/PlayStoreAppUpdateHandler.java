@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 
 import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
-import com.abatra.android.wheelie.update.AppUpdateCriteria;
+import com.abatra.android.wheelie.update.AppUpdateAvailabilityCriteria;
 import com.abatra.android.wheelie.update.AppUpdateHandler;
 import com.abatra.android.wheelie.update.AppUpdateRequest;
 import com.abatra.android.wheelie.update.AppUpdateRequestResult;
@@ -44,8 +44,8 @@ public class PlayStoreAppUpdateHandler implements AppUpdateHandler {
     }
 
     @Override
-    public void checkAppUpdateAvailability(AppUpdateCriteria appUpdateCriteria, Callback callback) {
-        appUpdateAvailabilityChecker.checkAppUpdateAvailability(appUpdateCriteria, callback);
+    public void checkAppUpdateAvailability(AppUpdateAvailabilityCriteria appUpdateAvailabilityCriteria, Callback callback) {
+        appUpdateAvailabilityChecker.checkAppUpdateAvailability(appUpdateAvailabilityCriteria, callback);
     }
 
     @Override
@@ -56,11 +56,6 @@ public class PlayStoreAppUpdateHandler implements AppUpdateHandler {
     @Override
     public AppUpdateRequestResult onAppUpdateRequestResult(int resultCode, @Nullable Intent intent) {
         return appUpdateRequestor.onAppUpdateRequestResult(resultCode, intent);
-    }
-
-    @Override
-    public void registerInstallStatusListener() {
-        appUpdateRequestor.registerInstallStatusListener();
     }
 
     @Override

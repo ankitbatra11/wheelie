@@ -4,7 +4,7 @@ import android.os.Build;
 
 import com.abatra.android.wheelie.update.AppUpdateAvailability;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
-import com.abatra.android.wheelie.update.AppUpdateCriteria;
+import com.abatra.android.wheelie.update.AppUpdateAvailabilityCriteria;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager;
@@ -45,7 +45,7 @@ public class PlayStoreAppUpdateAvailabilityCheckerTest {
     private AppUpdateAvailabilityChecker.Callback mockedCallback;
 
     @Mock
-    private AppUpdateCriteria mockedAppUpdateCriteria;
+    private AppUpdateAvailabilityCriteria mockedAppUpdateAvailabilityCriteria;
 
     @Captor
     private ArgumentCaptor<OnCompleteListener<AppUpdateInfo>> appUpdateInfoOnCompleteListener;
@@ -58,7 +58,7 @@ public class PlayStoreAppUpdateAvailabilityCheckerTest {
 
         MockitoAnnotations.openMocks(this);
 
-        when(mockedAppUpdateCriteria.meets(any())).thenReturn(true);
+        when(mockedAppUpdateAvailabilityCriteria.meets(any())).thenReturn(true);
 
         fakeAppUpdateManager = new FakeAppUpdateManager(getApplicationContext());
         playStoreAppUpdateAvailabilityChecker = new PlayStoreAppUpdateAvailabilityChecker(fakeAppUpdateManager);
@@ -79,7 +79,7 @@ public class PlayStoreAppUpdateAvailabilityCheckerTest {
         when(mockedAppUpdateInfoTask.getException()).thenReturn(exception);
 
         playStoreAppUpdateAvailabilityChecker = new PlayStoreAppUpdateAvailabilityChecker(mockedAppUpdateManager);
-        playStoreAppUpdateAvailabilityChecker.checkAppUpdateAvailability(mockedAppUpdateCriteria, mockedCallback);
+        playStoreAppUpdateAvailabilityChecker.checkAppUpdateAvailability(mockedAppUpdateAvailabilityCriteria, mockedCallback);
 
         verify(mockedAppUpdateInfoTask, times(1)).addOnCompleteListener(appUpdateInfoOnCompleteListener.capture());
         assertThat(appUpdateInfoOnCompleteListener.getValue(), notNullValue());
@@ -93,7 +93,7 @@ public class PlayStoreAppUpdateAvailabilityCheckerTest {
 
         fakeAppUpdateManager.setUpdateAvailable(2);
 
-        playStoreAppUpdateAvailabilityChecker.checkAppUpdateAvailability(mockedAppUpdateCriteria, mockedCallback);
+        playStoreAppUpdateAvailabilityChecker.checkAppUpdateAvailability(mockedAppUpdateAvailabilityCriteria, mockedCallback);
         Robolectric.flushForegroundThreadScheduler();
 
         verify(mockedCallback, times(1)).onAppUpdateAvailable(appUpdateAvailabilityArgumentCaptor.capture());
@@ -111,11 +111,11 @@ public class PlayStoreAppUpdateAvailabilityCheckerTest {
 
         fakeAppUpdateManager.setUpdateNotAvailable();
 
-        playStoreAppUpdateAvailabilityChecker.checkAppUpdateAvailability(mockedAppUpdateCriteria, mockedCallback);
+        playStoreAppUpdateAvailabilityChecker.checkAppUpdateAvailability(mockedAppUpdateAvailabilityCriteria, mockedCallback);
         Robolectric.flushForegroundThreadScheduler();
 
         verify(mockedCallback, times(1)).onAppUpdateCriteriaNotMet();
-        verify(mockedAppUpdateCriteria, never()).meets(any());
+        verify(mockedAppUpdateAvailabilityCriteria, never()).meets(any());
 
     }
 
@@ -123,12 +123,12 @@ public class PlayStoreAppUpdateAvailabilityCheckerTest {
     public void testCheckingAppUpdate_appUpdateCriteriaNotMet() {
 
         fakeAppUpdateManager.setUpdateAvailable(2);
-        when(mockedAppUpdateCriteria.meets(any())).thenReturn(false);
+        when(mockedAppUpdateAvailabilityCriteria.meets(any())).thenReturn(false);
 
-        playStoreAppUpdateAvailabilityChecker.checkAppUpdateAvailability(mockedAppUpdateCriteria, mockedCallback);
+        playStoreAppUpdateAvailabilityChecker.checkAppUpdateAvailability(mockedAppUpdateAvailabilityCriteria, mockedCallback);
         Robolectric.flushForegroundThreadScheduler();
 
         verify(mockedCallback, times(1)).onAppUpdateCriteriaNotMet();
-        verify(mockedAppUpdateCriteria, times(1)).meets(any(PlayStoreAppUpdateAvailability.class));
+        verify(mockedAppUpdateAvailabilityCriteria, times(1)).meets(any(PlayStoreAppUpdateAvailability.class));
     }
 }

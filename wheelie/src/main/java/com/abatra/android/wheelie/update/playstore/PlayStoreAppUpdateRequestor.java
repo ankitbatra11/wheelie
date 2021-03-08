@@ -108,6 +108,9 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
     public void onStateUpdate(@NonNull InstallState state) {
         Timber.d("installStatus=%d", state.installStatus());
         switch (state.installStatus()) {
+            case InstallStatus.PENDING:
+                observers.forEachObserver(Observer::onAppUpdatePendingDownload);
+                break;
             case InstallStatus.DOWNLOADING:
                 installingOrDownloadingInstallStatus = InstallStatus.DOWNLOADING;
                 observers.forEachObserver(type -> {
@@ -142,11 +145,6 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
     }
 
     @Override
-    public void registerInstallStatusListener() {
-        appUpdateManager.registerListener(this);
-    }
-
-    @Override
     public void installDownloadedUpdate() {
         appUpdateManager.completeUpdate().addOnFailureListener(e -> Timber.e(e, "appUpdateManager.completeUpdate failed!"));
     }
@@ -159,7 +157,7 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
                     if (result.installStatus() == InstallStatus.DOWNLOADED) {
                         observers.forEachObserver(Observer::onAppUpdateDownloaded);
                     } else if (result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                        observers.forEachObserver(type -> type.onImmediateAppUpdateInProgress(result));
+                        observers.forEachObserver(type -> type.onImmediateAppUpdateInProgress(new PlayStoreAppUpdateAvailability(result)));
                     }
                 });
     }
