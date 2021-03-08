@@ -4,13 +4,13 @@ import android.app.Activity;
 
 import androidx.annotation.NonNull;
 
-public class AppUpdateRequest {
+abstract public class AppUpdateRequest {
 
     private final AppUpdateType requestedAppUpdateType;
     private final Activity activity;
     private final int reqCode;
 
-    public AppUpdateRequest(AppUpdateType requestedAppUpdateType, Activity activity, int reqCode) {
+    protected AppUpdateRequest(AppUpdateType requestedAppUpdateType, Activity activity, int reqCode) {
         this.requestedAppUpdateType = requestedAppUpdateType;
         this.activity = activity;
         this.reqCode = reqCode;

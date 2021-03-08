@@ -12,26 +12,26 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-abstract public class PlayStoreAppUpdateModule {
+public class PlayStoreAppUpdateModule {
 
     @Provides
-    static AppUpdateManager appUpdateManager(Context context) {
+    protected AppUpdateManager appUpdateManager(Context context) {
         return AppUpdateManagerFactory.create(context);
     }
 
     @Provides
-    static AppUpdateAvailabilityChecker appUpdateAvailabilityChecker(AppUpdateManager appUpdateManager) {
+    protected AppUpdateAvailabilityChecker appUpdateAvailabilityChecker(AppUpdateManager appUpdateManager) {
         return new PlayStoreAppUpdateAvailabilityChecker(appUpdateManager);
     }
 
     @Provides
-    static AppUpdateRequestor appUpdateRequestor(AppUpdateManager appUpdateManager) {
+    protected AppUpdateRequestor appUpdateRequestor(AppUpdateManager appUpdateManager) {
         return new PlayStoreAppUpdateRequestor(appUpdateManager);
     }
 
     @Provides
-    static AppUpdateHandler appUpdateHandler(AppUpdateAvailabilityChecker appUpdateAvailabilityChecker,
-                                             AppUpdateRequestor appUpdateRequestor) {
+    protected AppUpdateHandler appUpdateHandler(AppUpdateAvailabilityChecker appUpdateAvailabilityChecker,
+                                                AppUpdateRequestor appUpdateRequestor) {
         return new PlayStoreAppUpdateHandler(appUpdateAvailabilityChecker, appUpdateRequestor);
     }
 

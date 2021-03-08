@@ -6,11 +6,6 @@ public enum AppUpdateType {
         public int getPlayStoreAppUpdateType() {
             return com.google.android.play.core.install.model.AppUpdateType.FLEXIBLE;
         }
-
-        @Override
-        public void beforeStartingAppUpdateFlow(AppUpdateRequestor appUpdateRequestor) {
-            appUpdateRequestor.registerInstallStatusListener();
-        }
     },
     IMMEDIATE {
         @Override
@@ -20,7 +15,4 @@ public enum AppUpdateType {
     };
 
     public abstract int getPlayStoreAppUpdateType();
-
-    public void beforeStartingAppUpdateFlow(AppUpdateRequestor appUpdateRequestor) {
-    }
 }

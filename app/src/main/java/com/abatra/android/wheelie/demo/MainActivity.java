@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -37,11 +38,21 @@ import com.abatra.android.wheelie.permission.ManifestMultiplePermissionsRequesto
 import com.abatra.android.wheelie.permission.ManifestSinglePermissionRequestor;
 import com.abatra.android.wheelie.permission.MultiplePermissionsGrantResult;
 import com.abatra.android.wheelie.permission.MultiplePermissionsRequestor;
+import com.abatra.android.wheelie.update.AppUpdateAvailability;
+import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
+import com.abatra.android.wheelie.update.AppUpdateCriteria;
+import com.abatra.android.wheelie.update.AppUpdateHandler;
+import com.abatra.android.wheelie.update.AppUpdateRequestor;
+import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateAvailability;
+import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateRequest;
+import com.abatra.android.wheelie.update.playstore.fake.FakePlayStoreAppUpdateHandlerFactory;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.common.base.Throwables;
 
 import timber.log.Timber;
 
@@ -51,6 +62,8 @@ import static com.abatra.android.wheelie.activity.ResultContracts.MediaInfo;
 import static com.abatra.android.wheelie.activity.ResultContracts.OpenMedia;
 import static com.abatra.android.wheelie.activity.ResultContracts.OpenSettingsScreen.wirelessSettings;
 import static com.abatra.android.wheelie.activity.ResultContracts.ShareMedia;
+import static com.abatra.android.wheelie.update.AppUpdateType.FLEXIBLE;
+import static com.abatra.android.wheelie.update.AppUpdateType.IMMEDIATE;
 
 public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
@@ -109,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         });
 
         ActivityResultLauncher<Void> launcher = registerForActivityResult(wirelessSettings(), result -> {
-            ConstraintLayout view = binding.getRoot();
+            View view = binding.coordinator;
             Snackbar.make(view, R.string.wireless_settings_result_msg, Snackbar.LENGTH_SHORT).show();
         });
         binding.launchWirelessSettingsBtn.setOnClickListener(v -> launcher.launch(null));
@@ -181,6 +194,160 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
                 result -> showSnackbarMessage("picked video uri=" + result));
 
         binding.buttonPickVideoGetContent.setOnClickListener(v -> pickVideoLauncher.launch(null));
+
+        FakePlayStoreAppUpdateHandlerFactory appUpdateHandlerFactory = new FakePlayStoreAppUpdateHandlerFactory(this);
+        binding.buttonCheckFlexibleUpdate.setOnClickListener(v -> checkFlexibleUpdate(appUpdateHandlerFactory));
+        binding.buttonCheckImmediateUpdate.setOnClickListener(v -> checkImmediateUpdate(appUpdateHandlerFactory));
+    }
+
+    private void checkImmediateUpdate(FakePlayStoreAppUpdateHandlerFactory appUpdateHandlerFactory) {
+        AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateImmediateUpdateAvailableToInstall();
+        appUpdateHandler.observeLifecycle(this);
+        appUpdateHandler.addObserver(new AppUpdateRequestor.Observer() {
+
+            @Override
+            public void onAppUpdateDownloadProgressChange(long bytesDownloaded, long totalBytesToDownload) {
+                showSnackbarMessage("Downloading app update... " + bytesDownloaded + "/" + totalBytesToDownload);
+            }
+
+            @Override
+            public void onAppUpdateDownloaded() {
+                makeSnackbar("An update has been downloaded.", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Install", v -> appUpdateHandler.installDownloadedUpdate())
+                        .show();
+            }
+
+            @Override
+            public void onAppUpdateInstallFailure() {
+                showSnackbarMessage("onAppUpdateInstallFailed");
+            }
+
+            @Override
+            public void onRequestAppUpdateFailure(Throwable error) {
+                showSnackbarMessage("onAppUpdateRequestFailed\n" + Throwables.getStackTraceAsString(error));
+            }
+
+            @Override
+            public void onInstallingAppUpdate() {
+                showSnackbarMessage("Installing app update");
+            }
+
+            @Override
+            public void onAppUpdateInstalled() {
+                showSnackbarMessage("App has been successfully updated!");
+            }
+
+            @Override
+            public void onImmediateAppUpdateInProgress(AppUpdateInfo result) {
+                showSnackbarMessage("immediate app update in progress result=" + result);
+                appUpdateHandler.requestAppUpdate(new PlayStoreAppUpdateRequest(
+                        IMMEDIATE,
+                        MainActivity.this,
+                        1,
+                        new PlayStoreAppUpdateAvailability(result)));
+            }
+        });
+        appUpdateHandler.checkAppUpdateAvailability(AppUpdateCriteria.isAppUpdateAllowedOfType(IMMEDIATE), new AppUpdateAvailabilityChecker.Callback() {
+
+            @Override
+            public void onAppUpdateAvailable(AppUpdateAvailability appUpdateAvailability) {
+
+                PlayStoreAppUpdateRequest appUpdateRequest = new PlayStoreAppUpdateRequest(
+                        IMMEDIATE,
+                        MainActivity.this,
+                        1,
+                        (PlayStoreAppUpdateAvailability) appUpdateAvailability);
+
+                appUpdateHandler.requestAppUpdate(appUpdateRequest);
+            }
+
+            @Override
+            public void onAppUpdateAvailableCheckFailed(Throwable error) {
+                showToastMessage(Throwables.getStackTraceAsString(error));
+            }
+
+            @Override
+            public void onAppUpdateCriteriaNotMet() {
+                showSnackbarMessage("onAppUpdateCriteriaNotMet");
+            }
+        });
+    }
+
+    private void checkFlexibleUpdate(FakePlayStoreAppUpdateHandlerFactory appUpdateHandlerFactory) {
+        AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateFlexibleUpdateAvailableToDownloadAndInstall();
+        appUpdateHandler.observeLifecycle(this);
+        appUpdateHandler.addObserver(new AppUpdateRequestor.Observer() {
+
+            @Override
+            public void onAppUpdateDownloadProgressChange(long bytesDownloaded, long totalBytesToDownload) {
+                showSnackbarMessage("Downloading app update... " + bytesDownloaded + "/" + totalBytesToDownload);
+            }
+
+            @Override
+            public void onAppUpdateDownloaded() {
+                makeSnackbar("An update has been downloaded.", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Install", v -> appUpdateHandler.installDownloadedUpdate())
+                        .show();
+            }
+
+            @Override
+            public void onAppUpdateInstallFailure() {
+                showSnackbarMessage("onAppUpdateInstallFailed");
+            }
+
+            @Override
+            public void onRequestAppUpdateFailure(Throwable error) {
+                showSnackbarMessage("onAppUpdateRequestFailed\n" + Throwables.getStackTraceAsString(error));
+            }
+
+            @Override
+            public void onInstallingAppUpdate() {
+                showSnackbarMessage("Installing app update");
+            }
+
+            @Override
+            public void onAppUpdateInstalled() {
+                showSnackbarMessage("App has been successfully updated!");
+            }
+
+            @Override
+            public void onImmediateAppUpdateInProgress(AppUpdateInfo result) {
+                showSnackbarMessage("immediate app update in progress result=" + result);
+                appUpdateHandler.requestAppUpdate(new PlayStoreAppUpdateRequest(
+                        IMMEDIATE,
+                        MainActivity.this,
+                        1,
+                        new PlayStoreAppUpdateAvailability(result)));
+            }
+        });
+        appUpdateHandler.checkAppUpdateAvailability(AppUpdateCriteria.isAppUpdateAllowedOfType(FLEXIBLE), new AppUpdateAvailabilityChecker.Callback() {
+
+            @Override
+            public void onAppUpdateAvailable(AppUpdateAvailability appUpdateAvailability) {
+                makeSnackbar("An update is available for the app", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Download", v -> {
+
+                            PlayStoreAppUpdateRequest appUpdateRequest = new PlayStoreAppUpdateRequest(
+                                    FLEXIBLE,
+                                    MainActivity.this,
+                                    1,
+                                    (PlayStoreAppUpdateAvailability) appUpdateAvailability);
+
+                            appUpdateHandler.requestAppUpdate(appUpdateRequest);
+                        })
+                        .show();
+            }
+
+            @Override
+            public void onAppUpdateAvailableCheckFailed(Throwable error) {
+                showToastMessage(Throwables.getStackTraceAsString(error));
+            }
+
+            @Override
+            public void onAppUpdateCriteriaNotMet() {
+                showSnackbarMessage("onAppUpdateCriteriaNotMet");
+            }
+        });
     }
 
     private void print(Bitmap resource) {
@@ -203,7 +370,11 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     }
 
     private Snackbar makeSnackbar(String message) {
-        return Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT);
+        return makeSnackbar(message, Snackbar.LENGTH_SHORT);
+    }
+
+    private Snackbar makeSnackbar(String message, int length) {
+        return Snackbar.make(binding.getRoot(), message, length);
     }
 
     private void showToastMessage(String message) {

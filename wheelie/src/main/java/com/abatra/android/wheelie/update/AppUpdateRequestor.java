@@ -5,6 +5,7 @@ import android.content.Intent;
 import androidx.annotation.Nullable;
 
 import com.abatra.android.wheelie.lifecycle.LifecycleObserverObservable;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
 
 public interface AppUpdateRequestor extends LifecycleObserverObservable<AppUpdateRequestor.Observer> {
 
@@ -18,10 +19,18 @@ public interface AppUpdateRequestor extends LifecycleObserverObservable<AppUpdat
 
     interface Observer {
 
-        void onAppUpdateDownloadProgressChanged(long bytesDownloaded, long totalBytesToDownload);
+        void onRequestAppUpdateFailure(Throwable error);
+
+        void onAppUpdateDownloadProgressChange(long bytesDownloaded, long totalBytesToDownload);
 
         void onAppUpdateDownloaded();
 
-        void onAppUpdateInstallFailed();
+        void onInstallingAppUpdate();
+
+        void onAppUpdateInstalled();
+
+        void onAppUpdateInstallFailure();
+
+        void onImmediateAppUpdateInProgress(AppUpdateInfo result);
     }
 }
