@@ -39,18 +39,17 @@ import com.abatra.android.wheelie.permission.MultiplePermissionsGrantResult;
 import com.abatra.android.wheelie.permission.MultiplePermissionsRequestor;
 import com.abatra.android.wheelie.update.AppUpdateAvailability;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
-import com.abatra.android.wheelie.update.AppUpdateCriteria;
+import com.abatra.android.wheelie.update.AppUpdateAvailabilityCriteria;
 import com.abatra.android.wheelie.update.AppUpdateHandler;
+import com.abatra.android.wheelie.update.AppUpdateHandlerFactory;
 import com.abatra.android.wheelie.update.AppUpdateRequestor;
 import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateAvailability;
 import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateRequest;
-import com.abatra.android.wheelie.update.playstore.fake.FakePlayStoreAppUpdateHandlerFactory;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.common.base.Throwables;
 
 import timber.log.Timber;
@@ -194,26 +193,26 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
         binding.buttonPickVideoGetContent.setOnClickListener(v -> pickVideoLauncher.launch(null));
 
-        FakePlayStoreAppUpdateHandlerFactory appUpdateHandlerFactory = new FakePlayStoreAppUpdateHandlerFactory(this);
+        AppUpdateHandlerFactory appUpdateHandlerFactory = new AppUpdateHandlerFactory(this);
         binding.buttonCheckFlexibleUpdate.setOnClickListener(v -> {
-            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateFlexibleUpdateAvailableToDownloadAndInstall();
+            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.fakePlayStoreFlexibleUpdateAvailableToDownloadAndInstall();
             checkFlexibleUpdate(appUpdateHandler);
         });
         binding.buttonCheckFlexibleUpdateDownloadFails.setOnClickListener(v -> {
-            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateFlexibleUpdateAvailableToDownloadButDownloadFails();
+            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.fakePlayStoreFlexibleUpdateAvailableToDownloadButDownloadFails();
             checkFlexibleUpdate(appUpdateHandler);
         });
         binding.buttonCheckFlexibleUpdateInstallFails.setOnClickListener(v -> {
-            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateFlexibleUpdateAvailableToDownloadButInstall();
+            AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.fakePlayStoreFlexibleUpdateAvailableToDownloadButInstall();
             checkFlexibleUpdate(appUpdateHandler);
         });
         binding.buttonCheckImmediateUpdate.setOnClickListener(v -> checkImmediateUpdate(appUpdateHandlerFactory));
     }
 
-    private void checkImmediateUpdate(FakePlayStoreAppUpdateHandlerFactory appUpdateHandlerFactory) {
-        AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.simulateImmediateUpdateAvailableToInstall();
+    private void checkImmediateUpdate(AppUpdateHandlerFactory appUpdateHandlerFactory) {
+        AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.fakePlayStoreImmediateUpdateAvailableToInstall();
         appUpdateHandler.observeLifecycle(this);
-        appUpdateHandler.checkAppUpdateAvailability(AppUpdateCriteria.isAppUpdateAllowedOfType(IMMEDIATE), new AppUpdateAvailabilityChecker.Callback() {
+        appUpdateHandler.checkAppUpdateAvailability(AppUpdateAvailabilityCriteria.isAppUpdateAllowedOfType(IMMEDIATE), new AppUpdateAvailabilityChecker.Callback() {
 
             @Override
             public void onAppUpdateAvailable(AppUpdateAvailability appUpdateAvailability) {
@@ -242,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     private void checkFlexibleUpdate(AppUpdateHandler appUpdateHandler) {
         appUpdateHandler.observeLifecycle(this);
         appUpdateHandler.addObserver(new FlexibleAppUpdateObserver(appUpdateHandler));
-        appUpdateHandler.checkAppUpdateAvailability(AppUpdateCriteria.isAppUpdateAllowedOfType(FLEXIBLE), new FlexibleAppAvailabilityCallback(appUpdateHandler));
+        appUpdateHandler.checkAppUpdateAvailability(AppUpdateAvailabilityCriteria.isAppUpdateAllowedOfType(FLEXIBLE), new FlexibleAppAvailabilityCallback(appUpdateHandler));
     }
 
     private void print(Bitmap resource) {
@@ -340,13 +339,18 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         }
 
         @Override
-        public void onImmediateAppUpdateInProgress(AppUpdateInfo result) {
-            showSnackbarMessage("immediate app update in progress result=" + result);
+        public void onImmediateAppUpdateInProgress(AppUpdateAvailability appUpdateAvailability) {
+            showSnackbarMessage("immediate app update in progress appUpdateAvailability=" + appUpdateAvailability);
             appUpdateHandler.requestAppUpdate(new PlayStoreAppUpdateRequest(
                     IMMEDIATE,
                     MainActivity.this,
                     1,
-                    new PlayStoreAppUpdateAvailability(result)));
+                    (PlayStoreAppUpdateAvailability) appUpdateAvailability));
+        }
+
+        @Override
+        public void onAppUpdatePendingDownload() {
+            showSnackbarMessage("onAppUpdatePendingDownload");
         }
     }
 

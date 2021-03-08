@@ -2,7 +2,7 @@ package com.abatra.android.wheelie.update;
 
 public interface AppUpdateAvailabilityChecker {
 
-    void checkAppUpdateAvailability(AppUpdateCriteria appUpdateCriteria, Callback callback);
+    void checkAppUpdateAvailability(AppUpdateAvailabilityCriteria appUpdateAvailabilityCriteria, Callback callback);
 
     interface Callback {
 
