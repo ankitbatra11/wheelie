@@ -4,11 +4,11 @@ import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.widget.TextView;
 
-public class SpannableStringBuilderText implements Text {
+class SpannableStringBuilderText implements Text {
 
     private final SpannableStringBuilder spannableStringBuilder;
 
-    public SpannableStringBuilderText(SpannableStringBuilder spannableStringBuilder) {
+    SpannableStringBuilderText(SpannableStringBuilder spannableStringBuilder) {
         this.spannableStringBuilder = spannableStringBuilder;
     }
 

@@ -1,6 +1,7 @@
 package com.abatra.android.wheelie.resource;
 
 import android.content.Context;
+import android.text.SpannableStringBuilder;
 import android.widget.TextView;
 
 import androidx.annotation.StringRes;
@@ -19,6 +20,10 @@ public interface Text {
 
     static Text primitiveInteger(int integer) {
         return new PrimitiveIntegerText(integer);
+    }
+
+    static Text spannable(SpannableStringBuilder spannableStringBuilder) {
+        return new SpannableStringBuilderText(spannableStringBuilder);
     }
 
     void show(TextView textView);
