@@ -8,7 +8,14 @@ import androidx.fragment.app.Fragment;
 
 import com.abatra.android.wheelie.chronicle.BundleEventParams;
 import com.abatra.android.wheelie.chronicle.Event;
+import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
+import com.abatra.android.wheelie.chronicle.model.Item;
+import com.abatra.android.wheelie.chronicle.model.PurchasableItem;
+import com.abatra.android.wheelie.chronicle.model.Price;
+import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 import com.google.common.collect.ImmutableMap;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +25,9 @@ import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.firebase.analytics.FirebaseAnalytics.Event.BEGIN_CHECKOUT;
@@ -81,11 +90,11 @@ public class FirebaseEventBuilderTest {
     @Test
     public void test_buildBeginCheckoutEvent() {
 
-        FirebasePurchasableItem purchasableItem = createPurchasableItem();
-        FirebaseBeginCheckoutEventParams params = new FirebaseBeginCheckoutEventParams()
+        PurchasableItem purchasableItem = createPurchasableItem();
+        BeginCheckoutEventParams params = new BeginCheckoutEventParams()
                 .setCoupon("coupon")
-                .setFirebasePrice(new FirebasePrice(purchasableItem.getPrice(), "INR"))
-                .addCheckedOutItem(purchasableItem);
+                .setPrice(new Price(purchasableItem.getPrice(), "INR"))
+                .addItem(purchasableItem);
 
         Event event = firebaseEventBuilder.buildBeginCheckoutEvent(params);
 
@@ -93,14 +102,14 @@ public class FirebaseEventBuilderTest {
 
         verifyEvent(event, BEGIN_CHECKOUT, ImmutableMap.of(
                 Param.COUPON, params.getCoupon(),
-                Param.VALUE, params.getValue(),
-                Param.CURRENCY, params.getCurrency()));
+                Param.VALUE, params.getPrice().getValue(),
+                Param.CURRENCY, params.getPrice().getCurrency()));
 
         verifyPurchasableItem(event, purchasableItem);
     }
 
-    private FirebasePurchasableItem createPurchasableItem() {
-        return new FirebasePurchasableItem()
+    private PurchasableItem createPurchasableItem() {
+        return new PurchasableItem()
                 .setBrand("brand")
                 .setCategory("category")
                 .setId("id")
@@ -114,7 +123,7 @@ public class FirebaseEventBuilderTest {
         assertThat(requireBundleEventParams(event).bundle().size(), equalTo(expectedCount));
     }
 
-    private void verifyPurchasableItem(Event event, FirebasePurchasableItem purchasableItem) {
+    private void verifyPurchasableItem(Event event, PurchasableItem purchasableItem) {
         Parcelable[] parcelables = requireBundleEventParams(event).bundle().getParcelableArray(Param.ITEMS);
         assertThat(parcelables.length, equalTo(1));
         assertThat(parcelables[0], instanceOf(Bundle.class));
@@ -132,14 +141,14 @@ public class FirebaseEventBuilderTest {
     @Test
     public void test_buildPurchaseEvent() {
 
-        FirebasePurchasableItem purchasableItem = createPurchasableItem();
-        FirebasePurchaseEventParams params = new FirebasePurchaseEventParams()
+        PurchasableItem purchasableItem = createPurchasableItem();
+        PurchaseEventParams params = new PurchaseEventParams()
                 .setAffiliation("play store")
                 .setShipping(3)
                 .setTax(5)
                 .setTransactionId("txn id")
                 .setCoupon("coupon")
-                .setFirebasePrice(new FirebasePrice(purchasableItem.getPrice(), "INR"))
+                .setPrice(new Price(purchasableItem.getPrice(), "INR"))
                 .addPurchasedItem(purchasableItem);
 
         Event event = firebaseEventBuilder.buildPurchaseEvent(params);
@@ -152,10 +161,45 @@ public class FirebaseEventBuilderTest {
         expectedParams.put(Param.TAX, params.getTax());
         expectedParams.put(Param.TRANSACTION_ID, params.getTransactionId());
         expectedParams.put(Param.COUPON, params.getCoupon());
-        expectedParams.put(Param.VALUE, params.getValue());
-        expectedParams.put(Param.CURRENCY, params.getCurrency());
+        expectedParams.put(Param.VALUE, params.getPrice().getValue());
+        expectedParams.put(Param.CURRENCY, params.getPrice().getCurrency());
         verifyEvent(event, PURCHASE, expectedParams);
 
         verifyPurchasableItem(event, purchasableItem);
+    }
+
+    @Test
+    public void test_buildSelectItemEvent() {
+
+        String expectedItemListId = "itemListId";
+        String expectedItemListName = "itemListName";
+
+        List<Item> items = Arrays.asList(createItem(1), createItem(2));
+        SelectItemEventParams params = new SelectItemEventParams()
+                .setItemListId(expectedItemListId)
+                .setItemListName(expectedItemListName)
+                .setItems(items);
+
+        Event event = firebaseEventBuilder.buildSelectItemEvent(params);
+
+        verifyEvent(event, FirebaseAnalytics.Event.SELECT_ITEM, ImmutableMap.of(
+                Param.ITEM_LIST_ID, expectedItemListId,
+                Param.ITEM_LIST_NAME, expectedItemListName));
+
+        verifyItems(event, items);
+    }
+
+    private void verifyItems(Event event, List<Item> items) {
+        Parcelable[] parcelables = requireBundleEventParams(event).bundle().getParcelableArray(Param.ITEMS);
+        assertThat(parcelables.length, equalTo(items.size()));
+        for (int i = 0; i < parcelables.length; i++) {
+            Bundle bundle = (Bundle) parcelables[i];
+            assertThat(bundle.get(Param.ITEM_ID), equalTo(items.get(i).getId()));
+            assertThat(bundle.get(Param.ITEM_NAME), equalTo(items.get(i).getName()));
+        }
+    }
+
+    private Item createItem(int id) {
+        return new Item().setId("id" + id).setName("name" + id);
     }
 }

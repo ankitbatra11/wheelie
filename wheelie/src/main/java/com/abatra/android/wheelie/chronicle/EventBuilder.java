@@ -4,6 +4,10 @@ import android.os.Parcelable;
 
 import androidx.fragment.app.Fragment;
 
+import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
+import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
+
 public abstract class EventBuilder<T extends EventBuilder<T>> {
 
     protected abstract EventParams createEventParams();
@@ -69,6 +73,8 @@ public abstract class EventBuilder<T extends EventBuilder<T>> {
     public void record() {
         Chronicle.record(build());
     }
+
+    public abstract Event buildSelectItemEvent(SelectItemEventParams selectItemEventParams);
 
     public interface Factory {
         EventBuilder<?> createEventBuilder();
