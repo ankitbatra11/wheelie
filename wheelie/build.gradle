@@ -71,6 +71,8 @@ dependencies {
 
     implementation 'com.google.android.play:core:1.10.0'
 
+    implementation group: 'androidx.preference', name: 'preference', version: '1.1.1'
+
     testImplementation group: 'org.robolectric', name: 'robolectric', version: '4.5.1'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'androidx.test', name: 'core', version: '1.3.0'
