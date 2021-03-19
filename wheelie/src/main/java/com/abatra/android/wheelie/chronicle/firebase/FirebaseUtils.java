@@ -2,6 +2,8 @@ package com.abatra.android.wheelie.chronicle.firebase;
 
 import androidx.annotation.Nullable;
 
+import com.abatra.android.wheelie.chronicle.model.Price;
+
 import java.util.Optional;
 
 public class FirebaseUtils {
@@ -10,16 +12,16 @@ public class FirebaseUtils {
     }
 
     @Nullable
-    public static Double getValue(@Nullable FirebasePrice checkoutPrice) {
+    public static Double getValue(@Nullable Price checkoutPrice) {
         return Optional.ofNullable(checkoutPrice)
-                .map(FirebasePrice::getValue)
+                .map(Price::getValue)
                 .orElse(null);
     }
 
     @Nullable
-    public static String getCurrency(@Nullable FirebasePrice checkoutPrice) {
+    public static String getCurrency(@Nullable Price checkoutPrice) {
         return Optional.ofNullable(checkoutPrice)
-                .map(FirebasePrice::getCurrency)
+                .map(Price::getCurrency)
                 .orElse(null);
     }
 }

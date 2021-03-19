@@ -1,26 +1,29 @@
-package com.abatra.android.wheelie.chronicle.firebase;
+package com.abatra.android.wheelie.chronicle.model;
 
-public class FirebasePrice {
+import androidx.annotation.NonNull;
+
+public class Price {
 
     private final double value;
     private final String currency;
 
-    public FirebasePrice(double value, String currency) {
+    public Price(double value, String currency) {
         this.value = value;
         this.currency = currency;
     }
 
-    double getValue() {
+    public double getValue() {
         return value;
     }
 
-    String getCurrency() {
+    public String getCurrency() {
         return currency;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return "FirebasePrice{" +
+        return "Price{" +
                 "value=" + value +
                 ", currency='" + currency + '\'' +
                 '}';

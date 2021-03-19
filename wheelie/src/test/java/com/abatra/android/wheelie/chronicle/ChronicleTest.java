@@ -6,10 +6,14 @@ import androidx.fragment.app.Fragment;
 
 import com.abatra.android.wheelie.chronicle.firebase.FirebaseEventBuilder;
 import com.abatra.android.wheelie.chronicle.firebase.FirebaseEventRecorder;
+import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
+import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
@@ -24,6 +28,7 @@ import static com.abatra.android.wheelie.chronicle.Chronicle.recordBeginCheckout
 import static com.abatra.android.wheelie.chronicle.Chronicle.recordEventOfName;
 import static com.abatra.android.wheelie.chronicle.Chronicle.recordPurchaseEvent;
 import static com.abatra.android.wheelie.chronicle.Chronicle.recordScreenViewEvent;
+import static com.abatra.android.wheelie.chronicle.Chronicle.recordSelectItemEvent;
 import static com.abatra.android.wheelie.chronicle.Chronicle.setConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
@@ -32,6 +37,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.P)
@@ -120,5 +126,17 @@ public class ChronicleTest {
 
         assertThat(eventBuilder(), instanceOf(FirebaseEventBuilder.class));
         assertThat(eventRecorder(), instanceOf(FirebaseEventRecorder.class));
+    }
+
+    @Test
+    public void test_recordSecondItemEvent() {
+
+        when(mockedEventBuilder.buildSelectItemEvent(ArgumentMatchers.any())).thenReturn(mockedEvent);
+        SelectItemEventParams selectItemEventParams = new SelectItemEventParams();
+
+        recordSelectItemEvent(selectItemEventParams);
+
+        verify(mockedEventBuilder, times(1)).buildSelectItemEvent(selectItemEventParams);
+        verify(mockedEventRecorder, times(1)).record(mockedEvent);
     }
 }

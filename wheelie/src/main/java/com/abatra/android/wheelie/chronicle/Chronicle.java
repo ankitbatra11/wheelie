@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment;
 
 import com.abatra.android.wheelie.chronicle.firebase.FirebaseEventBuilder;
 import com.abatra.android.wheelie.chronicle.firebase.FirebaseEventRecorder;
+import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
+import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 
 public class Chronicle {
 
@@ -50,5 +53,9 @@ public class Chronicle {
 
     public static void recordPurchaseEvent(PurchaseEventParams purchaseEventParams) {
         record(eventBuilder().buildPurchaseEvent(purchaseEventParams));
+    }
+
+    public static void recordSelectItemEvent(SelectItemEventParams selectItemEventParams) {
+        record(eventBuilder().buildSelectItemEvent(selectItemEventParams));
     }
 }
