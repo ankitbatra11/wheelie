@@ -30,9 +30,6 @@ import static com.google.firebase.analytics.FirebaseAnalytics.Param;
 
 public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
 
-    private FirebaseEventBuilder() {
-    }
-
     @Override
     protected EventParams createEventParams() {
         return EventParams.bundled();
@@ -132,11 +129,6 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
     }
 
     public static class Factory implements EventBuilder.Factory {
-
-        public static final Factory INSTANCE = new Factory();
-
-        private Factory() {
-        }
 
         @Override
         public FirebaseEventBuilder createEventBuilder() {

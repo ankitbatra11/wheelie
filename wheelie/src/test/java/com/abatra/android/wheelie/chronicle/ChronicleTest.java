@@ -64,7 +64,7 @@ public class ChronicleTest {
     @Before
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        setConfig(new ChronicleConfig(getApplicationContext(), () -> mockedEventBuilder, context -> mockedEventRecorder));
+        setConfig(new ChronicleConfig(getApplicationContext(), () -> mockedEventBuilder, context -> mockedEventRecorder, eventRecorder, userPropertySetter));
     }
 
     @Test
