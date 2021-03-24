@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.abatra.android.wheelie.resource.Text;
+import com.abatra.android.wheelie.resource.text.Text;
 
 public final class Toaster {
 

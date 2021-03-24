@@ -1,11 +1,9 @@
 package com.abatra.android.wheelie.preferences;
 
-import android.graphics.drawable.Drawable;
-
-import androidx.annotation.Nullable;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceGroup;
+
+import com.abatra.android.wheelie.resource.image.Image;
 
 import java.util.Optional;
 
@@ -25,17 +23,10 @@ public class PreferenceUtils {
     }
 
     private static void tintIcon(Preference preference, int color) {
-        preference.setIcon(createTintedDrawable(preference.getIcon(), color));
-    }
-
-    @Nullable
-    private static Drawable createTintedDrawable(@Nullable Drawable drawable, int color) {
-        return Optional.ofNullable(drawable)
-                .map(DrawableCompat::wrap)
-                .map(mutableDrawable -> {
-                    DrawableCompat.setTint(mutableDrawable, color);
-                    return mutableDrawable;
-                })
-                .orElse(null);
+        Optional.ofNullable(preference.getIcon())
+                .map(Image::drawable)
+                .map(image -> image.tint(color))
+                .map(image -> image.getDrawable(preference.getContext()))
+                .ifPresent(preference::setIcon);
     }
 }
