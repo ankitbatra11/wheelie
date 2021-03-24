@@ -51,7 +51,7 @@ public class FirebaseEventBuilderTest {
     @Before
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        firebaseEventBuilder = FirebaseEventBuilder.Factory.INSTANCE.createEventBuilder();
+        firebaseEventBuilder = new FirebaseEventBuilder.Factory().createEventBuilder();
     }
 
     @Test
