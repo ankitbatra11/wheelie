@@ -1,4 +1,4 @@
-package com.abatra.android.wheelie.resource;
+package com.abatra.android.wheelie.resource.text;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
