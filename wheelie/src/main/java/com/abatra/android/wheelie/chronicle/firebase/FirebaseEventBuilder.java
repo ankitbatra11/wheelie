@@ -17,6 +17,7 @@ import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
 import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,11 +106,16 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
 
     @Override
     public Event buildSelectItemEvent(SelectItemEventParams selectItemEventParams) {
-        return withName(SELECT_ITEM)
+
+        withName(SELECT_ITEM)
                 .withParam(Param.ITEM_LIST_ID, selectItemEventParams.getItemListId())
-                .withParam(Param.ITEM_LIST_NAME, selectItemEventParams.getItemListName())
-                .withParam(Param.ITEMS, itemsToParcelables(selectItemEventParams.getItems()))
-                .build();
+                .withParam(Param.ITEM_LIST_NAME, selectItemEventParams.getItemListName());
+
+        Optional.ofNullable(selectItemEventParams.getItem()).ifPresent(item -> {
+            List<Item> items = Collections.singletonList(item);
+            withParam(Param.ITEMS, itemsToParcelables(items));
+        });
+        return build();
     }
 
     private Parcelable[] itemsToParcelables(List<Item> items) {
