@@ -1,14 +1,10 @@
 package com.abatra.android.wheelie.chronicle.model;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 public class SelectItemEventParams {
 
     private String itemListId;
     private String itemListName;
-    private List<Item> items;
+    private Item item;
 
     public String getItemListId() {
         return itemListId;
@@ -28,12 +24,12 @@ public class SelectItemEventParams {
         return this;
     }
 
-    public List<Item> getItems() {
-        return Optional.ofNullable(items).orElse(Collections.emptyList());
+    public Item getItem() {
+        return item;
     }
 
-    public SelectItemEventParams setItems(List<Item> items) {
-        this.items = items;
+    public SelectItemEventParams setItem(Item item) {
+        this.item = item;
         return this;
     }
 }

@@ -10,8 +10,8 @@ import com.abatra.android.wheelie.chronicle.BundleEventParams;
 import com.abatra.android.wheelie.chronicle.Event;
 import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
 import com.abatra.android.wheelie.chronicle.model.Item;
-import com.abatra.android.wheelie.chronicle.model.PurchasableItem;
 import com.abatra.android.wheelie.chronicle.model.Price;
+import com.abatra.android.wheelie.chronicle.model.PurchasableItem;
 import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
 import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 import com.google.common.collect.ImmutableMap;
@@ -25,7 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,11 +174,11 @@ public class FirebaseEventBuilderTest {
         String expectedItemListId = "itemListId";
         String expectedItemListName = "itemListName";
 
-        List<Item> items = Arrays.asList(createItem(1), createItem(2));
+        Item item = createItem(1);
         SelectItemEventParams params = new SelectItemEventParams()
                 .setItemListId(expectedItemListId)
                 .setItemListName(expectedItemListName)
-                .setItems(items);
+                .setItem(item);
 
         Event event = firebaseEventBuilder.buildSelectItemEvent(params);
 
@@ -186,7 +186,7 @@ public class FirebaseEventBuilderTest {
                 Param.ITEM_LIST_ID, expectedItemListId,
                 Param.ITEM_LIST_NAME, expectedItemListName));
 
-        verifyItems(event, items);
+        verifyItems(event, Collections.singletonList(item));
     }
 
     private void verifyItems(Event event, List<Item> items) {
