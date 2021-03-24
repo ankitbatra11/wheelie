@@ -4,8 +4,6 @@ import android.content.Context;
 
 import androidx.fragment.app.Fragment;
 
-import com.abatra.android.wheelie.chronicle.firebase.FirebaseEventBuilder;
-import com.abatra.android.wheelie.chronicle.firebase.FirebaseEventRecorder;
 import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
 import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
 import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
@@ -18,9 +16,7 @@ public class Chronicle {
     }
 
     public static void initializeForFirebase(Context context) {
-        setConfig(new ChronicleConfig(context,
-                FirebaseEventBuilder.Factory.INSTANCE,
-                FirebaseEventRecorder.Supplier.INSTANCE));
+        setConfig(ChronicleConfig.forFirebase(context));
     }
 
     static void setConfig(ChronicleConfig config) {
@@ -44,7 +40,7 @@ public class Chronicle {
     }
 
     static EventRecorder eventRecorder() {
-        return config.getEventRecorderSupplier().getEventRecorder(config.getContext());
+        return config.getEventRecorder();
     }
 
     public static void recordBeginCheckoutEvent(BeginCheckoutEventParams beginCheckoutEventParams) {
@@ -57,5 +53,9 @@ public class Chronicle {
 
     public static void recordSelectItemEvent(SelectItemEventParams selectItemEventParams) {
         record(eventBuilder().buildSelectItemEvent(selectItemEventParams));
+    }
+
+    public static void setUserProperty(String propertyName, String propertyValue) {
+        config.getUserPropertySetter().setUserProperty(propertyName, propertyValue);
     }
 }
