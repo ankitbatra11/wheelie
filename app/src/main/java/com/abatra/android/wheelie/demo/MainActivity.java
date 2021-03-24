@@ -207,6 +207,15 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             checkFlexibleUpdate(appUpdateHandler);
         });
         binding.buttonCheckImmediateUpdate.setOnClickListener(v -> checkImmediateUpdate(appUpdateHandlerFactory));
+
+        setupOpenSettings();
+    }
+
+    private void setupOpenSettings() {
+        binding.buttonOpenSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), SettingsActivity.class);
+            v.getContext().startActivity(intent);
+        });
     }
 
     private void checkImmediateUpdate(AppUpdateHandlerFactory appUpdateHandlerFactory) {
