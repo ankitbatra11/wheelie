@@ -61,10 +61,13 @@ public class ChronicleTest {
     @Mock
     private PurchaseEventParams mockedPurchaseEventParams;
 
+    @Mock
+    private UserPropertySetter mockedUserPropertySetter;
+
     @Before
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        setConfig(new ChronicleConfig(getApplicationContext(), () -> mockedEventBuilder, context -> mockedEventRecorder, eventRecorder, userPropertySetter));
+        setConfig(new ChronicleConfig(() -> mockedEventBuilder, mockedEventRecorder, mockedUserPropertySetter));
     }
 
     @Test
@@ -138,5 +141,16 @@ public class ChronicleTest {
 
         verify(mockedEventBuilder, times(1)).buildSelectItemEvent(selectItemEventParams);
         verify(mockedEventRecorder, times(1)).record(mockedEvent);
+    }
+
+    @Test
+    public void test_setUserProperty() {
+
+        String expectedName = "pName";
+        String expectedValue = "pValue";
+
+        Chronicle.setUserProperty(expectedName, expectedValue);
+
+        verify(mockedUserPropertySetter, times(1)).setUserProperty(expectedName, expectedValue);
     }
 }
