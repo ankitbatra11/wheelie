@@ -6,13 +6,11 @@ import java.util.Optional;
 
 public class Resource<T> {
 
-    @Nullable
-    private T data;
-
-    @Nullable
-    private Throwable error;
-
     private final Status status;
+    @Nullable
+    private final T data;
+    @Nullable
+    private final Throwable error;
 
     Resource(Status status, @Nullable T data, @Nullable Throwable error) {
         this.status = status;
@@ -44,7 +42,7 @@ public class Resource<T> {
         return Optional.ofNullable(error);
     }
 
-    enum Status {
+    public enum Status {
         LOADING,
         LOADED,
         FAILED
