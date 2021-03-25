@@ -1,10 +1,10 @@
 package com.abatra.android.wheelie.lifecycle;
 
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.MediatorLiveData;
 
 import bolts.Task;
 
-public class ResourceMutableLiveData<T> extends MutableLiveData<Resource<T>> implements ResourceLiveDataApi<T> {
+public class ResourceMediatorLiveData<T> extends MediatorLiveData<Resource<T>> implements ResourceLiveDataApi<T> {
 
     private final ResourceLiveDataApi<T> delegate = new ResourceLiveData<>(this);
 
