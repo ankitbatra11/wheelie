@@ -34,12 +34,12 @@ public class Resource<T> {
         return status;
     }
 
-    public Optional<T> getData() {
-        return Optional.ofNullable(data);
+    public T getData() {
+        return data;
     }
 
-    public Optional<Throwable> getError() {
-        return Optional.ofNullable(error);
+    public Throwable getError() {
+        return error;
     }
 
     public enum Status {
