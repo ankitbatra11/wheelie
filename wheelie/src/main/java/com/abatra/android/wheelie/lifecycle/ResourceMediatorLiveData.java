@@ -2,6 +2,8 @@ package com.abatra.android.wheelie.lifecycle;
 
 import androidx.lifecycle.MediatorLiveData;
 
+import java.util.function.Function;
+
 import bolts.Task;
 
 public class ResourceMediatorLiveData<T> extends MediatorLiveData<Resource<T>> implements ResourceLiveDataApi<T> {
@@ -46,5 +48,15 @@ public class ResourceMediatorLiveData<T> extends MediatorLiveData<Resource<T>> i
     @Override
     public void postResource(Task<T> task) {
         delegate.postResource(task);
+    }
+
+    @Override
+    public <V> void setResource(Task<V> task, Function<V, T> function) {
+        delegate.setResource(task, function);
+    }
+
+    @Override
+    public <V> void postResource(Task<V> task, Function<V, T> function) {
+        delegate.postResource(task, function);
     }
 }

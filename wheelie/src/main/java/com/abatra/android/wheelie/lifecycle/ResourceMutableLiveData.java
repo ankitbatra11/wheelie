@@ -2,6 +2,8 @@ package com.abatra.android.wheelie.lifecycle;
 
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.function.Function;
+
 import bolts.Task;
 
 public class ResourceMutableLiveData<T> extends MutableLiveData<Resource<T>> implements ResourceLiveDataApi<T> {
@@ -46,5 +48,15 @@ public class ResourceMutableLiveData<T> extends MutableLiveData<Resource<T>> imp
     @Override
     public void postResource(Task<T> task) {
         delegate.postResource(task);
+    }
+
+    @Override
+    public <V> void setResource(Task<V> task, Function<V, T> function) {
+        delegate.setResource(task, function);
+    }
+
+    @Override
+    public <V> void postResource(Task<V> task, Function<V, T> function) {
+        delegate.postResource(task, function);
     }
 }
