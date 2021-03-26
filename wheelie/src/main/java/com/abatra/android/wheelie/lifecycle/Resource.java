@@ -3,6 +3,7 @@ package com.abatra.android.wheelie.lifecycle;
 import androidx.annotation.Nullable;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 public class Resource<T> {
 
@@ -40,6 +41,18 @@ public class Resource<T> {
 
     public Throwable getError() {
         return error;
+    }
+
+    public <V> Resource<V> map(Function<T, V> function) {
+        switch (status) {
+            case LOADING:
+                return loading();
+            case LOADED:
+                return loaded(function.apply(getData()));
+            case FAILED:
+                return failed(getError());
+        }
+        throw new IllegalStateException("Invalid status=" + status);
     }
 
     public enum Status {
