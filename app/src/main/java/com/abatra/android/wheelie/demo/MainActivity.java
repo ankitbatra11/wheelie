@@ -32,7 +32,7 @@ import com.abatra.android.wheelie.media.picker.PickableMediaType;
 import com.abatra.android.wheelie.media.printer.ImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentPrintImageRequest;
-import com.abatra.android.wheelie.network.InternetConnectionObserver;
+import com.abatra.android.wheelie.network.InternetConnectivityChecker;
 import com.abatra.android.wheelie.permission.ManageOverlayPermissionRequestor;
 import com.abatra.android.wheelie.permission.ManifestMultiplePermissionsRequestor;
 import com.abatra.android.wheelie.permission.ManifestSinglePermissionRequestor;
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     private static final String PRINT_JOB_NAME = "print picked image";
 
     private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
-    private final InternetConnectionObserver internetConnectionObserver = InternetConnectionObserver.newInstance(this);
+    private final InternetConnectivityChecker internetConnectivityChecker = InternetConnectivityChecker.newInstance(this);
     private ActivityResultLauncher<MediaInfo> attachDataLauncher;
     private ActivityResultLauncher<MediaInfo> openMediaLauncher;
     private ActivityResultLauncher<MediaInfo> shareMediaLauncher;
@@ -114,9 +114,9 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             }
         });
 
-        internetConnectionObserver.observeLifecycle(this);
+        internetConnectivityChecker.observeLifecycle(this);
         binding.checkInternetConnectionBtn.setOnClickListener(v -> {
-            LiveData<Boolean> connected = internetConnectionObserver.isConnectedToInternet();
+            LiveData<Boolean> connected = internetConnectivityChecker.isConnectedToInternet();
             connected.observe(this, c -> Snackbar.make(v, c.toString(), Snackbar.LENGTH_SHORT).show());
         });
 

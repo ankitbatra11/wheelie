@@ -7,13 +7,13 @@ import androidx.lifecycle.LiveData;
 
 import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
 
-public interface InternetConnectionObserver extends ILifecycleObserver {
+public interface InternetConnectivityChecker extends ILifecycleObserver {
 
-    static InternetConnectionObserver newInstance(Context context) {
+    static InternetConnectivityChecker newInstance(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return new QOrAboveInternetConnectionObserver(context);
+            return new QOrAboveInternetConnectivityChecker(context);
         } else {
-            return new PreQInternetConnectionObserver(context);
+            return new PreQInternetConnectivityChecker(context);
         }
     }
 
