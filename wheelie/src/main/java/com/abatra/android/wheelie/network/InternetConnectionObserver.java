@@ -3,10 +3,11 @@ package com.abatra.android.wheelie.network;
 import android.content.Context;
 import android.os.Build;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
-import com.abatra.android.wheelie.pattern.Observable;
+import androidx.lifecycle.LiveData;
 
-public interface InternetConnectionObserver extends ILifecycleObserver, Observable<InternetConnectionObserver.Listener> {
+import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
+
+public interface InternetConnectionObserver extends ILifecycleObserver {
 
     static InternetConnectionObserver newInstance(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -16,11 +17,5 @@ public interface InternetConnectionObserver extends ILifecycleObserver, Observab
         }
     }
 
-    boolean isConnectedToInternet();
-
-    void isConnectedToInternet(Listener listener);
-
-    interface Listener {
-        void onInternetConnectivityChanged(boolean connected);
-    }
+    LiveData<Boolean> isConnectedToInternet();
 }

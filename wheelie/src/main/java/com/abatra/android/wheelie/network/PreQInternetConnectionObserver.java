@@ -7,7 +7,15 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.abatra.android.wheelie.pattern.Observable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+
+import com.abatra.android.wheelie.thread.BoltsUtils;
+
+import timber.log.Timber;
+
+import static com.abatra.android.wheelie.thread.SaferTask.backgroundTask;
 
 public class PreQInternetConnectionObserver implements InternetConnectionObserver {
 
@@ -19,12 +27,11 @@ public class PreQInternetConnectionObserver implements InternetConnectionObserve
     }
 
     private final Context context;
-    private final Observable<Listener> listeners = Observable.copyOnWriteArraySet();
+    private final MutableLiveData<Boolean> connectedLiveData = new MutableLiveData<>();
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean connectedToInternet = isConnectedToInternet();
-            listeners.forEachObserver(listener -> listener.onInternetConnectivityChanged(connectedToInternet));
+            updateConnectedLiveData();
         }
     };
 
@@ -33,34 +40,34 @@ public class PreQInternetConnectionObserver implements InternetConnectionObserve
     }
 
     @Override
-    public void onCreate() {
+    public void onResume() {
+        Timber.v("onResume");
         context.registerReceiver(broadcastReceiver, INTENT_FILTER);
     }
 
     @Override
-    public void addObserver(Listener observer) {
-        listeners.addObserver(observer);
+    public LiveData<Boolean> isConnectedToInternet() {
+        updateConnectedLiveData();
+        return Transformations.distinctUntilChanged(connectedLiveData);
+    }
+
+    private void updateConnectedLiveData() {
+        backgroundTask(() ->
+        {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        }).continueOnUiThread(task ->
+        {
+            BoltsUtils.getResult(task).ifPresent(connectedLiveData::setValue);
+            return null;
+        });
     }
 
     @Override
-    public void removeObserver(Listener observer) {
-        listeners.removeObserver(observer);
-    }
-
-    @Override
-    public boolean isConnectedToInternet() {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-    }
-
-    @Override
-    public void isConnectedToInternet(Listener listener) {
-        listener.onInternetConnectivityChanged(isConnectedToInternet());
-    }
-
-    @Override
-    public void onDestroy() {
+    public void onPause() {
+        Timber.v("onPause");
         context.unregisterReceiver(broadcastReceiver);
     }
 }

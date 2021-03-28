@@ -1,11 +1,19 @@
 package com.abatra.android.wheelie.lifecycle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.Optional;
 import java.util.function.Function;
 
+import bolts.Task;
+
 public class Resource<T> {
+
+    public enum Status {
+        LOADING,
+        LOADED,
+        FAILED
+    }
 
     private final Status status;
     @Nullable
@@ -13,10 +21,18 @@ public class Resource<T> {
     @Nullable
     private final Throwable error;
 
-    Resource(Status status, @Nullable T data, @Nullable Throwable error) {
+    protected Resource(Status status, @Nullable T data, @Nullable Throwable error) {
         this.status = status;
         this.data = data;
         this.error = error;
+    }
+
+    public static <T> Resource<T> fromTask(Task<T> task) {
+        if (task.getError() != null) {
+            return Resource.failed(task.getError());
+        } else {
+            return Resource.loaded(task.getResult());
+        }
     }
 
     public static <T> Resource<T> loading() {
@@ -55,9 +71,13 @@ public class Resource<T> {
         throw new IllegalStateException("Invalid status=" + status);
     }
 
-    public enum Status {
-        LOADING,
-        LOADED,
-        FAILED
+    @NonNull
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "status=" + status +
+                ", data=" + data +
+                ", error=" + error +
+                '}';
     }
 }
