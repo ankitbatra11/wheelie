@@ -10,11 +10,13 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
-import com.abatra.android.wheelie.pattern.Observable;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import timber.log.Timber;
 
 @RequiresApi(api = Build.VERSION_CODES.Q)
 public class QOrAboveInternetConnectionObserver implements InternetConnectionObserver {
@@ -31,22 +33,38 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
             .build();
 
     private final Context context;
-    private final Observable<Listener> listeners = Observable.copyOnWriteArraySet();
-    private final Set<Network> availableNetworks = new CopyOnWriteArraySet<>();
+    private final AtomicInteger activeNetworkCount = new AtomicInteger(0);
+    private final MutableLiveData<Integer> connectedNetworkLiveCount = new MutableLiveData<>(0);
     private final ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
+
+        @Override
+        public void onUnavailable() {
+            super.onUnavailable();
+            Timber.v("onUnavailable");
+            activeNetworkCount.set(0);
+            updateLiveCount();
+        }
+
+        private void updateLiveCount() {
+            connectedNetworkLiveCount.postValue(makeZeroIfNegative(activeNetworkCount.get()));
+        }
+
+        private Integer makeZeroIfNegative(int i) {
+            return Math.max(0, i);
+        }
 
         @Override
         public void onAvailable(@NonNull Network network) {
             super.onAvailable(network);
-            availableNetworks.add(network);
-            listeners.forEachObserver(type -> type.onInternetConnectivityChanged(isConnectedToInternet()));
+            Timber.v("onAvailable network=%s newCount=%d", network, activeNetworkCount.incrementAndGet());
+            updateLiveCount();
         }
 
         @Override
         public void onLost(@NonNull Network network) {
             super.onLost(network);
-            availableNetworks.remove(network);
-            listeners.forEachObserver(type -> type.onInternetConnectivityChanged(isConnectedToInternet()));
+            Timber.v("onLost network=%s newCount=%d", network, activeNetworkCount.decrementAndGet());
+            updateLiveCount();
         }
     };
 
@@ -55,8 +73,15 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
     }
 
     @Override
-    public void onCreate() {
+    public void onResume() {
+        Timber.v("onResume");
         getConnectivityManager().registerNetworkCallback(NETWORK_REQUEST, networkCallback);
+    }
+
+    @Override
+    public void onPause() {
+        Timber.v("onPause");
+        getConnectivityManager().unregisterNetworkCallback(networkCallback);
     }
 
     private ConnectivityManager getConnectivityManager() {
@@ -64,44 +89,9 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
     }
 
     @Override
-    public void addObserver(Listener observer) {
-        listeners.addObserver(observer);
-    }
-
-    @Override
-    public void removeObserver(Listener observer) {
-        listeners.removeObserver(observer);
-    }
-
-    @Override
-    public boolean isConnectedToInternet() {
-        return !availableNetworks.isEmpty();
-    }
-
-    @Override
-    public void isConnectedToInternet(Listener listener) {
-        getConnectivityManager().requestNetwork(NETWORK_REQUEST, new ConnectivityManager.NetworkCallback() {
-            @Override
-            public void onUnavailable() {
-                super.onUnavailable();
-                listener.onInternetConnectivityChanged(false);
-            }
-
-            @Override
-            public void onAvailable(@NonNull Network network) {
-                super.onAvailable(network);
-                listener.onInternetConnectivityChanged(true);
-            }
-        });
-    }
-
-    @Override
-    public void onDestroy() {
-
-        availableNetworks.clear();
-        listeners.removeObservers();
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        connectivityManager.unregisterNetworkCallback(networkCallback);
+    public LiveData<Boolean> isConnectedToInternet() {
+        getConnectivityManager().requestNetwork(NETWORK_REQUEST, networkCallback);
+        LiveData<Boolean> connectedLiveStatus = Transformations.map(connectedNetworkLiveCount, activeNetworkCount -> activeNetworkCount > 0);
+        return Transformations.distinctUntilChanged(connectedLiveStatus);
     }
 }

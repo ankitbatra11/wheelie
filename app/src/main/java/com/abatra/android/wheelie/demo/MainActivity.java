@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.print.PrintHelper;
 
 import com.abatra.android.wheelie.activity.ResultContracts.InputLessActivityResultContract;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     private static final String PRINT_JOB_NAME = "print picked image";
 
     private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
-    private final InternetConnectionObserver connectionObserver = InternetConnectionObserver.newInstance(this);
+    private final InternetConnectionObserver internetConnectionObserver = InternetConnectionObserver.newInstance(this);
     private ActivityResultLauncher<MediaInfo> attachDataLauncher;
     private ActivityResultLauncher<MediaInfo> openMediaLauncher;
     private ActivityResultLauncher<MediaInfo> shareMediaLauncher;
@@ -113,10 +114,10 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             }
         });
 
-        connectionObserver.observeLifecycle(this);
+        internetConnectionObserver.observeLifecycle(this);
         binding.checkInternetConnectionBtn.setOnClickListener(v -> {
-            String message = String.valueOf(connectionObserver.isConnectedToInternet());
-            Snackbar.make(v, message, Snackbar.LENGTH_SHORT).show();
+            LiveData<Boolean> connected = internetConnectionObserver.isConnectedToInternet();
+            connected.observe(this, c -> Snackbar.make(v, c.toString(), Snackbar.LENGTH_SHORT).show());
         });
 
         ActivityResultLauncher<Void> launcher = registerForActivityResult(wirelessSettings(), result -> {
