@@ -11,13 +11,17 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.abatra.android.wheelie.context.ExtContext;
 import com.abatra.android.wheelie.thread.BoltsUtils;
 
+import java.util.concurrent.Executor;
+
+import bolts.Task;
 import timber.log.Timber;
 
-import static com.abatra.android.wheelie.thread.SaferTask.backgroundTask;
+import static com.abatra.android.wheelie.thread.SaferTask.callOn;
 
-public class PreQInternetConnectionObserver implements InternetConnectionObserver {
+public class PreQInternetConnectivityChecker implements InternetConnectivityChecker {
 
     private static final IntentFilter INTENT_FILTER = new IntentFilter();
     private static final String ACTION_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
@@ -26,7 +30,7 @@ public class PreQInternetConnectionObserver implements InternetConnectionObserve
         INTENT_FILTER.addAction(ACTION_CONNECTIVITY_CHANGE);
     }
 
-    private final Context context;
+    private final ExtContext extContext;
     private final MutableLiveData<Boolean> connectedLiveData = new MutableLiveData<>();
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -34,15 +38,16 @@ public class PreQInternetConnectionObserver implements InternetConnectionObserve
             updateConnectedLiveData();
         }
     };
+    Executor backgroundExecutor = Task.BACKGROUND_EXECUTOR;
 
-    public PreQInternetConnectionObserver(Context context) {
-        this.context = context;
+    public PreQInternetConnectivityChecker(Context context) {
+        this.extContext = ExtContext.wrap(context);
     }
 
     @Override
     public void onResume() {
         Timber.v("onResume");
-        context.registerReceiver(broadcastReceiver, INTENT_FILTER);
+        extContext.registerReceiver(broadcastReceiver, INTENT_FILTER);
     }
 
     @Override
@@ -52,10 +57,10 @@ public class PreQInternetConnectionObserver implements InternetConnectionObserve
     }
 
     private void updateConnectedLiveData() {
-        backgroundTask(() ->
+        callOn(backgroundExecutor, () ->
         {
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            ConnectivityManager connectivityManager = extContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         }).continueOnUiThread(task ->
@@ -68,6 +73,6 @@ public class PreQInternetConnectionObserver implements InternetConnectionObserve
     @Override
     public void onPause() {
         Timber.v("onPause");
-        context.unregisterReceiver(broadcastReceiver);
+        extContext.unregisterReceiver(broadcastReceiver);
     }
 }

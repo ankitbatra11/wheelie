@@ -12,14 +12,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 
+import com.abatra.android.wheelie.context.ExtContext;
+
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import bolts.Task;
 import timber.log.Timber;
 
+import static androidx.lifecycle.Transformations.distinctUntilChanged;
+import static androidx.lifecycle.Transformations.map;
+import static com.abatra.android.wheelie.thread.SaferTask.callOn;
+
 @RequiresApi(api = Build.VERSION_CODES.Q)
-public class QOrAboveInternetConnectionObserver implements InternetConnectionObserver {
+public class QOrAboveInternetConnectivityChecker implements InternetConnectivityChecker {
 
     private static final IntentFilter INTENT_FILTER = new IntentFilter();
     private static final String ACTION_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
@@ -32,7 +39,7 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build();
 
-    private final Context context;
+    private final ExtContext extContext;
     private final AtomicInteger activeNetworkCount = new AtomicInteger(0);
     private final MutableLiveData<Integer> connectedNetworkLiveCount = new MutableLiveData<>(0);
     private final ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
@@ -67,31 +74,34 @@ public class QOrAboveInternetConnectionObserver implements InternetConnectionObs
             updateLiveCount();
         }
     };
+    Executor backgroundExecutor = Task.BACKGROUND_EXECUTOR;
 
-    public QOrAboveInternetConnectionObserver(Context context) {
-        this.context = context;
+    public QOrAboveInternetConnectivityChecker(Context context) {
+        this.extContext = ExtContext.wrap(context);
     }
 
     @Override
     public void onResume() {
         Timber.v("onResume");
-        getConnectivityManager().registerNetworkCallback(NETWORK_REQUEST, networkCallback);
+        getExtConnectivityManager().registerNetworkCallback(NETWORK_REQUEST, networkCallback);
     }
 
     @Override
     public void onPause() {
         Timber.v("onPause");
-        getConnectivityManager().unregisterNetworkCallback(networkCallback);
+        getExtConnectivityManager().unregisterNetworkCallback(networkCallback);
     }
 
-    private ConnectivityManager getConnectivityManager() {
-        return (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    private ExtConnectivityManager getExtConnectivityManager() {
+        return ExtConnectivityManager.from(extContext.getContext());
     }
 
     @Override
     public LiveData<Boolean> isConnectedToInternet() {
-        getConnectivityManager().requestNetwork(NETWORK_REQUEST, networkCallback);
-        LiveData<Boolean> connectedLiveStatus = Transformations.map(connectedNetworkLiveCount, activeNetworkCount -> activeNetworkCount > 0);
-        return Transformations.distinctUntilChanged(connectedLiveStatus);
+        callOn(backgroundExecutor, () -> {
+            getExtConnectivityManager().getConnectivityManager().requestNetwork(NETWORK_REQUEST, networkCallback);
+            return null;
+        });
+        return distinctUntilChanged(map(connectedNetworkLiveCount, activeNetworkCount -> activeNetworkCount > 0));
     }
 }
