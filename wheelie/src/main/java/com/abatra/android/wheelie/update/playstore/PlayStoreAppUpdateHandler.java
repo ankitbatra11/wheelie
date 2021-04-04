@@ -44,8 +44,8 @@ public class PlayStoreAppUpdateHandler implements AppUpdateHandler {
     }
 
     @Override
-    public void checkAppUpdateAvailability(AppUpdateAvailabilityCriteria appUpdateAvailabilityCriteria, Callback callback) {
-        appUpdateAvailabilityChecker.checkAppUpdateAvailability(appUpdateAvailabilityCriteria, callback);
+    public void checkAppUpdateAvailability(AppUpdateAvailabilityCriteria availabilityCriteria, Callback callback) {
+        appUpdateAvailabilityChecker.checkAppUpdateAvailability(availabilityCriteria, callback);
     }
 
     @Override

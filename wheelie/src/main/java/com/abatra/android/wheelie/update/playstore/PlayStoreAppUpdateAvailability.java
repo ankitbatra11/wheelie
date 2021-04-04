@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class PlayStoreAppUpdateAvailability implements AppUpdateAvailability {
 
-    private final AppUpdateInfo appUpdateInfo;
+    final AppUpdateInfo appUpdateInfo;
 
     public PlayStoreAppUpdateAvailability(AppUpdateInfo appUpdateInfo) {
         this.appUpdateInfo = appUpdateInfo;
@@ -32,7 +32,7 @@ public class PlayStoreAppUpdateAvailability implements AppUpdateAvailability {
         return Optional.ofNullable(appUpdateInfo.clientVersionStalenessDays()).orElse(0) > days;
     }
 
-    AppUpdateInfo getAppUpdateInfo() {
+    public AppUpdateInfo getAppUpdateInfo() {
         return appUpdateInfo;
     }
 

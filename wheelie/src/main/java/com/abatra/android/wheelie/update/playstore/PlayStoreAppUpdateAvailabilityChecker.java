@@ -23,10 +23,10 @@ public class PlayStoreAppUpdateAvailabilityChecker implements AppUpdateAvailabil
     }
 
     @Override
-    public void checkAppUpdateAvailability(AppUpdateAvailabilityCriteria appUpdateAvailabilityCriteria, Callback callback) {
+    public void checkAppUpdateAvailability(AppUpdateAvailabilityCriteria availabilityCriteria, Callback callback) {
         appUpdateManager.getAppUpdateInfo().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                onGetAppUpdateInfoSuccess(task.getResult(), appUpdateAvailabilityCriteria, callback);
+                onGetAppUpdateInfoSuccess(task.getResult(), availabilityCriteria, callback);
             } else {
                 Timber.e(task.getException(), "App update availability check failed!");
                 callback.onAppUpdateAvailableCheckFailed(task.getException());
