@@ -16,9 +16,7 @@ public class Resource<T> {
     }
 
     private final Status status;
-    @Nullable
     private final T data;
-    @Nullable
     private final Throwable error;
 
     protected Resource(Status status, @Nullable T data, @Nullable Throwable error) {
@@ -27,7 +25,7 @@ public class Resource<T> {
         this.error = error;
     }
 
-    public static <T> Resource<T> fromTask(Task<T> task) {
+    public static <T> Resource<T> from(Task<T> task) {
         if (task.getError() != null) {
             return Resource.failed(task.getError());
         } else {
@@ -69,6 +67,18 @@ public class Resource<T> {
                 return failed(getError());
         }
         throw new IllegalStateException("Invalid status=" + status);
+    }
+
+    public boolean isLoaded() {
+        return status == Status.LOADED;
+    }
+
+    public boolean isLoading() {
+        return status == Status.LOADING;
+    }
+
+    public boolean isFailed() {
+        return status == Status.FAILED;
     }
 
     @NonNull
