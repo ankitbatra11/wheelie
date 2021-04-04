@@ -225,13 +225,13 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         appUpdateHandler.checkAppUpdateAvailability(AppUpdateAvailabilityCriteria.isAppUpdateAllowedOfType(IMMEDIATE), new AppUpdateAvailabilityChecker.Callback() {
 
             @Override
-            public void onAppUpdateAvailable(AppUpdateAvailability appUpdateAvailability) {
+            public void onAppUpdateAvailable(AppUpdateAvailability updateAvailability) {
 
                 PlayStoreAppUpdateRequest appUpdateRequest = new PlayStoreAppUpdateRequest(
                         IMMEDIATE,
                         MainActivity.this,
                         1,
-                        (PlayStoreAppUpdateAvailability) appUpdateAvailability);
+                        (PlayStoreAppUpdateAvailability) updateAvailability);
 
                 appUpdateHandler.requestAppUpdate(appUpdateRequest);
             }
@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         }
 
         @Override
-        public void onAppUpdateAvailable(AppUpdateAvailability appUpdateAvailability) {
+        public void onAppUpdateAvailable(AppUpdateAvailability updateAvailability) {
             makeSnackbar("An update is available for the app", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Download", v -> {
 
@@ -381,7 +381,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
                                 FLEXIBLE,
                                 MainActivity.this,
                                 1,
-                                (PlayStoreAppUpdateAvailability) appUpdateAvailability);
+                                (PlayStoreAppUpdateAvailability) updateAvailability);
 
                         appUpdateHandler.requestAppUpdate(appUpdateRequest);
                     })
