@@ -8,6 +8,7 @@
       <w>crashlytics</w>
       <w>cutable</w>
       <w>delegator</w>
+      <w>jetpack</w>
       <w>launchable</w>
       <w>muxer</w>
       <w>pausable</w>
@@ -15,6 +16,7 @@
       <w>requestor</w>
       <w>runnables</w>
       <w>snackbar</w>
+      <w>syncer</w>
       <w>transcodable</w>
     </words>
   </dictionary>
