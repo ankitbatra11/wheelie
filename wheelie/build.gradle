@@ -6,8 +6,13 @@ plugins {
 group = 'com.github.ankitbatra11'
 
 android {
+
     compileSdkVersion 30
     buildToolsVersion "30.0.0"
+
+    buildFeatures {
+        viewBinding = true
+    }
 
     defaultConfig {
 
@@ -76,6 +81,8 @@ dependencies {
     implementation group: 'androidx.preference', name: 'preference', version: '1.1.1'
 
     implementation "androidx.startup:startup-runtime:1.0.0"
+
+    implementation group: 'androidx.recyclerview', name: 'recyclerview-selection', version: '1.1.0'
 
     testImplementation group: 'org.robolectric', name: 'robolectric', version: '4.5.1'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
