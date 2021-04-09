@@ -5,7 +5,6 @@ import android.provider.Settings;
 
 import androidx.lifecycle.Lifecycle;
 
-import com.abatra.android.wheelie.activity.result.RequestManageOverlayPermission;
 import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
 
 import org.junit.Before;

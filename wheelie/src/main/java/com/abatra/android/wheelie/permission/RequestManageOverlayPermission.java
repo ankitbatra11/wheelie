@@ -1,4 +1,4 @@
-package com.abatra.android.wheelie.activity.result;
+package com.abatra.android.wheelie.permission;
 
 import android.content.Context;
 import android.content.Intent;

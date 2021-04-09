@@ -13,15 +13,10 @@ import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-@Singleton
 public class AppUpdateHandlerFactory {
 
     private final Context context;
 
-    @Inject
     public AppUpdateHandlerFactory(Context context) {
         this.context = context;
     }

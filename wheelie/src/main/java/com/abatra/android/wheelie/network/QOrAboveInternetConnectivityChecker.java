@@ -10,8 +10,6 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.abatra.android.wheelie.context.ExtContext;
 
@@ -21,12 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import bolts.Task;
 import timber.log.Timber;
 
-import static androidx.lifecycle.Transformations.distinctUntilChanged;
-import static androidx.lifecycle.Transformations.map;
 import static com.abatra.android.wheelie.thread.SaferTask.callOn;
 
 @RequiresApi(api = Build.VERSION_CODES.Q)
-public class QOrAboveInternetConnectivityChecker implements InternetConnectivityChecker {
+public class QOrAboveInternetConnectivityChecker extends AbstractInternetConnectivityChecker {
 
     private static final IntentFilter INTENT_FILTER = new IntentFilter();
     private static final String ACTION_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
@@ -41,7 +37,6 @@ public class QOrAboveInternetConnectivityChecker implements InternetConnectivity
 
     private final ExtContext extContext;
     private final AtomicInteger activeNetworkCount = new AtomicInteger(0);
-    private final MutableLiveData<Integer> connectedNetworkLiveCount = new MutableLiveData<>(0);
     private final ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
 
         @Override
@@ -53,7 +48,7 @@ public class QOrAboveInternetConnectivityChecker implements InternetConnectivity
         }
 
         private void updateLiveCount() {
-            connectedNetworkLiveCount.postValue(makeZeroIfNegative(activeNetworkCount.get()));
+            isConnectedLiveData.postValue(makeZeroIfNegative(activeNetworkCount.get()) > 0);
         }
 
         private Integer makeZeroIfNegative(int i) {
@@ -81,14 +76,12 @@ public class QOrAboveInternetConnectivityChecker implements InternetConnectivity
     }
 
     @Override
-    public void onResume() {
-        Timber.v("onResume");
+    protected void startListening() {
         getExtConnectivityManager().registerNetworkCallback(NETWORK_REQUEST, networkCallback);
     }
 
     @Override
-    public void onPause() {
-        Timber.v("onPause");
+    protected void stopListening() {
         getExtConnectivityManager().unregisterNetworkCallback(networkCallback);
     }
 
@@ -97,11 +90,10 @@ public class QOrAboveInternetConnectivityChecker implements InternetConnectivity
     }
 
     @Override
-    public LiveData<Boolean> isConnectedToInternet() {
+    protected void updateIsConnectedLiveData() {
         callOn(backgroundExecutor, () -> {
             getExtConnectivityManager().getConnectivityManager().requestNetwork(NETWORK_REQUEST, networkCallback);
             return null;
         });
-        return distinctUntilChanged(map(connectedNetworkLiveCount, activeNetworkCount -> activeNetworkCount > 0));
     }
 }
