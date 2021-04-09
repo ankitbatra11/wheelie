@@ -2,17 +2,28 @@ package com.abatra.android.wheelie.lifecycle;
 
 import android.content.Context;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultCaller;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.ActivityResultRegistry;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.abatra.android.wheelie.activity.ActivityResultRegistrar;
+import java.util.Optional;
 
-public interface ILifecycleOwner extends LifecycleOwner, ActivityResultRegistrar {
+public interface ILifecycleOwner extends LifecycleOwner, ActivityResultCaller {
+
+    static ILifecycleOwner viewOf(Fragment fragment) {
+        return new FragmentViewLifecycleOwner(fragment);
+    }
 
     default Context getContext() {
-        Fragment fragment = getFragment();
-        return fragment != null ? fragment.requireContext() : getAppCompatActivity();
+        return Optional.ofNullable(getFragment())
+                .map(Fragment::requireContext)
+                .orElseGet(this::getAppCompatActivity);
     }
 
     default Fragment getFragment() {
@@ -25,5 +36,26 @@ public interface ILifecycleOwner extends LifecycleOwner, ActivityResultRegistrar
                 ? (AppCompatActivity) getFragment().getActivity()
                 : null
                 : null;
+    }
+
+    @NonNull
+    @Override
+    default <I, O> ActivityResultLauncher<I> registerForActivityResult(@NonNull ActivityResultContract<I, O> contract,
+                                                                       @NonNull ActivityResultCallback<O> callback) {
+        return getActivityResultCaller().registerForActivityResult(contract, callback);
+    }
+
+    default ActivityResultCaller getActivityResultCaller() {
+        return Optional.ofNullable(getFragment())
+                .map(f -> (ActivityResultCaller) f)
+                .orElseGet(this::getAppCompatActivity);
+    }
+
+    @NonNull
+    @Override
+    default <I, O> ActivityResultLauncher<I> registerForActivityResult(@NonNull ActivityResultContract<I, O> contract,
+                                                                       @NonNull ActivityResultRegistry registry,
+                                                                       @NonNull ActivityResultCallback<O> callback) {
+        return getActivityResultCaller().registerForActivityResult(contract, registry, callback);
     }
 }
