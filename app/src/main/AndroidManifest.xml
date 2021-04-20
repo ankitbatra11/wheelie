@@ -34,6 +34,9 @@
             <meta-data
                 android:name="com.abatra.android.wheelie.demo.LoggerInitializer"
                 android:value="androidx.startup" />
+            <meta-data
+                android:name="com.abatra.android.wheelie.demo.DebugStrictModeInitializer"
+                android:value="androidx.startup" />
         </provider>
 
     </application>
