@@ -4,8 +4,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-import androidx.fragment.app.Fragment;
-
 import com.abatra.android.wheelie.chronicle.BundleEventParams;
 import com.abatra.android.wheelie.chronicle.Event;
 import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
@@ -13,6 +11,7 @@ import com.abatra.android.wheelie.chronicle.model.Item;
 import com.abatra.android.wheelie.chronicle.model.Price;
 import com.abatra.android.wheelie.chronicle.model.PurchasableItem;
 import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.ScreenViewEventParams;
 import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 import com.google.common.collect.ImmutableMap;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -20,7 +19,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -45,9 +43,6 @@ public class FirebaseEventBuilderTest {
 
     private FirebaseEventBuilder firebaseEventBuilder;
 
-    @Mock
-    private Fragment mockedFragment;
-
     @Before
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -62,11 +57,14 @@ public class FirebaseEventBuilderTest {
     @Test
     public void test_buildScreenViewEvent() {
 
-        Event event = firebaseEventBuilder.buildScreenViewEvent(mockedFragment);
+        String expectedClass = "class";
+        String expectedName = "name";
+
+        Event event = firebaseEventBuilder.buildScreenViewEvent(new ScreenViewEventParams(expectedClass, expectedName));
 
         verifyEvent(event, SCREEN_VIEW, ImmutableMap.of(
-                Param.SCREEN_CLASS, mockedFragment.getClass().getSimpleName(),
-                Param.SCREEN_NAME, mockedFragment.getClass().getSimpleName()));
+                Param.SCREEN_CLASS, expectedClass,
+                Param.SCREEN_NAME, expectedName));
     }
 
     private void verifyEvent(Event event, String expectedName, Map<String, Object> expectedParams) {

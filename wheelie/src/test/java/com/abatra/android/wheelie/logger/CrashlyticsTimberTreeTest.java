@@ -1,4 +1,4 @@
-package com.abatra.android.wheelie.startup;
+package com.abatra.android.wheelie.logger;
 
 import com.abatra.android.wheelie.logger.CrashlyticsTimberTree;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;

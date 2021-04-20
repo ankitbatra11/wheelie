@@ -6,17 +6,18 @@ import androidx.fragment.app.Fragment;
 
 import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
 import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.ScreenViewEventParams;
 import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 
 public abstract class EventBuilder<T extends EventBuilder<T>> {
 
     protected abstract EventParams createEventParams();
 
-    public abstract Event buildScreenViewEvent(Fragment fragment);
-
     public abstract Event buildBeginCheckoutEvent(BeginCheckoutEventParams beginCheckoutEventParams);
 
     public abstract Event buildPurchaseEvent(PurchaseEventParams purchaseEventParams);
+
+    public abstract Event buildScreenViewEvent(ScreenViewEventParams screenViewEventParams);
 
     private String eventName;
     private final EventParams eventParams = createEventParams();
