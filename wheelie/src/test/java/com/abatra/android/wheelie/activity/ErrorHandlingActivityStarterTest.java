@@ -8,20 +8,17 @@ import android.content.Intent;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.fragment.app.Fragment;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.function.Consumer;
-
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ErrorHandlingActivityStarterTest {
@@ -30,7 +27,7 @@ public class ErrorHandlingActivityStarterTest {
     private Intent mockedIntent;
 
     @Mock
-    private ActivityNotFoundErrorHandler mockedErrorHandler;
+    private StartActivityErrorHandler mockedErrorHandler;
 
     @Mock
     private Context mockedContext;
@@ -47,19 +44,14 @@ public class ErrorHandlingActivityStarterTest {
     @InjectMocks
     private ErrorHandlingActivityStarter activityStarter;
 
-    @Before
-    public void setup() {
-        activityStarter.setActivityNotFoundErrorHandler(mockedErrorHandler);
-    }
-
     @Test
     public void test_startActivity_activityNotFound() {
 
         doThrow(new ActivityNotFoundException()).when(mockedContext).startActivity(any());
 
-        activityStarter.startActivity(mockedContext, mockedIntent);
+        activityStarter.startActivity(mockedContext, mockedIntent, mockedErrorHandler);
 
-        verify(mockedErrorHandler, times(1)).handleActivityNotFoundError(mockedIntent);
+        verify(mockedErrorHandler, times(1)).onActivityNotFoundError(any(ActivityNotFoundException.class));
     }
 
     @Test
@@ -67,9 +59,9 @@ public class ErrorHandlingActivityStarterTest {
 
         doThrow(new IllegalStateException()).when(mockedFragment).startActivity(any());
 
-        activityStarter.startActivity(mockedFragment, mockedIntent);
+        activityStarter.startActivity(mockedFragment, mockedIntent, mockedErrorHandler);
 
-        verify(mockedErrorHandler, never()).handleActivityNotFoundError(any());
+        verify(mockedErrorHandler, times(1)).onError(any(IllegalStateException.class));
     }
 
     @Test
@@ -77,20 +69,18 @@ public class ErrorHandlingActivityStarterTest {
 
         doThrow(new IllegalStateException()).when(mockedActivityResultLauncher).launch(any());
 
-        activityStarter.launch(mockedActivityResultLauncher, mockedIntent);
+        activityStarter.launch(mockedActivityResultLauncher, mockedIntent, mockedErrorHandler);
 
-        verify(mockedActivityResultLauncher, times(1)).launch(mockedIntent);
-        verify(mockedErrorHandler, never()).handleActivityNotFoundError(any());
+        verify(mockedErrorHandler, times(1)).onError(any(IllegalStateException.class));
     }
 
     @Test
     public void test_startActivity_activityFound() {
 
-        activityStarter.startActivity(mockedActivity, mockedIntent);
+        activityStarter.startActivity(mockedActivity, mockedIntent, mockedErrorHandler);
 
         verify(mockedActivity, times(1)).startActivity(mockedIntent);
-        verify(mockedErrorHandler, never()).handleActivityNotFoundError(any());
-
+        verifyNoInteractions(mockedErrorHandler);
     }
 
     @Test
@@ -98,18 +88,18 @@ public class ErrorHandlingActivityStarterTest {
 
         doThrow(new ActivityNotFoundException()).when(mockedActivityResultLauncher).launch(any());
 
-        activityStarter.launch(mockedActivityResultLauncher, mockedIntent);
+        activityStarter.launch(mockedActivityResultLauncher, mockedIntent, mockedErrorHandler);
 
         verify(mockedActivityResultLauncher, times(1)).launch(mockedIntent);
-        verify(mockedErrorHandler, times(1)).handleActivityNotFoundError(mockedIntent);
+        verify(mockedErrorHandler, times(1)).onActivityNotFoundError(any(ActivityNotFoundException.class));
     }
 
     @Test
     public void test_launch_activityFound() {
 
-        activityStarter.launch(mockedActivityResultLauncher, mockedIntent);
+        activityStarter.launch(mockedActivityResultLauncher, mockedIntent, mockedErrorHandler);
 
         verify(mockedActivityResultLauncher, times(1)).launch(mockedIntent);
-        verify(mockedErrorHandler, never()).handleActivityNotFoundError(any());
+        verifyNoInteractions(mockedErrorHandler);
     }
 }
