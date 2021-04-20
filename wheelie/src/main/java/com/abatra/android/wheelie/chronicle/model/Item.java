@@ -5,6 +5,10 @@ public class Item implements ItemParams<Item> {
     private String id;
     private String name;
 
+    public static Item ofName(String name) {
+        return new Item().setName(name);
+    }
+
     @Override
     public String getId() {
         return id;
