@@ -8,6 +8,7 @@ import com.abatra.android.wheelie.chronicle.firebase.FirebaseEventBuilder;
 import com.abatra.android.wheelie.chronicle.firebase.FirebaseEventRecorder;
 import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
 import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.ScreenViewEventParams;
 import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 
 import org.junit.Before;
@@ -50,9 +51,6 @@ public class ChronicleTest {
     private EventBuilder<?> mockedEventBuilder;
 
     @Mock
-    private Fragment mockedFragment;
-
-    @Mock
     private Event mockedEvent;
 
     @Mock
@@ -78,10 +76,12 @@ public class ChronicleTest {
     @Test
     public void test_recordScreenViewEvent() {
 
-        recordScreenViewEvent(mockedFragment);
+        ScreenViewEventParams screenViewEventParams = new ScreenViewEventParams("", "");
+
+        recordScreenViewEvent(screenViewEventParams);
 
         verify(mockedEventRecorder, timeout(1)).record(null);
-        verify(mockedEventBuilder, times(1)).buildScreenViewEvent(mockedFragment);
+        verify(mockedEventBuilder, times(1)).buildScreenViewEvent(screenViewEventParams);
     }
 
     @Test

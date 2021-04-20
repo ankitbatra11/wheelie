@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 
 import com.abatra.android.wheelie.chronicle.model.BeginCheckoutEventParams;
 import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.ScreenViewEventParams;
 import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
 
 public class Chronicle {
@@ -27,8 +28,8 @@ public class Chronicle {
         return config.getEventBuilderFactory().createEventBuilder();
     }
 
-    public static void recordScreenViewEvent(Fragment fragment) {
-        record(eventBuilder().buildScreenViewEvent(fragment));
+    public static void recordScreenViewEvent(ScreenViewEventParams screenViewEventParams) {
+        record(eventBuilder().buildScreenViewEvent(screenViewEventParams));
     }
 
     public static void recordEventOfName(String eventName) {

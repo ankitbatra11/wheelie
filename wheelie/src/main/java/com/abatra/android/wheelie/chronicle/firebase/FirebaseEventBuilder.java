@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import com.abatra.android.wheelie.chronicle.Event;
 import com.abatra.android.wheelie.chronicle.EventBuilder;
@@ -14,8 +13,8 @@ import com.abatra.android.wheelie.chronicle.model.Item;
 import com.abatra.android.wheelie.chronicle.model.Price;
 import com.abatra.android.wheelie.chronicle.model.PurchasableItem;
 import com.abatra.android.wheelie.chronicle.model.PurchaseEventParams;
+import com.abatra.android.wheelie.chronicle.model.ScreenViewEventParams;
 import com.abatra.android.wheelie.chronicle.model.SelectItemEventParams;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,8 +24,27 @@ import timber.log.Timber;
 
 import static com.google.firebase.analytics.FirebaseAnalytics.Event.BEGIN_CHECKOUT;
 import static com.google.firebase.analytics.FirebaseAnalytics.Event.PURCHASE;
+import static com.google.firebase.analytics.FirebaseAnalytics.Event.SCREEN_VIEW;
 import static com.google.firebase.analytics.FirebaseAnalytics.Event.SELECT_ITEM;
-import static com.google.firebase.analytics.FirebaseAnalytics.Param;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.AFFILIATION;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.COUPON;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.CURRENCY;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.ITEMS;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_BRAND;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_CATEGORY;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_ID;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_LIST_ID;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_LIST_NAME;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_NAME;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_VARIANT;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.PRICE;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.QUANTITY;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.SCREEN_CLASS;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.SCREEN_NAME;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.SHIPPING;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.TAX;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.TRANSACTION_ID;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param.VALUE;
 
 public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
 
@@ -36,27 +54,19 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
     }
 
     @Override
-    public Event buildScreenViewEvent(Fragment fragment) {
-        return withName(FirebaseAnalytics.Event.SCREEN_VIEW)
-                .withParam(Param.SCREEN_CLASS, fragment.getClass().getSimpleName())
-                .withParam(Param.SCREEN_NAME, fragment.getClass().getSimpleName())
-                .build();
-    }
-
-    @Override
     public Event buildBeginCheckoutEvent(BeginCheckoutEventParams beginCheckoutEventParams) {
         return withName(BEGIN_CHECKOUT)
-                .withParam(Param.COUPON, beginCheckoutEventParams.getCoupon())
+                .withParam(COUPON, beginCheckoutEventParams.getCoupon())
                 .withPriceParam(beginCheckoutEventParams.getPrice())
-                .withParam(Param.ITEMS, purchasableItemsToParcelables(beginCheckoutEventParams.getItems()))
+                .withParam(ITEMS, purchasableItemsToParcelables(beginCheckoutEventParams.getItems()))
                 .build();
     }
 
     private EventBuilder<?> withPriceParam(@Nullable Price price) {
         Optional.ofNullable(price).ifPresent(p -> {
             if (p.getCurrency() != null) {
-                withParam(Param.CURRENCY, p.getCurrency());
-                withParam(Param.VALUE, p.getValue());
+                withParam(CURRENCY, p.getCurrency());
+                withParam(VALUE, p.getValue());
             } else {
                 Timber.w("Must specify currency with value and vice versa! price=%s", p);
             }
@@ -78,26 +88,26 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
 
     private Bundle createBundle(PurchasableItem item) {
         Bundle bundle = new Bundle();
-        bundle.putString(Param.ITEM_ID, item.getId());
-        bundle.putString(Param.ITEM_NAME, item.getName());
-        bundle.putString(Param.ITEM_CATEGORY, item.getCategory());
-        bundle.putString(Param.ITEM_BRAND, item.getBrand());
-        bundle.putString(Param.ITEM_VARIANT, item.getVariant());
-        bundle.putDouble(Param.PRICE, item.getPrice());
-        bundle.putLong(Param.QUANTITY, item.getQuantity());
+        bundle.putString(ITEM_ID, item.getId());
+        bundle.putString(ITEM_NAME, item.getName());
+        bundle.putString(ITEM_CATEGORY, item.getCategory());
+        bundle.putString(ITEM_BRAND, item.getBrand());
+        bundle.putString(ITEM_VARIANT, item.getVariant());
+        bundle.putDouble(PRICE, item.getPrice());
+        bundle.putLong(QUANTITY, item.getQuantity());
         return bundle;
     }
 
     @Override
     public Event buildPurchaseEvent(PurchaseEventParams purchaseEventParams) {
         return withName(PURCHASE)
-                .withParam(Param.TRANSACTION_ID, purchaseEventParams.getTransactionId())
-                .withParam(Param.AFFILIATION, purchaseEventParams.getAffiliation())
+                .withParam(TRANSACTION_ID, purchaseEventParams.getTransactionId())
+                .withParam(AFFILIATION, purchaseEventParams.getAffiliation())
                 .withPriceParam(purchaseEventParams.getPrice())
-                .withParam(Param.TAX, purchaseEventParams.getTax())
-                .withParam(Param.SHIPPING, purchaseEventParams.getShipping())
-                .withParam(Param.COUPON, purchaseEventParams.getCoupon())
-                .withParam(Param.ITEMS, purchasableItemsToParcelables(purchaseEventParams.getItems()))
+                .withParam(TAX, purchaseEventParams.getTax())
+                .withParam(SHIPPING, purchaseEventParams.getShipping())
+                .withParam(COUPON, purchaseEventParams.getCoupon())
+                .withParam(ITEMS, purchasableItemsToParcelables(purchaseEventParams.getItems()))
                 .build();
     }
 
@@ -105,12 +115,12 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
     public Event buildSelectItemEvent(SelectItemEventParams selectItemEventParams) {
 
         withName(SELECT_ITEM)
-                .withParam(Param.ITEM_LIST_ID, selectItemEventParams.getItemListId())
-                .withParam(Param.ITEM_LIST_NAME, selectItemEventParams.getItemListName());
+                .withParam(ITEM_LIST_ID, selectItemEventParams.getItemListId())
+                .withParam(ITEM_LIST_NAME, selectItemEventParams.getItemListName());
 
         Optional.ofNullable(selectItemEventParams.getItem()).ifPresent(item -> {
             List<Item> items = Collections.singletonList(item);
-            withParam(Param.ITEMS, itemsToParcelables(items));
+            withParam(ITEMS, itemsToParcelables(items));
         });
         return build();
     }
@@ -123,9 +133,17 @@ public class FirebaseEventBuilder extends EventBuilder<FirebaseEventBuilder> {
 
     private Bundle createBundle(Item item) {
         Bundle bundle = new Bundle();
-        bundle.putString(Param.ITEM_ID, item.getId());
-        bundle.putString(Param.ITEM_NAME, item.getName());
+        bundle.putString(ITEM_ID, item.getId());
+        bundle.putString(ITEM_NAME, item.getName());
         return bundle;
+    }
+
+    @Override
+    public Event buildScreenViewEvent(ScreenViewEventParams screenViewEventParams) {
+        return withName(SCREEN_VIEW)
+                .withParam(SCREEN_CLASS, screenViewEventParams.getScreenClass())
+                .withParam(SCREEN_NAME, screenViewEventParams.getScreenName())
+                .build();
     }
 
     public static class Factory implements EventBuilder.Factory {
