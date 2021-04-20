@@ -6,6 +6,12 @@ public class SelectItemEventParams {
     private String itemListName;
     private Item item;
 
+    public static SelectItemEventParams create(String listName, String itemName) {
+        return new SelectItemEventParams()
+                .setItemListName(listName)
+                .setItem(Item.ofName(itemName));
+    }
+
     public String getItemListId() {
         return itemListId;
     }
