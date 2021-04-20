@@ -32,6 +32,4 @@ public interface ILifecycleOwner extends LifecycleOwner, ActivityResultCaller {
     default AppCompatActivity getAppCompatActivity() {
         return null;
     }
-
-    ActivityStarter getActivityStarter();
 }

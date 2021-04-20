@@ -56,9 +56,4 @@ public class FragmentLifecycleOwner implements ILifecycleOwner {
     public Lifecycle getLifecycle() {
         return fragment.getLifecycle();
     }
-
-    @Override
-    public ActivityStarter getActivityStarter() {
-        return ActivityStarter.of(fragment);
-    }
 }

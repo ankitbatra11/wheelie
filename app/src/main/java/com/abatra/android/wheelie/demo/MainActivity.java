@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.print.PrintHelper;
 
+import com.abatra.android.wheelie.activity.ErrorHandlingActivityStarter;
 import com.abatra.android.wheelie.activity.result.contract.AttachDataActivityResultContract;
 import com.abatra.android.wheelie.activity.result.contract.AttachDataActivityResultContract.AttachableData;
 import com.abatra.android.wheelie.activity.result.contract.GetContentActivityResultContract;
@@ -89,10 +90,14 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-        ManifestSinglePermissionRequestor singlePermissionRequestor = new ManifestSinglePermissionRequestor();
-        ManifestMultiplePermissionsRequestor multiplePermissionsRequestor = new ManifestMultiplePermissionsRequestor();
-        HybridPermissionRequestor hybridPermissionRequestor = new HybridPermissionRequestor(singlePermissionRequestor, multiplePermissionsRequestor);
-        OpenAppDetailsPermissionRequestor openAppDetailsPermissionRequestor = new OpenAppDetailsPermissionRequestor(hybridPermissionRequestor);
+        OpenAppDetailsPermissionRequestor openAppDetailsPermissionRequestor = new OpenAppDetailsPermissionRequestor(
+                new HybridPermissionRequestor(
+                        new ManifestSinglePermissionRequestor(),
+                        new ManifestMultiplePermissionsRequestor()
+                ),
+                new ErrorHandlingActivityStarter()
+        );
+
         openAppDetailsPermissionRequestor.observeLifecycle(ILifecycleOwner.activity(this));
 
         attachDataLauncher = registerForActivityResult(new AttachDataActivityResultContract(),
