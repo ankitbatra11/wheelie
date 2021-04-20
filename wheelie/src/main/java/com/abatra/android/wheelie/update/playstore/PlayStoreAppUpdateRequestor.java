@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.abatra.android.wheelie.java8.Consumer;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 import com.abatra.android.wheelie.pattern.Observable;
 import com.abatra.android.wheelie.update.AppUpdateRequest;
 import com.abatra.android.wheelie.update.AppUpdateRequestResult;
@@ -35,6 +36,11 @@ public class PlayStoreAppUpdateRequestor implements AppUpdateRequestor, InstallS
 
     public PlayStoreAppUpdateRequestor(AppUpdateManager appUpdateManager) {
         this.appUpdateManager = appUpdateManager;
+    }
+
+    @Override
+    public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+        lifecycleOwner.getLifecycle().addObserver(this);
     }
 
     protected AppUpdateManager getAppUpdateManager() {

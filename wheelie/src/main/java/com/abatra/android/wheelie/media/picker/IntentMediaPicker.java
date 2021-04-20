@@ -7,8 +7,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.observer.ILifecycleObserver;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 
 import java.util.List;
 

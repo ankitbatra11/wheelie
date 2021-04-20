@@ -6,7 +6,7 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 
 import java.util.Optional;
 

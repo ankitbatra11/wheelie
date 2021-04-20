@@ -10,12 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
-import com.abatra.android.wheelie.activity.ActivityStarter;
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
-
 import java.util.Optional;
 
-public class WheelieFragment<VB extends ViewBinding> extends Fragment implements ILifecycleOwner {
+public class WheelieFragment<VB extends ViewBinding> extends Fragment {
 
     private FragmentViewBinding<VB> fragmentViewBinding;
 
@@ -31,7 +28,7 @@ public class WheelieFragment<VB extends ViewBinding> extends Fragment implements
     }
 
     @Nullable
-    private FragmentViewBinding<VB> createFragmentViewBinding() {
+    protected FragmentViewBinding<VB> createFragmentViewBinding() {
         return null;
     }
 
@@ -41,9 +38,5 @@ public class WheelieFragment<VB extends ViewBinding> extends Fragment implements
 
     protected Optional<VB> getBinding() {
         return fragmentViewBinding.getValue();
-    }
-
-    protected ActivityStarter getActivityStarter() {
-        return ActivityStarter.of(this);
     }
 }

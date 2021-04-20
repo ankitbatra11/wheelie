@@ -6,9 +6,9 @@ import java.util.function.Function;
 
 import bolts.Task;
 
-public class ResourceMutableLiveData<T> extends MutableLiveData<Resource<T>> implements ResourceLiveDataApi<T> {
+public class LceMutableLiveData<T> extends MutableLiveData<Lce<T>> implements LceLiveDataApi<T> {
 
-    private final ResourceLiveDataApi<T> delegate = new ResourceLiveData<>(this);
+    private final LceLiveDataApi<T> delegate = new LceLiveData<>(this);
 
     @Override
     public void setResourceValue(T value) {

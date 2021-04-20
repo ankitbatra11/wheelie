@@ -11,7 +11,8 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.abatra.android.wheelie.context.ExtContext;
+import com.abatra.android.wheelie.context.ExtendedContext;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,7 +36,7 @@ public class QOrAboveInternetConnectivityChecker extends AbstractInternetConnect
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build();
 
-    private final ExtContext extContext;
+    private final ExtendedContext extendedContext;
     private final AtomicInteger activeNetworkCount = new AtomicInteger(0);
     private final ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
 
@@ -72,7 +73,12 @@ public class QOrAboveInternetConnectivityChecker extends AbstractInternetConnect
     Executor backgroundExecutor = Task.BACKGROUND_EXECUTOR;
 
     public QOrAboveInternetConnectivityChecker(Context context) {
-        this.extContext = ExtContext.wrap(context);
+        this.extendedContext = ExtendedContext.wrap(context);
+    }
+
+    @Override
+    public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+        lifecycleOwner.getLifecycle().addObserver(this);
     }
 
     @Override
@@ -86,7 +92,7 @@ public class QOrAboveInternetConnectivityChecker extends AbstractInternetConnect
     }
 
     private ExtConnectivityManager getExtConnectivityManager() {
-        return ExtConnectivityManager.from(extContext.getContext());
+        return ExtConnectivityManager.from(extendedContext.getContext());
     }
 
     @Override

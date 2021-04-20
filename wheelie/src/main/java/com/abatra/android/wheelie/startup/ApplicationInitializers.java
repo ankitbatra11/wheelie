@@ -1,8 +1,6 @@
-package com.abatra.android.wheelie.app;
+package com.abatra.android.wheelie.startup;
 
 import android.app.Application;
-
-import com.abatra.android.wheelie.startup.ApplicationInitializer;
 
 import java.util.Collection;
 import java.util.Collections;

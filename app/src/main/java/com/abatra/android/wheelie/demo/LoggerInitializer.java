@@ -4,7 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.abatra.android.wheelie.startup.TimberInitializer;
+import com.abatra.android.wheelie.logger.TimberInitializer;
 
 import timber.log.Timber;
 

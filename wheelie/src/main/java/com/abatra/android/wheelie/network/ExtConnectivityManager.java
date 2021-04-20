@@ -8,7 +8,7 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.abatra.android.wheelie.context.ExtContext;
+import com.abatra.android.wheelie.context.ExtendedContext;
 
 import timber.log.Timber;
 
@@ -25,7 +25,7 @@ public class ExtConnectivityManager {
     }
 
     public static ExtConnectivityManager from(Context context) {
-        return wrap(ExtContext.wrap(context).getSystemService(Context.CONNECTIVITY_SERVICE));
+        return wrap(ExtendedContext.wrap(context).getSystemService(Context.CONNECTIVITY_SERVICE));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

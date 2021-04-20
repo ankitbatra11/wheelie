@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import bolts.Task;
 
-interface ResourceLiveDataApi<T> {
+interface LceLiveDataApi<T> {
 
     void setResourceValue(T value);
 

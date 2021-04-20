@@ -6,9 +6,9 @@ import java.util.function.Function;
 
 import bolts.Task;
 
-public class ResourceMediatorLiveData<T> extends MediatorLiveData<Resource<T>> implements ResourceLiveDataApi<T> {
+public class LceMediatorLiveData<T> extends MediatorLiveData<Lce<T>> implements LceLiveDataApi<T> {
 
-    private final ResourceLiveDataApi<T> delegate = new ResourceLiveData<>(this);
+    private final LceLiveDataApi<T> delegate = new LceLiveData<>(this);
 
     @Override
     public void setResourceValue(T value) {

@@ -7,18 +7,18 @@ import android.content.IntentFilter;
 
 import timber.log.Timber;
 
-public class ExtContext {
+public class ExtendedContext {
 
     public static final Intent INTENT = new Intent();
 
     private final Context context;
 
-    private ExtContext(Context context) {
+    private ExtendedContext(Context context) {
         this.context = context;
     }
 
-    public static ExtContext wrap(Context context) {
-        return new ExtContext(context);
+    public static ExtendedContext wrap(Context context) {
+        return new ExtendedContext(context);
     }
 
     public Intent registerReceiver(BroadcastReceiver broadcastReceiver, IntentFilter intentFilter) {

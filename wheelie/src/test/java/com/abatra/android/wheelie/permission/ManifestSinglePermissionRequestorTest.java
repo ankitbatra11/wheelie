@@ -3,7 +3,7 @@ package com.abatra.android.wheelie.permission;
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
 import androidx.lifecycle.Lifecycle;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 
 import org.junit.Before;
 import org.junit.Test;

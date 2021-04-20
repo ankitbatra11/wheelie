@@ -1,14 +1,14 @@
-package com.abatra.android.wheelie.lifecycle;
+package com.abatra.android.wheelie.lifecycle.observer;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
+
 public interface ILifecycleObserver extends LifecycleObserver {
 
-    default void observeLifecycle(ILifecycleOwner lifecycleOwner) {
-        lifecycleOwner.getLifecycle().addObserver(this);
-    }
+    void observeLifecycle(ILifecycleOwner lifecycleOwner);
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     default void onCreate() {

@@ -9,10 +9,6 @@ import static com.abatra.android.wheelie.permission.SinglePermissionGrantResult.
 
 public class ManifestSinglePermissionRequestor extends AbstractSinglePermissionRequestor {
 
-    @Inject
-    public ManifestSinglePermissionRequestor() {
-    }
-
     @Override
     protected boolean isPermissionGranted(String permission) {
         return PermissionUtils.isPermissionGranted(getLifecycleOwner().getContext(), permission);

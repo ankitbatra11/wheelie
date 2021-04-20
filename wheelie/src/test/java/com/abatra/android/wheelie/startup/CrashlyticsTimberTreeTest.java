@@ -1,5 +1,6 @@
 package com.abatra.android.wheelie.startup;
 
+import com.abatra.android.wheelie.logger.CrashlyticsTimberTree;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.junit.Test;

@@ -8,8 +8,8 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.observer.ILifecycleObserver;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 
 import javax.inject.Inject;
 

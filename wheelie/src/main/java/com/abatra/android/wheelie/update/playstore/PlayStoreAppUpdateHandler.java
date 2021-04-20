@@ -4,7 +4,7 @@ import android.content.Intent;
 
 import androidx.annotation.Nullable;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityCriteria;
 import com.abatra.android.wheelie.update.AppUpdateHandler;

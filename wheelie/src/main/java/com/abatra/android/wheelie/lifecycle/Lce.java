@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import bolts.Task;
 
-public class Resource<T> {
+public class Lce<T> {
 
     public enum Status {
         LOADING,
@@ -19,30 +19,30 @@ public class Resource<T> {
     private final T data;
     private final Throwable error;
 
-    protected Resource(Status status, @Nullable T data, @Nullable Throwable error) {
+    protected Lce(Status status, @Nullable T data, @Nullable Throwable error) {
         this.status = status;
         this.data = data;
         this.error = error;
     }
 
-    public static <T> Resource<T> from(Task<T> task) {
+    public static <T> Lce<T> from(Task<T> task) {
         if (task.getError() != null) {
-            return Resource.failed(task.getError());
+            return Lce.failed(task.getError());
         } else {
-            return Resource.loaded(task.getResult());
+            return Lce.loaded(task.getResult());
         }
     }
 
-    public static <T> Resource<T> loading() {
-        return new Resource<>(Status.LOADING, null, null);
+    public static <T> Lce<T> loading() {
+        return new Lce<>(Status.LOADING, null, null);
     }
 
-    public static <T> Resource<T> loaded(T data) {
-        return new Resource<>(Status.LOADED, data, null);
+    public static <T> Lce<T> loaded(T data) {
+        return new Lce<>(Status.LOADED, data, null);
     }
 
-    public static <T> Resource<T> failed(Throwable error) {
-        return new Resource<>(Status.FAILED, null, error);
+    public static <T> Lce<T> failed(Throwable error) {
+        return new Lce<>(Status.FAILED, null, error);
     }
 
     public Status getStatus() {
@@ -57,7 +57,7 @@ public class Resource<T> {
         return error;
     }
 
-    public <V> Resource<V> map(Function<T, V> function) {
+    public <V> Lce<V> map(Function<T, V> function) {
         switch (status) {
             case LOADING:
                 return loading();
@@ -84,7 +84,7 @@ public class Resource<T> {
     @NonNull
     @Override
     public String toString() {
-        return "Resource{" +
+        return "Lce{" +
                 "status=" + status +
                 ", data=" + data +
                 ", error=" + error +

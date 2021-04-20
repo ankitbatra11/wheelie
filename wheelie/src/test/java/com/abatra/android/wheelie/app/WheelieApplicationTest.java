@@ -3,6 +3,7 @@ package com.abatra.android.wheelie.app;
 import android.os.Build;
 
 import com.abatra.android.wheelie.startup.ApplicationInitializer;
+import com.abatra.android.wheelie.startup.ApplicationInitializers;
 
 import org.junit.Before;
 import org.junit.Test;
