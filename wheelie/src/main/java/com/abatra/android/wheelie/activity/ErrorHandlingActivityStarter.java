@@ -1,23 +1,19 @@
 package com.abatra.android.wheelie.activity;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
-
-import java.util.function.Consumer;
+import androidx.fragment.app.Fragment;
 
 import timber.log.Timber;
 
-class SafeActivityStarter implements ActivityStarter {
+public class ErrorHandlingActivityStarter implements ActivityStarter {
 
-    private final Consumer<Intent> intentStarter;
     private ActivityNotFoundErrorHandler activityNotFoundErrorHandler = ActivityNotFoundErrorHandler.NO_OP;
-
-    protected SafeActivityStarter(Consumer<Intent> intentStarter) {
-        this.intentStarter = intentStarter;
-    }
 
     @Override
     public void setActivityNotFoundErrorHandler(@NonNull ActivityNotFoundErrorHandler activityNotFoundErrorHandler) {
@@ -25,8 +21,18 @@ class SafeActivityStarter implements ActivityStarter {
     }
 
     @Override
-    public void startActivity(Intent intent) {
-        startActivitySilently(() -> intentStarter.accept(intent), intent);
+    public void startActivity(Context context, Intent intent) {
+        startActivitySilently(() -> context.startActivity(intent), intent);
+    }
+
+    @Override
+    public void startActivity(Fragment fragment, Intent intent) {
+        startActivitySilently(() -> fragment.startActivity(intent), intent);
+    }
+
+    @Override
+    public void startActivity(Activity activity, Intent intent) {
+        startActivitySilently(() -> activity.startActivity(intent), intent);
     }
 
     public void startActivitySilently(Runnable startActivity, Object infoForActivityNotFoundError) {

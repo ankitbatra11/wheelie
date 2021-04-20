@@ -50,9 +50,4 @@ public class AppCompatActivityLifecycleOwner implements ILifecycleOwner {
     public Lifecycle getLifecycle() {
         return activity.getLifecycle();
     }
-
-    @Override
-    public ActivityStarter getActivityStarter() {
-        return ActivityStarter.of(activity);
-    }
 }

@@ -7,6 +7,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
 
+import com.abatra.android.wheelie.activity.ActivityStarter;
 import com.abatra.android.wheelie.activity.result.contract.OpenAppDetailsContract;
 import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 
@@ -16,13 +17,15 @@ import java.util.Optional;
 public class OpenAppDetailsPermissionRequestor implements PermissionRequestor {
 
     private final PermissionRequestor permissionRequestor;
+    private final ActivityStarter activityStarter;
     private ILifecycleOwner lifecycleOwner;
     private ActivityResultLauncher<Void> appDetailsScreenLauncher;
     @Nullable
     private ActivityResultCallback<ActivityResult> appDetailsScreenResultCallback;
 
-    public OpenAppDetailsPermissionRequestor(PermissionRequestor permissionRequestor) {
+    public OpenAppDetailsPermissionRequestor(PermissionRequestor permissionRequestor, ActivityStarter activityStarter) {
         this.permissionRequestor = permissionRequestor;
+        this.activityStarter = activityStarter;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class OpenAppDetailsPermissionRequestor implements PermissionRequestor {
     }
 
     private void openAppDetailsScreen() {
-        lifecycleOwner.getActivityStarter().launch(appDetailsScreenLauncher, null);
+        activityStarter.launch(appDetailsScreenLauncher, null);
     }
 
     @Override

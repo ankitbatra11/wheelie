@@ -10,8 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
-import com.abatra.android.wheelie.activity.ActivityStarter;
-
 public class AppProcessLifecycleOwner implements ILifecycleOwner {
 
     private static final AppProcessLifecycleOwner INSTANCE = new AppProcessLifecycleOwner();
@@ -25,11 +23,6 @@ public class AppProcessLifecycleOwner implements ILifecycleOwner {
 
     @Override
     public Context getContext() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ActivityStarter getActivityStarter() {
         throw new UnsupportedOperationException();
     }
 
