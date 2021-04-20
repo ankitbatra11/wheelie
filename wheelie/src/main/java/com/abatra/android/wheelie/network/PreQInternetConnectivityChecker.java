@@ -7,7 +7,8 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.abatra.android.wheelie.context.ExtContext;
+import com.abatra.android.wheelie.context.ExtendedContext;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 import com.abatra.android.wheelie.thread.BoltsUtils;
 
 import java.util.concurrent.Executor;
@@ -25,7 +26,7 @@ public class PreQInternetConnectivityChecker extends AbstractInternetConnectivit
         INTENT_FILTER.addAction(ACTION_CONNECTIVITY_CHANGE);
     }
 
-    private final ExtContext extContext;
+    private final ExtendedContext extendedContext;
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -35,19 +36,24 @@ public class PreQInternetConnectivityChecker extends AbstractInternetConnectivit
     Executor backgroundExecutor = Task.BACKGROUND_EXECUTOR;
 
     public PreQInternetConnectivityChecker(Context context) {
-        this.extContext = ExtContext.wrap(context);
+        this.extendedContext = ExtendedContext.wrap(context);
+    }
+
+    @Override
+    public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+        lifecycleOwner.getLifecycle().addObserver(this);
     }
 
     @Override
     protected void startListening() {
-        extContext.registerReceiver(broadcastReceiver, INTENT_FILTER);
+        extendedContext.registerReceiver(broadcastReceiver, INTENT_FILTER);
     }
 
     @Override
     protected void updateIsConnectedLiveData() {
         callOn(backgroundExecutor, () ->
         {
-            ConnectivityManager connectivityManager = extContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager connectivityManager = extendedContext.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
@@ -60,6 +66,6 @@ public class PreQInternetConnectivityChecker extends AbstractInternetConnectivit
 
     @Override
     protected void stopListening() {
-        extContext.unregisterReceiver(broadcastReceiver);
+        extendedContext.unregisterReceiver(broadcastReceiver);
     }
 }

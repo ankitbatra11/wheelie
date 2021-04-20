@@ -5,21 +5,15 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestMultiple
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 
 import java.util.Optional;
-
-import javax.inject.Inject;
 
 public class ManifestMultiplePermissionsRequestor implements MultiplePermissionsRequestor {
 
     private ILifecycleOwner lifecycleOwner;
     private ActivityResultLauncher<String[]> multiplePermissionsActivityResultLauncher;
     private CallbackDelegator callbackDelegator;
-
-    @Inject
-    public ManifestMultiplePermissionsRequestor() {
-    }
 
     @Override
     public void observeLifecycle(ILifecycleOwner lifecycleOwner) {

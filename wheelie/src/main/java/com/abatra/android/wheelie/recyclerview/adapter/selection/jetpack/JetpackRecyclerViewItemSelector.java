@@ -4,6 +4,7 @@ import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.selection.StorageStrategy;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 import com.abatra.android.wheelie.recyclerview.adapter.RecyclerViewItem;
 import com.abatra.android.wheelie.recyclerview.adapter.selection.AbstractRecyclerViewItemSelector;
 import com.abatra.android.wheelie.recyclerview.adapter.selection.SelectableRecyclerViewItem;
@@ -44,6 +45,11 @@ public class JetpackRecyclerViewItemSelector<K> extends AbstractRecyclerViewItem
                 storageStrategy);
 
         return new JetpackRecyclerViewItemSelector<>(recyclerViewAdapter, builder.build());
+    }
+
+    @Override
+    public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+        lifecycleOwner.getLifecycle().addObserver(this);
     }
 
     @Override

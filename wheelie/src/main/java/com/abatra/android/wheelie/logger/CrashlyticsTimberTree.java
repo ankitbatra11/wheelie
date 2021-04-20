@@ -1,4 +1,4 @@
-package com.abatra.android.wheelie.startup;
+package com.abatra.android.wheelie.logger;
 
 import android.util.Log;
 

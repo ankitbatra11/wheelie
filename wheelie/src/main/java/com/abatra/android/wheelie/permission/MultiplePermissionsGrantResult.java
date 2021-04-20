@@ -50,7 +50,6 @@ public class MultiplePermissionsGrantResult {
         MultiplePermissionsGrantResult onMultiplePermissionsGrantResult(Map<String, Boolean> grantResult, Activity activity) {
             Map<String, SinglePermissionGrantResult> grantResultByPermission = new HashMap<>();
             for (Map.Entry<String, SinglePermissionGrantResult.Builder> builderByPermission : buildersByPermission.entrySet()) {
-                //noinspection ConstantConditions
                 boolean granted = grantResult.getOrDefault(builderByPermission.getKey(), false);
                 SinglePermissionGrantResult value = builderByPermission.getValue().onPermissionGrantResult(granted, activity);
                 grantResultByPermission.put(builderByPermission.getKey(), value);

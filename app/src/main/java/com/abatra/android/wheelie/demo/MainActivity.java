@@ -28,7 +28,7 @@ import com.abatra.android.wheelie.activity.result.contract.OpenMediaActivityResu
 import com.abatra.android.wheelie.activity.result.contract.ShareMediaActivityResultContract;
 import com.abatra.android.wheelie.animation.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 import com.abatra.android.wheelie.media.MimeTypes;
 import com.abatra.android.wheelie.media.picker.IntentMediaPicker;
 import com.abatra.android.wheelie.media.picker.PickMediaCount;
@@ -38,11 +38,13 @@ import com.abatra.android.wheelie.media.printer.ImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentImagePrinter;
 import com.abatra.android.wheelie.media.printer.IntentPrintImageRequest;
 import com.abatra.android.wheelie.network.InternetConnectivityChecker;
+import com.abatra.android.wheelie.permission.HybridPermissionRequestor;
 import com.abatra.android.wheelie.permission.ManageOverlayPermissionRequestor;
 import com.abatra.android.wheelie.permission.ManifestMultiplePermissionsRequestor;
 import com.abatra.android.wheelie.permission.ManifestSinglePermissionRequestor;
 import com.abatra.android.wheelie.permission.MultiplePermissionsGrantResult;
 import com.abatra.android.wheelie.permission.MultiplePermissionsRequestor;
+import com.abatra.android.wheelie.permission.OpenAppDetailsPermissionRequestor;
 import com.abatra.android.wheelie.update.AppUpdateAvailability;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
 import com.abatra.android.wheelie.update.AppUpdateAvailabilityCriteria;
@@ -67,7 +69,7 @@ import static com.abatra.android.wheelie.intent.IntentFactory.openAppDetailsSett
 import static com.abatra.android.wheelie.update.AppUpdateType.FLEXIBLE;
 import static com.abatra.android.wheelie.update.AppUpdateType.IMMEDIATE;
 
-public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
+public class MainActivity extends AppCompatActivity {
 
     private static final String PRINT_JOB_NAME = "print picked image";
 
@@ -87,6 +89,12 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
         super.onCreate(savedInstanceState);
 
+        ManifestSinglePermissionRequestor singlePermissionRequestor = new ManifestSinglePermissionRequestor();
+        ManifestMultiplePermissionsRequestor multiplePermissionsRequestor = new ManifestMultiplePermissionsRequestor();
+        HybridPermissionRequestor hybridPermissionRequestor = new HybridPermissionRequestor(singlePermissionRequestor, multiplePermissionsRequestor);
+        OpenAppDetailsPermissionRequestor openAppDetailsPermissionRequestor = new OpenAppDetailsPermissionRequestor(hybridPermissionRequestor);
+        openAppDetailsPermissionRequestor.observeLifecycle(ILifecycleOwner.activity(this));
+
         attachDataLauncher = registerForActivityResult(new AttachDataActivityResultContract(),
                 result -> showSnackbarMessage("Attach data result callback"));
 
@@ -99,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
 
-        intentMediaPicker.observeLifecycle(this);
+        intentMediaPicker.observeLifecycle(ILifecycleOwner.activity(this));
         binding.pickImage.setOnClickListener(v -> {
 
             PickMediaRequest pickMediaRequest = PickMediaRequest.builder()
@@ -117,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             }
         });
 
-        internetConnectivityChecker.observeLifecycle(this);
+        internetConnectivityChecker.observeLifecycle(ILifecycleOwner.activity(this));
         binding.checkInternetConnectionBtn.setOnClickListener(v -> {
             LiveData<Boolean> connected = internetConnectivityChecker.isConnectedToInternet();
             connected.observe(this, c -> Snackbar.make(v, c.toString(), Snackbar.LENGTH_SHORT).show());
@@ -156,12 +164,9 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
             shareMediaLauncher.launch(input);
         }));
 
-        ManifestSinglePermissionRequestor singlePermissionRequestor = new ManifestSinglePermissionRequestor();
-
-        singlePermissionRequestor.observeLifecycle(this);
         binding.reqCameraPermission.setOnClickListener(v -> {
             String permission = Manifest.permission.CAMERA;
-            singlePermissionRequestor.requestSystemPermission(permission, grantResult -> showToastMessage("grantResult=" + grantResult));
+            openAppDetailsPermissionRequestor.requestSystemPermission(permission, grantResult -> showToastMessage("grantResult=" + grantResult));
         });
 
         ActivityResultLauncher<Intent> appDetailsLauncher = registerForActivityResult(
@@ -170,11 +175,9 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
         binding.launchAppDetailsSettings.setOnClickListener(v -> appDetailsLauncher.launch(openAppDetailsSettings(this)));
 
-        ManifestMultiplePermissionsRequestor multiplePermissionsRequestor = new ManifestMultiplePermissionsRequestor();
-        multiplePermissionsRequestor.observeLifecycle(this);
         binding.reqMultiplePermissions.setOnClickListener(v -> {
             String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
-            multiplePermissionsRequestor.requestSystemPermissions(permissions, new MultiplePermissionsRequestor.Callback() {
+            openAppDetailsPermissionRequestor.requestSystemPermissions(permissions, new MultiplePermissionsRequestor.Callback() {
                 @Override
                 public void onPermissionResult(MultiplePermissionsGrantResult multiplePermissionsGrantResult) {
                     showToastMessage("grantResult=" + multiplePermissionsGrantResult);
@@ -183,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
         });
 
         ManageOverlayPermissionRequestor manageOverlayPermissionRequestor = new ManageOverlayPermissionRequestor();
-        manageOverlayPermissionRequestor.observeLifecycle(this);
+        manageOverlayPermissionRequestor.observeLifecycle(ILifecycleOwner.activity(this));
         binding.reqManageOverlayPermission.setOnClickListener(v -> manageOverlayPermissionRequestor.requestSystemPermission(
                 null, grantResult -> showToastMessage("manage overlay permission grantResult=" + grantResult)));
 
@@ -224,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
 
     private void checkImmediateUpdate(AppUpdateHandlerFactory appUpdateHandlerFactory) {
         AppUpdateHandler appUpdateHandler = appUpdateHandlerFactory.fakePlayStoreImmediateUpdateAvailableToInstall();
-        appUpdateHandler.observeLifecycle(this);
+        appUpdateHandler.observeLifecycle(ILifecycleOwner.activity(this));
         appUpdateHandler.checkAppUpdateAvailability(AppUpdateAvailabilityCriteria.isAppUpdateAllowedOfType(IMMEDIATE), new AppUpdateAvailabilityChecker.Callback() {
 
             @Override
@@ -252,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
     }
 
     private void checkFlexibleUpdate(AppUpdateHandler appUpdateHandler) {
-        appUpdateHandler.observeLifecycle(this);
+        appUpdateHandler.observeLifecycle(ILifecycleOwner.activity(this));
         appUpdateHandler.addObserver(new FlexibleAppUpdateObserver(appUpdateHandler));
         appUpdateHandler.checkAppUpdateAvailability(AppUpdateAvailabilityCriteria.isAppUpdateAllowedOfType(FLEXIBLE), new FlexibleAppAvailabilityCallback(appUpdateHandler));
     }
@@ -294,11 +297,6 @@ public class MainActivity extends AppCompatActivity implements ILifecycleOwner {
                 .pick(PickMediaCount.SINGLE)
                 .withMediaResultCallback(uriActivityResultCallback)
                 .build());
-    }
-
-    @Override
-    public AppCompatActivity getAppCompatActivity() {
-        return this;
     }
 
     private class FlexibleAppUpdateObserver implements AppUpdateRequestor.Observer {

@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 import com.abatra.android.wheelie.recyclerview.adapter.AbstractAdapter;
 import com.abatra.android.wheelie.recyclerview.adapter.OnItemChildViewClickListener;
 import com.abatra.android.wheelie.recyclerview.adapter.OnItemClickListener;

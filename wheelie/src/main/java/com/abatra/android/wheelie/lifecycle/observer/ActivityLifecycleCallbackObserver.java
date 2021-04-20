@@ -1,4 +1,4 @@
-package com.abatra.android.wheelie.lifecycle;
+package com.abatra.android.wheelie.lifecycle.observer;
 
 import android.app.Activity;
 import android.app.Application;

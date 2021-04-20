@@ -9,23 +9,23 @@ import bolts.Task;
 
 import static com.abatra.android.wheelie.thread.BoltsUtils.getResult;
 
-class ResourceLiveData<T> implements ResourceLiveDataApi<T> {
+class LceLiveData<T> implements LceLiveDataApi<T> {
 
-    private final MutableLiveData<Resource<T>> liveData;
-    private final Resource<T> loading = Resource.loading();
+    private final MutableLiveData<Lce<T>> liveData;
+    private final Lce<T> loading = Lce.loading();
 
-    public ResourceLiveData(MutableLiveData<Resource<T>> liveData) {
+    public LceLiveData(MutableLiveData<Lce<T>> liveData) {
         this.liveData = liveData;
     }
 
     @Override
     public void setResourceValue(T value) {
-        liveData.setValue(Resource.loaded(value));
+        liveData.setValue(Lce.loaded(value));
     }
 
     @Override
     public void postResourceValue(T value) {
-        liveData.postValue(Resource.loaded(value));
+        liveData.postValue(Lce.loaded(value));
     }
 
     @Override
@@ -40,12 +40,12 @@ class ResourceLiveData<T> implements ResourceLiveDataApi<T> {
 
     @Override
     public void setError(Throwable error) {
-        liveData.setValue(Resource.failed(error));
+        liveData.setValue(Lce.failed(error));
     }
 
     @Override
     public void postError(Throwable error) {
-        liveData.postValue(Resource.failed(error));
+        liveData.postValue(Lce.failed(error));
     }
 
     @Override

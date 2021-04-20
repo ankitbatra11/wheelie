@@ -5,7 +5,7 @@ import android.provider.Settings;
 
 import androidx.lifecycle.Lifecycle;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleOwner;
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -74,7 +74,7 @@ public class ManageOverlayPermissionRequestorTest {
     @Test
     public void test_createRequestPermissionActivityResultContract() {
         assertThat(permissionRequestor.createRequestPermissionActivityResultContract(),
-                instanceOf(RequestManageOverlayPermission.class));
+                instanceOf(ManageOverlayPermissionContract.class));
     }
 
     @Test

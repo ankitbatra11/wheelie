@@ -2,7 +2,7 @@ package com.abatra.android.wheelie.permission;
 
 import android.content.ActivityNotFoundException;
 
-import com.abatra.android.wheelie.lifecycle.ILifecycleObserver;
+import com.abatra.android.wheelie.lifecycle.observer.ILifecycleObserver;
 
 public interface MultiplePermissionsRequestor extends ILifecycleObserver {
 

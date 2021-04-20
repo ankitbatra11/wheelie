@@ -2,6 +2,8 @@ package com.abatra.android.wheelie.lifecycle;
 
 import androidx.lifecycle.Lifecycle;
 
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

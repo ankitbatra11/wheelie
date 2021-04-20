@@ -1,5 +1,6 @@
 package com.abatra.android.wheelie.lifecycle;
 
+import com.abatra.android.wheelie.lifecycle.observer.ILifecycleObserver;
 import com.abatra.android.wheelie.pattern.Observable;
 
 public interface LifecycleObserverObservable<O> extends ILifecycleObserver, Observable<O> {

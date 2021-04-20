@@ -2,6 +2,8 @@ package com.abatra.android.wheelie.app;
 
 import android.app.Application;
 
+import com.abatra.android.wheelie.startup.ApplicationInitializers;
+
 public class WheelieApplication extends Application {
 
     @Override

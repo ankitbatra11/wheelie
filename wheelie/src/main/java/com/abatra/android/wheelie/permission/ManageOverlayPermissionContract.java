@@ -11,11 +11,11 @@ import androidx.annotation.Nullable;
 import com.abatra.android.wheelie.intent.IntentFactory;
 import com.abatra.android.wheelie.permission.PermissionUtils;
 
-public class RequestManageOverlayPermission extends ActivityResultContract<String, Boolean> {
+public class ManageOverlayPermissionContract extends ActivityResultContract<String, Boolean> {
 
     private final Context context;
 
-    public RequestManageOverlayPermission(Context context) {
+    public ManageOverlayPermissionContract(Context context) {
         this.context = context;
     }
 

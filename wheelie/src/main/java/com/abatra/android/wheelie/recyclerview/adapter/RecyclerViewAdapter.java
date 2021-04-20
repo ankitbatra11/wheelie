@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 import com.abatra.android.wheelie.recyclerview.adapter.binding.BindingRecyclerViewAdapter;
 
 import java.util.Optional;
@@ -42,6 +43,11 @@ public class RecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends Abs
 
     public static BindingRecyclerViewAdapter bindingMultipleItemViewTypes(RecyclerViewItemViewType... itemViewTypes) {
         return new BindingRecyclerViewAdapter(RecyclerViewItems.empty(), multipleItemViewTypes(itemViewTypes));
+    }
+
+    @Override
+    public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
+        lifecycleOwner.getLifecycle().addObserver(this);
     }
 
     @Override
