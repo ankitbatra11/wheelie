@@ -14,29 +14,29 @@ import java.util.Optional;
 
 public class WheelieFragment<VB extends ViewBinding> extends Fragment {
 
-    private FragmentViewBinding<VB> fragmentViewBinding;
+    protected VB binding;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        fragmentViewBinding = createFragmentViewBinding();
-        return Optional.ofNullable(fragmentViewBinding)
-                .map(b -> b.createView(this, inflater, container, savedInstanceState))
+        binding = createFragmentViewBinding();
+        return Optional.ofNullable(binding)
+                .map(ViewBinding::getRoot)
                 .orElse(null);
     }
 
     @Nullable
-    protected FragmentViewBinding<VB> createFragmentViewBinding() {
+    protected VB createFragmentViewBinding() {
         return null;
     }
 
-    protected VB requireBinding() {
-        return fragmentViewBinding.requireValue();
+    protected Optional<VB> getBinding() {
+        return Optional.ofNullable(binding);
     }
 
-    protected Optional<VB> getBinding() {
-        return fragmentViewBinding.getValue();
+    protected VB requireBinding() {
+        return getBinding().orElseThrow(IllegalStateException::new);
     }
 }
