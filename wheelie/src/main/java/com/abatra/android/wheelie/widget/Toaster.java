@@ -19,7 +19,7 @@ public final class Toaster {
     }
 
     private static Toast makeToast(Context context, Text message, int duration) {
-        return Toast.makeText(context.getApplicationContext(), message.getString(context), duration);
+        return Toast.makeText(context, message.getString(context), duration);
     }
 
     public static void toastLong(Context context, Text message) {
