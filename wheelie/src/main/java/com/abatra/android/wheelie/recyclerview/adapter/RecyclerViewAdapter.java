@@ -10,14 +10,10 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
-import com.abatra.android.wheelie.recyclerview.adapter.binding.BindingRecyclerViewAdapter;
 
 import java.util.Optional;
 
 import timber.log.Timber;
-
-import static com.abatra.android.wheelie.recyclerview.adapter.RecyclerViewItemViewTypeFactory.multipleItemViewTypes;
-import static com.abatra.android.wheelie.recyclerview.adapter.RecyclerViewItemViewTypeFactory.singleItemViewType;
 
 public class RecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends AbstractAdapter<VH> implements Adapter {
 
@@ -35,14 +31,6 @@ public class RecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends Abs
         super(recyclerViewItems);
         this.itemViewTypeFactory = itemViewTypeFactory;
         registerAdapterDataObserver(compositeDataObserver);
-    }
-
-    public static BindingRecyclerViewAdapter bindingSingleItemViewType(RecyclerViewItemViewType itemViewType) {
-        return new BindingRecyclerViewAdapter(RecyclerViewItems.empty(), singleItemViewType(itemViewType));
-    }
-
-    public static BindingRecyclerViewAdapter bindingMultipleItemViewTypes(RecyclerViewItemViewType... itemViewTypes) {
-        return new BindingRecyclerViewAdapter(RecyclerViewItems.empty(), multipleItemViewTypes(itemViewTypes));
     }
 
     @Override
@@ -84,6 +72,8 @@ public class RecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends Abs
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         VH viewHolder = itemViewTypeFactory.createItemViewType(viewType).createViewHolder(parent);
+
+        assert recyclerView != null;
 
         Optional.ofNullable(onItemClickListener).ifPresent(onItemClickListener -> {
             View itemView = viewHolder.itemView;

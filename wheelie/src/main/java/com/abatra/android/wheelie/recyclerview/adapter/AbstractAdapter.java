@@ -1,5 +1,6 @@
 package com.abatra.android.wheelie.recyclerview.adapter;
 
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -106,5 +107,10 @@ abstract public class AbstractAdapter<VH extends RecyclerView.ViewHolder> extend
 
     protected RecyclerViewItem.Api getItemApi() {
         return delegate;
+    }
+
+    @Override
+    public void dispatchUpdates(DiffUtil.DiffResult diffResult) {
+        diffResult.dispatchUpdatesTo(this);
     }
 }

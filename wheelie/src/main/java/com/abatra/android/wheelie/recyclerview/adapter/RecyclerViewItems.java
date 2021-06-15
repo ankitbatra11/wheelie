@@ -26,7 +26,7 @@ public class RecyclerViewItems implements RecyclerViewItem.Api {
         return new RecyclerViewItems(Lists.newArrayList());
     }
 
-    public static RecyclerViewItems fromItems(RecyclerViewItem... recyclerViewItems) {
+    public static RecyclerViewItems fromArray(RecyclerViewItem... recyclerViewItems) {
         return new RecyclerViewItems(Lists.newArrayList(recyclerViewItems));
     }
 

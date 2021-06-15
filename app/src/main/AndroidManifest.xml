@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".EnterAnimatedActivity" />
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".RecyclerViewAdapterDemoActivity" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
