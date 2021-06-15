@@ -110,6 +110,12 @@ abstract public class AbstractAdapter<VH extends RecyclerView.ViewHolder> extend
     }
 
     @Override
+    public void setItems(List<RecyclerViewItem> items, DiffUtil.DiffResult diffResult) {
+        delegate.setItems(items);
+        dispatchUpdates(diffResult);
+    }
+
+    @Override
     public void dispatchUpdates(DiffUtil.DiffResult diffResult) {
         diffResult.dispatchUpdatesTo(this);
     }

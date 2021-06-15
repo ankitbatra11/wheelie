@@ -146,4 +146,9 @@ public class SelectionRecyclerViewAdapter<VH extends RecyclerView.ViewHolder> ex
     public void dispatchUpdates(DiffUtil.DiffResult diffResult) {
         recyclerViewAdapter.dispatchUpdates(diffResult);
     }
+
+    @Override
+    public void setItems(List<RecyclerViewItem> items, DiffUtil.DiffResult diffResult) {
+        recyclerViewAdapter.setItems(items, diffResult);
+    }
 }
