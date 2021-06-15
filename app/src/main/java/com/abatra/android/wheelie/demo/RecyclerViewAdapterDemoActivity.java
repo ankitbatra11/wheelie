@@ -45,7 +45,7 @@ public class RecyclerViewAdapterDemoActivity extends AppCompatActivity {
 
         Executors.newSingleThreadScheduledExecutor().schedule(
                 () -> {
-                    List<ListItem> items = Arrays.asList(
+                    List<RecyclerViewItem> items = Arrays.asList(
                             new ListItem(Text.string("One")),
                             new ListItem(Text.string("Two")),
                             new ListItem(Text.string("Three"))
@@ -73,10 +73,7 @@ public class RecyclerViewAdapterDemoActivity extends AppCompatActivity {
                         }
                     });
 
-                    runOnUiThread(() -> {
-                        adapter.setItems(items);
-                        adapter.dispatchUpdates(diffResult);
-                    });
+                    runOnUiThread(() -> adapter.setItems(items, diffResult));
                 },
                 2,
                 TimeUnit.SECONDS
