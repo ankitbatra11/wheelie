@@ -4,6 +4,7 @@ import android.view.View;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.abatra.android.wheelie.lifecycle.observer.ILifecycleObserver;
 
@@ -16,4 +17,6 @@ public interface Adapter extends ILifecycleObserver, RecyclerViewItem.Api {
     void setItemChildViewClickListener(@IdRes int childViewId, @Nullable OnItemChildViewClickListener onClickListener);
 
     void registerNoItemsViewDataObserver(View noItemsView);
+
+    void dispatchUpdates(DiffUtil.DiffResult diffResult);
 }

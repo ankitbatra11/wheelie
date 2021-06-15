@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
@@ -139,5 +140,10 @@ public class SelectionRecyclerViewAdapter<VH extends RecyclerView.ViewHolder> ex
     @Override
     public void registerNoItemsViewDataObserver(View noItemsView) {
         recyclerViewAdapter.registerNoItemsViewDataObserver(noItemsView);
+    }
+
+    @Override
+    public void dispatchUpdates(DiffUtil.DiffResult diffResult) {
+        recyclerViewAdapter.dispatchUpdates(diffResult);
     }
 }

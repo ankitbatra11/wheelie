@@ -112,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
 
+        binding.recyclerViewDemoButton.setOnClickListener(v -> startActivity(new Intent(v.getContext(), RecyclerViewAdapterDemoActivity.class)));
+
         intentMediaPicker.observeLifecycle(ILifecycleOwner.activity(this));
         binding.pickImage.setOnClickListener(v -> {
 
