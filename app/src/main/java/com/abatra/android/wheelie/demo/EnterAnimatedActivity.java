@@ -8,7 +8,7 @@ import android.view.Window;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.abatra.android.wheelie.animation.SharedAxisMotion;
+import com.abatra.android.wheelie.core.anim.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityEnterAnimatedBinding;
 
 public class EnterAnimatedActivity extends AppCompatActivity {

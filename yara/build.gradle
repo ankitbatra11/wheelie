@@ -1,0 +1,14 @@
+android {
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+    }
+}
+
+dependencies {
+    api group: 'androidx.recyclerview', name: 'recyclerview', version: '1.2.1'
+    api group: 'androidx.recyclerview', name: 'recyclerview-selection', version: '1.1.0'
+
+    api project(':design-pattern')
+    api project(':lifecycle')
+}

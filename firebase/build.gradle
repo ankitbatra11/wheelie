@@ -1,0 +1,18 @@
+android {
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+
+    api platform('com.google.firebase:firebase-bom:28.1.0')
+    api 'com.google.firebase:firebase-config'
+    api 'com.google.firebase:firebase-analytics'
+    api 'com.google.firebase:firebase-crashlytics'
+
+    api project(':core');
+    api project(':chronicle');
+}

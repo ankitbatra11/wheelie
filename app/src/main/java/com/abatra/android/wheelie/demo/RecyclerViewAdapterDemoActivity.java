@@ -11,13 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.abatra.android.wheelie.demo.databinding.RecyclerViewAdapterDemoActivityBinding;
 import com.abatra.android.wheelie.demo.databinding.RecyclerViewAdapterDemoItemBinding;
-import com.abatra.android.wheelie.recyclerview.adapter.RecyclerViewAdapter;
-import com.abatra.android.wheelie.recyclerview.adapter.RecyclerViewItem;
-import com.abatra.android.wheelie.recyclerview.adapter.RecyclerViewItemViewTypeFactory;
-import com.abatra.android.wheelie.recyclerview.adapter.RecyclerViewItems;
-import com.abatra.android.wheelie.recyclerview.adapter.binding.BindingRecyclerViewItemViewType;
-import com.abatra.android.wheelie.recyclerview.adapter.binding.ViewBindingRecyclerViewItem;
-import com.abatra.android.wheelie.resource.text.Text;
+import com.abatra.android.wheelie.core.res.text.Text;
+import com.abatra.android.wheelie.yara.RecyclerViewAdapter;
+import com.abatra.android.wheelie.yara.RecyclerViewItem;
+import com.abatra.android.wheelie.yara.RecyclerViewItemViewTypeFactory;
+import com.abatra.android.wheelie.yara.RecyclerViewItems;
+import com.abatra.android.wheelie.yara.binding.BindingRecyclerViewItemViewType;
+import com.abatra.android.wheelie.yara.binding.ViewBindingRecyclerViewItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
