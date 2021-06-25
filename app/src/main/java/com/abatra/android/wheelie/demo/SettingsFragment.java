@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.abatra.android.wheelie.preferences.PreferenceUtils;
+import com.abatra.android.wheelie.core.prefs.PreferenceUtils;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 

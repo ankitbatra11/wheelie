@@ -1,0 +1,11 @@
+android {
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+    }
+}
+
+dependencies {
+    api project(':lifecycle')
+    api "androidx.lifecycle:lifecycle-livedata:2.3.1"
+}

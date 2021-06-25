@@ -1,0 +1,10 @@
+android {
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+    }
+}
+
+dependencies {
+    api group: 'androidx.print', name: 'print', version: '1.0.0'
+}

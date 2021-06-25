@@ -20,40 +20,40 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.print.PrintHelper;
 
-import com.abatra.android.wheelie.activity.ErrorHandlingActivityStarter;
-import com.abatra.android.wheelie.activity.result.contract.AttachDataActivityResultContract;
-import com.abatra.android.wheelie.activity.result.contract.AttachDataActivityResultContract.AttachableData;
-import com.abatra.android.wheelie.activity.result.contract.GetContentActivityResultContract;
-import com.abatra.android.wheelie.activity.result.contract.IntentActivityResultContract;
-import com.abatra.android.wheelie.activity.result.contract.OpenMediaActivityResultContract;
-import com.abatra.android.wheelie.activity.result.contract.ShareMediaActivityResultContract;
-import com.abatra.android.wheelie.animation.SharedAxisMotion;
+import com.abatra.android.wheelie.appUpdate.AppUpdateAvailability;
+import com.abatra.android.wheelie.appUpdate.AppUpdateAvailabilityChecker;
+import com.abatra.android.wheelie.appUpdate.AppUpdateAvailabilityCriteria;
+import com.abatra.android.wheelie.appUpdate.AppUpdateHandler;
+import com.abatra.android.wheelie.appUpdate.AppUpdateHandlerFactory;
+import com.abatra.android.wheelie.appUpdate.AppUpdateRequestor;
+import com.abatra.android.wheelie.appUpdate.playStore.PlayStoreAppUpdateAvailability;
+import com.abatra.android.wheelie.appUpdate.playStore.PlayStoreAppUpdateRequest;
+import com.abatra.android.wheelie.core.MimeTypes;
+import com.abatra.android.wheelie.core.activity.ErrorHandlingActivityStarter;
+import com.abatra.android.wheelie.core.activity.resultContracts.AttachDataActivityResultContract;
+import com.abatra.android.wheelie.core.activity.resultContracts.AttachDataActivityResultContract.AttachableData;
+import com.abatra.android.wheelie.core.activity.resultContracts.GetContentActivityResultContract;
+import com.abatra.android.wheelie.core.activity.resultContracts.IntentActivityResultContract;
+import com.abatra.android.wheelie.core.activity.resultContracts.OpenMediaActivityResultContract;
+import com.abatra.android.wheelie.core.activity.resultContracts.ShareMediaActivityResultContract;
+import com.abatra.android.wheelie.core.anim.SharedAxisMotion;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
 import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
-import com.abatra.android.wheelie.media.MimeTypes;
-import com.abatra.android.wheelie.media.picker.IntentMediaPicker;
-import com.abatra.android.wheelie.media.picker.PickMediaCount;
-import com.abatra.android.wheelie.media.picker.PickMediaRequest;
-import com.abatra.android.wheelie.media.picker.PickableMediaType;
-import com.abatra.android.wheelie.media.printer.ImagePrinter;
-import com.abatra.android.wheelie.media.printer.IntentImagePrinter;
-import com.abatra.android.wheelie.media.printer.IntentPrintImageRequest;
+import com.abatra.android.wheelie.mayI.HybridPermissionRequestor;
+import com.abatra.android.wheelie.mayI.ManageOverlayPermissionRequestor;
+import com.abatra.android.wheelie.mayI.ManifestMultiplePermissionsRequestor;
+import com.abatra.android.wheelie.mayI.ManifestSinglePermissionRequestor;
+import com.abatra.android.wheelie.mayI.MultiplePermissionsGrantResult;
+import com.abatra.android.wheelie.mayI.MultiplePermissionsRequestor;
+import com.abatra.android.wheelie.mayI.OpenAppDetailsPermissionRequestor;
 import com.abatra.android.wheelie.network.InternetConnectivityChecker;
-import com.abatra.android.wheelie.permission.HybridPermissionRequestor;
-import com.abatra.android.wheelie.permission.ManageOverlayPermissionRequestor;
-import com.abatra.android.wheelie.permission.ManifestMultiplePermissionsRequestor;
-import com.abatra.android.wheelie.permission.ManifestSinglePermissionRequestor;
-import com.abatra.android.wheelie.permission.MultiplePermissionsGrantResult;
-import com.abatra.android.wheelie.permission.MultiplePermissionsRequestor;
-import com.abatra.android.wheelie.permission.OpenAppDetailsPermissionRequestor;
-import com.abatra.android.wheelie.update.AppUpdateAvailability;
-import com.abatra.android.wheelie.update.AppUpdateAvailabilityChecker;
-import com.abatra.android.wheelie.update.AppUpdateAvailabilityCriteria;
-import com.abatra.android.wheelie.update.AppUpdateHandler;
-import com.abatra.android.wheelie.update.AppUpdateHandlerFactory;
-import com.abatra.android.wheelie.update.AppUpdateRequestor;
-import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateAvailability;
-import com.abatra.android.wheelie.update.playstore.PlayStoreAppUpdateRequest;
+import com.abatra.android.wheelie.picker.IntentMediaPicker;
+import com.abatra.android.wheelie.picker.PickMediaCount;
+import com.abatra.android.wheelie.picker.PickMediaRequest;
+import com.abatra.android.wheelie.picker.PickableMediaType;
+import com.abatra.android.wheelie.printer.ImagePrinter;
+import com.abatra.android.wheelie.printer.IntentImagePrinter;
+import com.abatra.android.wheelie.printer.IntentPrintImageRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -63,18 +63,18 @@ import com.google.common.base.Throwables;
 
 import timber.log.Timber;
 
-import static com.abatra.android.wheelie.activity.result.contract.OpenMediaActivityResultContract.OpenableMedia;
-import static com.abatra.android.wheelie.activity.result.contract.OpenSettingsScreenActivityResultContract.wirelessSettings;
-import static com.abatra.android.wheelie.activity.result.contract.ShareMediaActivityResultContract.ShareableMedia;
-import static com.abatra.android.wheelie.intent.IntentFactory.openAppDetailsSettings;
-import static com.abatra.android.wheelie.update.AppUpdateType.FLEXIBLE;
-import static com.abatra.android.wheelie.update.AppUpdateType.IMMEDIATE;
+import static com.abatra.android.wheelie.appUpdate.AppUpdateType.FLEXIBLE;
+import static com.abatra.android.wheelie.appUpdate.AppUpdateType.IMMEDIATE;
+import static com.abatra.android.wheelie.core.activity.resultContracts.OpenMediaActivityResultContract.OpenableMedia;
+import static com.abatra.android.wheelie.core.activity.resultContracts.OpenSettingsScreenActivityResultContract.wirelessSettings;
+import static com.abatra.android.wheelie.core.activity.resultContracts.ShareMediaActivityResultContract.ShareableMedia;
+import static com.abatra.android.wheelie.core.content.Intents.openAppDetailsSettings;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String PRINT_JOB_NAME = "print picked image";
 
-    private final IntentMediaPicker intentMediaPicker = new IntentMediaPicker();
+    private final IntentMediaPicker intentMediaPicker = IntentMediaPicker.getInstance();
     private final InternetConnectivityChecker internetConnectivityChecker = InternetConnectivityChecker.newInstance(this);
     private ActivityResultLauncher<AttachableData> attachDataLauncher;
     private ActivityResultLauncher<OpenableMedia> openMediaLauncher;
@@ -279,7 +279,8 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         ImagePrinter.Listener listener = () -> showSnackbarMessage("print image result callback");
-        new IntentImagePrinter().print(printImageRequest, listener);
+
+        IntentImagePrinter.getInstance().print(printImageRequest, listener);
     }
 
     private void showSnackbarMessage(String message) {
