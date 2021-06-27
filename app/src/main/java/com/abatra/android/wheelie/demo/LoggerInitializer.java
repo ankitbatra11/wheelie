@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 
 import com.abatra.android.wheelie.firebase.CrashlyticsTimberTree;
 import com.abatra.android.wheelie.logger.TimberInitializer;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import timber.log.Timber;
 
@@ -22,7 +21,7 @@ public class LoggerInitializer extends TimberInitializer {
 
     @Override
     protected Timber.Tree getReleaseTree() {
-        return new CrashlyticsTimberTree(FirebaseCrashlytics.getInstance());
+        return CrashlyticsTimberTree.newInstance();
     }
 
     @Override

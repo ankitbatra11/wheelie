@@ -18,8 +18,12 @@ public class CrashlyticsTimberTree extends Timber.Tree {
 
     private final FirebaseCrashlytics firebaseCrashlytics;
 
-    public CrashlyticsTimberTree(FirebaseCrashlytics firebaseCrashlytics) {
+    private CrashlyticsTimberTree(FirebaseCrashlytics firebaseCrashlytics) {
         this.firebaseCrashlytics = firebaseCrashlytics;
+    }
+
+    public static CrashlyticsTimberTree newInstance() {
+        return new CrashlyticsTimberTree(FirebaseCrashlytics.getInstance());
     }
 
     @Override
