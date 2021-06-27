@@ -5,17 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Optional;
 
-abstract public class WheelieFragment<VB extends ViewBinding> extends Fragment {
+public class WheelieFragment<VB extends ViewBinding> extends Fragment {
 
     protected VB binding;
 
@@ -42,19 +39,6 @@ abstract public class WheelieFragment<VB extends ViewBinding> extends Fragment {
     protected VB requireBinding() {
         return getBinding().orElseThrow(IllegalStateException::new);
     }
-
-    @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                onBackPressed();
-            }
-        });
-    }
-
-    protected abstract void onBackPressed();
 
     @Override
     public void onDestroyView() {
