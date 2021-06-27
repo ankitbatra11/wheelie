@@ -3,6 +3,8 @@ package com.abatra.android.wheelie.core.res.text;
 import android.content.Context;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 class ColoredText implements Text {
 
     private final Text text;
@@ -22,5 +24,14 @@ class ColoredText implements Text {
     @Override
     public String getString(Context context) {
         return text.getString(context);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "ColoredText{" +
+                "text=" + text +
+                ", color=" + color +
+                '}';
     }
 }

@@ -3,6 +3,7 @@ package com.abatra.android.wheelie.core.res.text;
 import android.content.Context;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 class StringResourceText implements Text {
@@ -22,5 +23,13 @@ class StringResourceText implements Text {
     @Override
     public String getString(Context context) {
         return context.getString(res);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "StringResourceText{" +
+                "res=" + res +
+                '}';
     }
 }

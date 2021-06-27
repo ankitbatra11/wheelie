@@ -1,10 +1,7 @@
 package com.abatra.android.wheelie.firebase.remoteConfig;
 
-import android.content.Context;
-
 import com.abatra.android.wheelie.core.remoteConfig.DynamicConfig;
 import com.abatra.android.wheelie.core.remoteConfig.DynamicConfigSettings;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
@@ -16,15 +13,16 @@ import static com.abatra.android.wheelie.firebase.GmsTaskUtils.logTask;
 
 public class FirebaseDynamicConfig implements DynamicConfig {
 
+    private static final FirebaseDynamicConfig INSTANCE = new FirebaseDynamicConfig(FirebaseRemoteConfig.getInstance());
+
     private final FirebaseRemoteConfig firebaseRemoteConfig;
 
-    public FirebaseDynamicConfig(FirebaseRemoteConfig firebaseRemoteConfig) {
+    private FirebaseDynamicConfig(FirebaseRemoteConfig firebaseRemoteConfig) {
         this.firebaseRemoteConfig = firebaseRemoteConfig;
     }
 
-    public static FirebaseDynamicConfig initialized(Context context) {
-        FirebaseApp.initializeApp(context);
-        return new FirebaseDynamicConfig(FirebaseRemoteConfig.getInstance());
+    public static FirebaseDynamicConfig getInstance() {
+        return INSTANCE;
     }
 
     @Override

@@ -5,14 +5,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Optional;
 
-public class ViewBindingFragment<VB extends ViewBinding> extends Fragment {
+abstract public class WheelieFragment<VB extends ViewBinding> extends Fragment {
 
     protected VB binding;
 
@@ -21,14 +24,14 @@ public class ViewBindingFragment<VB extends ViewBinding> extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = inflateViewBinding();
+        binding = inflateViewBinding(inflater, container);
         return Optional.ofNullable(binding)
                 .map(ViewBinding::getRoot)
                 .orElse(null);
     }
 
     @Nullable
-    protected VB inflateViewBinding() {
+    protected VB inflateViewBinding(LayoutInflater inflater, ViewGroup container) {
         return null;
     }
 
@@ -38,5 +41,24 @@ public class ViewBindingFragment<VB extends ViewBinding> extends Fragment {
 
     protected VB requireBinding() {
         return getBinding().orElseThrow(IllegalStateException::new);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                onBackPressed();
+            }
+        });
+    }
+
+    protected abstract void onBackPressed();
+
+    @Override
+    public void onDestroyView() {
+        binding = null;
+        super.onDestroyView();
     }
 }

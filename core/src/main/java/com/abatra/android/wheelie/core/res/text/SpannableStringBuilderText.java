@@ -4,6 +4,8 @@ import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 class SpannableStringBuilderText implements Text {
 
     private final SpannableStringBuilder spannableStringBuilder;
@@ -20,5 +22,13 @@ class SpannableStringBuilderText implements Text {
     @Override
     public String getString(Context context) {
         return spannableStringBuilder.toString();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "SpannableStringBuilderText{" +
+                "spannableStringBuilder=" + spannableStringBuilder +
+                '}';
     }
 }
