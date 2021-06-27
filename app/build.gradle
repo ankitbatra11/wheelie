@@ -11,10 +11,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.3.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-
     implementation project(':logger')
     implementation project(':firebase')
     implementation project(':app-update')
@@ -24,25 +20,6 @@ dependencies {
     implementation project(':printer')
     implementation project(':picker')
 
-    implementation group: 'androidx.lifecycle', name: 'lifecycle-extensions', version: '2.2.0'
-    implementation group: 'androidx.core', name: 'core', version: '1.5.0'
-    implementation group: 'androidx.fragment', name: 'fragment', version: '1.3.5'
-
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
-
-    implementation 'com.google.android.play:core:1.10.0'
-
-    implementation group: 'androidx.preference', name: 'preference', version: '1.1.1'
-
-    implementation platform('com.google.firebase:firebase-bom:28.0.1')
-    implementation 'com.google.firebase:firebase-config'
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-crashlytics'
-
-    implementation "androidx.startup:startup-runtime:1.0.0"
-
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
