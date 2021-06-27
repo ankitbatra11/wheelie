@@ -9,7 +9,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import timber.log.Timber;
 
 import static com.abatra.android.wheelie.firebase.GmsTaskUtils.logOnCompleteListener;
-import static com.abatra.android.wheelie.firebase.GmsTaskUtils.logTask;
+import static com.abatra.android.wheelie.firebase.GmsTaskUtils.log;
 
 public class FirebaseDynamicConfig implements DynamicConfig {
 
@@ -30,7 +30,7 @@ public class FirebaseDynamicConfig implements DynamicConfig {
 
         firebaseRemoteConfig.ensureInitialized().addOnCompleteListener(task -> {
 
-            logTask(task, "ensureInitialized");
+            log(task, "ensureInitialized");
 
             if (task.isSuccessful()) {
 
@@ -69,6 +69,6 @@ public class FirebaseDynamicConfig implements DynamicConfig {
 
     @Override
     public void fetchAndActivate() {
-        firebaseRemoteConfig.fetchAndActivate().addOnCompleteListener(task -> logTask(task, "fetchAndActivate"));
+        firebaseRemoteConfig.fetchAndActivate().addOnCompleteListener(task -> log(task, "fetchAndActivate"));
     }
 }

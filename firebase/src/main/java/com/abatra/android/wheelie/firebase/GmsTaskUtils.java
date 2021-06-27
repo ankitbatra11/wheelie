@@ -11,10 +11,10 @@ public class GmsTaskUtils {
     }
 
     public static <T> OnCompleteListener<T> logOnCompleteListener(String operation) {
-        return task -> logTask(task, operation);
+        return task -> log(task, operation);
     }
 
-    public static void logTask(Task<?> task, String operation) {
+    public static void log(Task<?> task, String operation) {
         if (task.getException() != null) {
             Timber.e(task.getException(), "%s failed!", operation);
         } else {
