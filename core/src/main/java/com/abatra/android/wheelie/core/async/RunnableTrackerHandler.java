@@ -3,14 +3,13 @@ package com.abatra.android.wheelie.core.async;
 import android.os.Handler;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import timber.log.Timber;
 
 class RunnableTrackerHandler {
-
     private final Handler handler;
-    private final Collection<Runnable> runnables = new HashSet<>();
+    private final Collection<Runnable> runnables = new CopyOnWriteArraySet<>();
 
     private RunnableTrackerHandler(Handler handler) {
         this.handler = handler;
