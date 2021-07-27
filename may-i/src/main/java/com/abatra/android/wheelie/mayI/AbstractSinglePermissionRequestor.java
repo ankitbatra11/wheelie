@@ -3,6 +3,7 @@ package com.abatra.android.wheelie.mayI;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,25 +16,22 @@ import static com.abatra.android.wheelie.mayI.SinglePermissionGrantResult.GRANTE
 
 abstract class AbstractSinglePermissionRequestor implements SinglePermissionRequestor {
 
+    @Nullable
     private ILifecycleOwner lifecycleOwner;
     private ActivityResultLauncher<String> singlePermissionRequestor;
     private CallbackDelegator callbackDelegator;
 
     @Override
     public void observeLifecycle(ILifecycleOwner lifecycleOwner) {
-
         this.lifecycleOwner = lifecycleOwner;
         this.lifecycleOwner.getLifecycle().addObserver(this);
 
         ActivityResultCallback<Boolean> activityResultCallback = result -> {
             Optional<CallbackDelegator> requestCallback = getCallbackDelegator();
-            requestCallback.ifPresent(callback -> {
-                Optional<ILifecycleOwner> ownerOptional = getLifecycleOwnerOptional();
-                ownerOptional.ifPresent(lo -> {
-                    AppCompatActivity appCompatActivity = lo.getAppCompatActivity();
-                    callback.onPermissionResult(callback.builder.onPermissionGrantResult(result, appCompatActivity));
-                });
-            });
+            requestCallback.ifPresent(callback -> getLifecycleOwner().ifPresent(owner -> {
+                AppCompatActivity appCompatActivity = owner.getAppCompatActivity();
+                callback.onPermissionResult(callback.builder.onPermissionGrantResult(result, appCompatActivity));
+            }));
         };
         singlePermissionRequestor = lifecycleOwner.registerForActivityResult(
                 createRequestPermissionActivityResultContract(),
@@ -42,12 +40,12 @@ abstract class AbstractSinglePermissionRequestor implements SinglePermissionRequ
 
     protected abstract ActivityResultContract<String, Boolean> createRequestPermissionActivityResultContract();
 
-    protected Optional<ILifecycleOwner> getLifecycleOwnerOptional() {
-        return Optional.ofNullable(getLifecycleOwner());
+    protected Optional<ILifecycleOwner> getLifecycleOwner() {
+        return Optional.ofNullable(lifecycleOwner);
     }
 
-    protected ILifecycleOwner getLifecycleOwner() {
-        return lifecycleOwner;
+    protected ILifecycleOwner requireLifecycleOwner() {
+        return getLifecycleOwner().orElseThrow(IllegalStateException::new);
     }
 
     @VisibleForTesting
@@ -61,7 +59,7 @@ abstract class AbstractSinglePermissionRequestor implements SinglePermissionRequ
             callback.onPermissionResult(GRANTED);
         } else {
             Builder builder = createBuilder();
-            builder.beforeRequestingPermission(permission, lifecycleOwner.getAppCompatActivity());
+            builder.beforeRequestingPermission(permission, requireLifecycleOwner().getAppCompatActivity());
             callbackDelegator = new CallbackDelegator(builder, callback);
             singlePermissionRequestor.launch(permission);
         }

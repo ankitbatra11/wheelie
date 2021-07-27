@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertFalse;
@@ -81,7 +82,8 @@ public class AbstractSinglePermissionRequestorTest {
 
         permissionRequestor.observeLifecycle(mockedLifecycleOwner);
 
-        assertThat(permissionRequestor.getLifecycleOwner(), sameInstance(mockedLifecycleOwner));
+        assertThat(permissionRequestor.getLifecycleOwner().isPresent(), equalTo(true));
+        assertThat(permissionRequestor.getLifecycleOwner().get(), sameInstance(mockedLifecycleOwner));
         verify(mockedLifecycle, times(1)).addObserver(permissionRequestor);
 
         verify(mockedLifecycleOwner, times(1)).registerForActivityResult(same(mockedActivityResultContract),
@@ -146,7 +148,7 @@ public class AbstractSinglePermissionRequestorTest {
         permissionRequestor.onDestroy();
 
         assertFalse(permissionRequestor.getCallbackDelegator().isPresent());
-        assertNull(permissionRequestor.getLifecycleOwner());
+        assertFalse(permissionRequestor.getLifecycleOwner().isPresent());
         assertNull(permissionRequestor.getSinglePermissionRequestor());
     }
 

@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.abatra.android.wheelie.core.content.Intents;
+
 import java.util.Optional;
 
 public class LoadViewStateEvent extends Event {
@@ -50,6 +52,7 @@ public class LoadViewStateEvent extends Event {
         return "LoadViewStateEvent{" +
                 "arguments=" + arguments +
                 ", savedState=" + savedState +
+                ", launchIntent=" + Intents.print(launchIntent) +
                 "} " + super.toString();
     }
 }

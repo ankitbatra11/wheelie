@@ -9,7 +9,9 @@ public class ManifestSinglePermissionRequestor extends AbstractSinglePermissionR
 
     @Override
     protected boolean isPermissionGranted(String permission) {
-        return PermissionUtils.isPermissionGranted(getLifecycleOwner().getContext(), permission);
+        return getLifecycleOwner()
+                .map(lifecycleOwner -> PermissionUtils.isPermissionGranted(lifecycleOwner.getContext(), permission))
+                .orElse(false);
     }
 
     @Override
