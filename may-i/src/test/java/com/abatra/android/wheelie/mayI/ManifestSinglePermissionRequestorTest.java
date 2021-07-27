@@ -1,5 +1,7 @@
 package com.abatra.android.wheelie.mayI;
 
+import android.content.Context;
+
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
 import androidx.lifecycle.Lifecycle;
 
@@ -17,8 +19,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,6 +41,15 @@ public class ManifestSinglePermissionRequestorTest {
     public void setup() {
         when(mockedLifecycleOwner.getLifecycle()).thenReturn(mockedLifecycle);
         permissionRequestor.observeLifecycle(mockedLifecycleOwner);
+    }
+
+    @Test
+    public void test_isPermissionGranted_nullLifecycleOwner() {
+        permissionRequestor = new ManifestSinglePermissionRequestor();
+        try (MockedStatic<PermissionUtils> permissionUtilsMockedStatic = mockStatic(PermissionUtils.class)) {
+            assertFalse(permissionRequestor.isPermissionGranted("p"));
+            permissionUtilsMockedStatic.verify(() -> PermissionUtils.isPermissionGranted(any(Context.class), anyString()), never());
+        }
     }
 
     @Test

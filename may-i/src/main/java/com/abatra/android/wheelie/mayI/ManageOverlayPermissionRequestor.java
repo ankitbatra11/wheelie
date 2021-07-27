@@ -2,18 +2,21 @@ package com.abatra.android.wheelie.mayI;
 
 import androidx.activity.result.contract.ActivityResultContract;
 
+import static com.abatra.android.wheelie.mayI.PermissionUtils.*;
 import static com.abatra.android.wheelie.mayI.SinglePermissionGrantResult.Builder;
 
 public class ManageOverlayPermissionRequestor extends AbstractSinglePermissionRequestor {
 
     @Override
     protected ActivityResultContract<String, Boolean> createRequestPermissionActivityResultContract() {
-        return new ManageOverlayPermissionContract(getLifecycleOwner().getContext());
+        return new ManageOverlayPermissionContract(requireLifecycleOwner().getContext());
     }
 
     @Override
     protected boolean isPermissionGranted(String permission) {
-        return PermissionUtils.canDrawOverlays(getLifecycleOwner().getContext());
+        return getLifecycleOwner()
+                .map(lifecycleOwner -> canDrawOverlays(lifecycleOwner.getContext()))
+                .orElse(false);
     }
 
     @Override
