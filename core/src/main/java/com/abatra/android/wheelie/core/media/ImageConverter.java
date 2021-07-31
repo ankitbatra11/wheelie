@@ -25,6 +25,7 @@ public class ImageConverter {
         int rowStride = planes[0].getRowStride();
         int rowPadding = rowStride - pixelStride * size.getWidth();
         Bitmap bitmap = createBitmapWithAvailableMemory(size, rowPadding, pixelStride);
+        buffer.rewind();
         bitmap.copyPixelsFromBuffer(buffer);
         buffer.clear();
         return bitmap;
