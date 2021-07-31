@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import timber.log.Timber;
 
 class RunnableTrackerHandler {
+
     private final Handler handler;
     private final Collection<Runnable> runnables = new CopyOnWriteArraySet<>();
 
