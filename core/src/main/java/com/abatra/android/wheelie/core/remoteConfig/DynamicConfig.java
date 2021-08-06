@@ -1,6 +1,8 @@
 package com.abatra.android.wheelie.core.remoteConfig;
 
-public interface DynamicConfig {
+import com.abatra.android.wheelie.core.startup.ApplicationInitializer;
+
+public interface DynamicConfig extends ApplicationInitializer {
 
     void initialize(DynamicConfigSettings settings);
 
