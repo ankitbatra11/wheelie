@@ -62,7 +62,7 @@ public class FirebaseDynamicConfig implements DynamicConfig {
 
     public FirebaseRemoteConfig getFirebaseRemoteConfig() {
         return Optional.ofNullable(firebaseRemoteConfig)
-                .orElseThrow(() -> new IllegalStateException("Initialize this class using application initializer?"));
+                .orElseThrow(() -> new IllegalStateException("Initialize this class using application initializer."));
     }
 
     @Override
