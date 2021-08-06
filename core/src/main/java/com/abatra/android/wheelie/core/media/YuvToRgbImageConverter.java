@@ -32,7 +32,7 @@ public class YuvToRgbImageConverter implements ImageConverter {
         this.scriptIntrinsicYuvToRGB = scriptIntrinsicYuvToRGB;
     }
 
-    public YuvToRgbImageConverter newInstance(Context context) {
+    public static YuvToRgbImageConverter newInstance(Context context) {
         RenderScript renderScript = RenderScript.create(context);
         ScriptIntrinsicYuvToRGB yuvToRGB = ScriptIntrinsicYuvToRGB.create(renderScript, Element.U8_4(renderScript));
         return new YuvToRgbImageConverter(renderScript, yuvToRGB);
