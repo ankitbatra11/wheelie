@@ -1,39 +1,49 @@
 package com.abatra.android.wheelie.firebase.remoteConfig;
 
+import static com.abatra.android.wheelie.firebase.GmsTaskUtils.log;
+import static com.abatra.android.wheelie.firebase.GmsTaskUtils.logOnCompleteListener;
+
+import android.content.Context;
+
+import androidx.annotation.VisibleForTesting;
+
 import com.abatra.android.wheelie.core.remoteConfig.DynamicConfig;
 import com.abatra.android.wheelie.core.remoteConfig.DynamicConfigSettings;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 
 import timber.log.Timber;
 
-import static com.abatra.android.wheelie.firebase.GmsTaskUtils.logOnCompleteListener;
-import static com.abatra.android.wheelie.firebase.GmsTaskUtils.log;
-
 public class FirebaseDynamicConfig implements DynamicConfig {
 
-    private static final FirebaseDynamicConfig INSTANCE = new FirebaseDynamicConfig(FirebaseRemoteConfig.getInstance());
-
+    @VisibleForTesting
+    static FirebaseDynamicConfig instance;
     private final FirebaseRemoteConfig firebaseRemoteConfig;
 
     private FirebaseDynamicConfig(FirebaseRemoteConfig firebaseRemoteConfig) {
         this.firebaseRemoteConfig = firebaseRemoteConfig;
     }
 
-    public static FirebaseDynamicConfig getInstance() {
-        return INSTANCE;
+    public static FirebaseDynamicConfig getInstance(Context context) {
+        if (instance == null) {
+            synchronized (FirebaseDynamicConfig.class) {
+                if (instance == null) {
+                    FirebaseApp.initializeApp(context);
+                    FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+                    instance = new FirebaseDynamicConfig(firebaseRemoteConfig);
+                }
+            }
+        }
+        return instance;
     }
 
     @Override
     public void initialize(DynamicConfigSettings settings) {
-
         firebaseRemoteConfig.ensureInitialized().addOnCompleteListener(task -> {
-
             log(task, "ensureInitialized");
-
             if (task.isSuccessful()) {
-
                 FirebaseDynamicConfigSettings configSettings = (FirebaseDynamicConfigSettings) settings;
 
                 firebaseRemoteConfig.setDefaultsAsync(configSettings.getDefaultValues())
