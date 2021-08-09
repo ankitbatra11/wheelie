@@ -8,12 +8,12 @@ android {
 dependencies {
     api 'com.parse.bolts:bolts-tasks:1.4.0'
 
-    api group: 'androidx.fragment', name: 'fragment', version: '1.3.5'
-    api "androidx.startup:startup-runtime:1.0.0"
-    api 'androidx.appcompat:appcompat:1.3.0'
+    api group: 'androidx.fragment', name: 'fragment', version: '1.3.6'
+    api "androidx.startup:startup-runtime:$STARTUP_VERSION"
+    api "androidx.appcompat:appcompat:$APPCOMPAT_VERSION"
     api group: 'androidx.preference', name: 'preference', version: '1.1.1'
 
-    api 'com.google.android.material:material:1.3.0'
+    api "com.google.android.material:material:$MATERIAL_VERSION"
 
     api group: 'androidx.navigation', name: 'navigation-fragment', version: '2.3.5'
 

@@ -7,6 +7,6 @@ android {
 
 dependencies {
     api project(':lifecycle')
-    api "androidx.lifecycle:lifecycle-viewmodel:2.3.1"
-    api "androidx.lifecycle:lifecycle-livedata:2.3.1"
+    api "androidx.lifecycle:lifecycle-viewmodel:$LIFECYCLE_VERSION"
+    api "androidx.lifecycle:lifecycle-livedata:$LIFECYCLE_VERSION"
 }

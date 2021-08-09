@@ -8,5 +8,5 @@ android {
 dependencies {
     api project(':core')
     api project(':lifecycle')
-    api 'com.google.android.play:core:1.10.0'
+    api "com.google.android.play:core:$PLAY_CORE_VERSION"
 }
