@@ -8,6 +8,9 @@ android {
     buildFeatures {
         dataBinding true
     }
+    lintOptions {
+        disable "EnsureInitializerMetadata"
+    }
 }
 
 dependencies {

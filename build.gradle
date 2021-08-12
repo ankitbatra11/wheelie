@@ -32,7 +32,6 @@ subprojects {
     android {
         compileSdkVersion 30
         buildToolsVersion "30.0.2"
-
         buildFeatures {
             viewBinding = true
         }
@@ -56,6 +55,9 @@ subprojects {
             coreLibraryDesugaringEnabled true
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
+        }
+        lintOptions {
+            abortOnError false
         }
         testOptions {
             unitTests {
