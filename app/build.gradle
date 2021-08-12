@@ -9,7 +9,6 @@ android {
         dataBinding true
     }
     lintOptions {
-        abortOnError false
         disable "EnsureInitializerMetadata"
     }
 }
