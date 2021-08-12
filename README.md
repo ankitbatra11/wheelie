@@ -1,6 +1,9 @@
 # wheelie
 Collection of libraries to make it easy to bootstrap and develop an existing Android app.
 
+# Jitpack Repo
+https://jitpack.io/#ankitbatra11/wheelie
+
 # Libraries
 
 ## Chronicle
@@ -57,6 +60,3 @@ Get a string value
 Get a long value
 
 `dynamicConfig.getLongValue(REMOTE_CONFIG_KEY)`
-
-# Jitpack Repo
-https://jitpack.io/#ankitbatra11/wheelie
