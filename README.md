@@ -1,5 +1,5 @@
 # wheelie
-Collection of libraries to make it easy to bootstrap a new or develop an existing Android app.
+Collection of libraries to make it easy to bootstrap and develop an existing Android app.
 
 # Libraries
 
