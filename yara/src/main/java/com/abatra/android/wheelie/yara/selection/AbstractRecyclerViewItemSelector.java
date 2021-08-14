@@ -1,6 +1,6 @@
 package com.abatra.android.wheelie.yara.selection;
 
-import com.abatra.android.wheelie.designPattern.Observable;
+import com.abatra.android.wheelie.core.designpattern.Observable;
 
 import java.util.function.Consumer;
 

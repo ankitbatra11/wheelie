@@ -8,12 +8,10 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/architecture/Wheelie.architecture.iml" filepath="$PROJECT_DIR$/.idea/modules/architecture/Wheelie.architecture.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/chronicle/Wheelie.chronicle.iml" filepath="$PROJECT_DIR$/.idea/modules/chronicle/Wheelie.chronicle.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/Wheelie.core.iml" filepath="$PROJECT_DIR$/.idea/modules/core/Wheelie.core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/design-pattern/Wheelie.design-pattern.iml" filepath="$PROJECT_DIR$/.idea/modules/design-pattern/Wheelie.design-pattern.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/firebase/Wheelie.firebase.iml" filepath="$PROJECT_DIR$/.idea/modules/firebase/Wheelie.firebase.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/lifecycle/Wheelie.lifecycle.iml" filepath="$PROJECT_DIR$/.idea/modules/lifecycle/Wheelie.lifecycle.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/logger/Wheelie.logger.iml" filepath="$PROJECT_DIR$/.idea/modules/logger/Wheelie.logger.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/may-i/Wheelie.may-i.iml" filepath="$PROJECT_DIR$/.idea/modules/may-i/Wheelie.may-i.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/network/Wheelie.network.iml" filepath="$PROJECT_DIR$/.idea/modules/network/Wheelie.network.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/picker/Wheelie.picker.iml" filepath="$PROJECT_DIR$/.idea/modules/picker/Wheelie.picker.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/printer/Wheelie.printer.iml" filepath="$PROJECT_DIR$/.idea/modules/printer/Wheelie.printer.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/video-editor/Wheelie.video-editor.iml" filepath="$PROJECT_DIR$/.idea/modules/video-editor/Wheelie.video-editor.iml" />

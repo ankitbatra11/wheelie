@@ -18,7 +18,6 @@ dependencies {
     implementation project(':firebase')
     implementation project(':app-update')
     implementation project(':yara')
-    implementation project(':network')
     implementation project(':may-i')
     implementation project(':printer')
     implementation project(':picker')

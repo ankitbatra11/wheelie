@@ -1,5 +1,12 @@
 package com.abatra.android.wheelie.demo;
 
+import static com.abatra.android.wheelie.appUpdate.AppUpdateType.FLEXIBLE;
+import static com.abatra.android.wheelie.appUpdate.AppUpdateType.IMMEDIATE;
+import static com.abatra.android.wheelie.core.activity.resultContracts.OpenMediaActivityResultContract.OpenableMedia;
+import static com.abatra.android.wheelie.core.activity.resultContracts.OpenSettingsScreenActivityResultContract.wirelessSettings;
+import static com.abatra.android.wheelie.core.activity.resultContracts.ShareMediaActivityResultContract.ShareableMedia;
+import static com.abatra.android.wheelie.core.content.Intents.openAppDetailsSettings;
+
 import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,7 +24,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 import androidx.print.PrintHelper;
 
 import com.abatra.android.wheelie.appUpdate.AppUpdateAvailability;
@@ -37,7 +43,9 @@ import com.abatra.android.wheelie.core.activity.resultContracts.IntentActivityRe
 import com.abatra.android.wheelie.core.activity.resultContracts.OpenMediaActivityResultContract;
 import com.abatra.android.wheelie.core.activity.resultContracts.ShareMediaActivityResultContract;
 import com.abatra.android.wheelie.core.anim.SharedAxisMotion;
+import com.abatra.android.wheelie.core.network.InternetConnectivityChecker;
 import com.abatra.android.wheelie.demo.databinding.ActivityMainBinding;
+import com.abatra.android.wheelie.lifecycle.network.LifecycleInternetConnectivityChecker;
 import com.abatra.android.wheelie.lifecycle.owner.ILifecycleOwner;
 import com.abatra.android.wheelie.mayI.HybridPermissionRequestor;
 import com.abatra.android.wheelie.mayI.ManageOverlayPermissionRequestor;
@@ -46,7 +54,6 @@ import com.abatra.android.wheelie.mayI.ManifestSinglePermissionRequestor;
 import com.abatra.android.wheelie.mayI.MultiplePermissionsGrantResult;
 import com.abatra.android.wheelie.mayI.MultiplePermissionsRequestor;
 import com.abatra.android.wheelie.mayI.OpenAppDetailsPermissionRequestor;
-import com.abatra.android.wheelie.network.InternetConnectivityChecker;
 import com.abatra.android.wheelie.picker.IntentMediaPicker;
 import com.abatra.android.wheelie.picker.PickMediaCount;
 import com.abatra.android.wheelie.picker.PickMediaRequest;
@@ -63,19 +70,12 @@ import com.google.common.base.Throwables;
 
 import timber.log.Timber;
 
-import static com.abatra.android.wheelie.appUpdate.AppUpdateType.FLEXIBLE;
-import static com.abatra.android.wheelie.appUpdate.AppUpdateType.IMMEDIATE;
-import static com.abatra.android.wheelie.core.activity.resultContracts.OpenMediaActivityResultContract.OpenableMedia;
-import static com.abatra.android.wheelie.core.activity.resultContracts.OpenSettingsScreenActivityResultContract.wirelessSettings;
-import static com.abatra.android.wheelie.core.activity.resultContracts.ShareMediaActivityResultContract.ShareableMedia;
-import static com.abatra.android.wheelie.core.content.Intents.openAppDetailsSettings;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String PRINT_JOB_NAME = "print picked image";
 
     private final IntentMediaPicker intentMediaPicker = IntentMediaPicker.getInstance();
-    private final InternetConnectivityChecker internetConnectivityChecker = InternetConnectivityChecker.newInstance(this);
+    private InternetConnectivityChecker internetConnectivityChecker;
     private ActivityResultLauncher<AttachableData> attachDataLauncher;
     private ActivityResultLauncher<OpenableMedia> openMediaLauncher;
     private ActivityResultLauncher<ShareableMedia> shareMediaLauncher;
@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LifecycleInternetConnectivityChecker internetConnectivityChecker = LifecycleInternetConnectivityChecker.newInstance(this);
+        this.internetConnectivityChecker = internetConnectivityChecker;
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             requestWindowFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
             SharedAxisMotion.X.setExitAnimation(this);
@@ -132,11 +135,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        binding.checkInternetConnectionBtn.setOnClickListener(v -> showConnectivityStatus(this.internetConnectivityChecker.isConnectedToInternet()));
+        this.internetConnectivityChecker.addObserver(this::showConnectivityStatus);
         internetConnectivityChecker.observeLifecycle(ILifecycleOwner.activity(this));
-        binding.checkInternetConnectionBtn.setOnClickListener(v -> {
-            LiveData<Boolean> connected = internetConnectivityChecker.isConnectedToInternet();
-            connected.observe(this, c -> Snackbar.make(v, c.toString(), Snackbar.LENGTH_SHORT).show());
-        });
 
         ActivityResultLauncher<Void> launcher = registerForActivityResult(wirelessSettings(), result -> {
             View view = binding.coordinator;
@@ -223,6 +224,17 @@ public class MainActivity extends AppCompatActivity {
         binding.buttonCheckImmediateUpdate.setOnClickListener(v -> checkImmediateUpdate(appUpdateHandlerFactory));
 
         setupOpenSettings();
+    }
+
+    private void showConnectivityStatus(boolean connected) {
+        Snackbar snackbar = Snackbar.make(binding.getRoot(), String.valueOf(connected), Snackbar.LENGTH_SHORT);
+        snackbar.show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        internetConnectivityChecker.stopChecking();
+        super.onDestroy();
     }
 
     private void setupOpenSettings() {

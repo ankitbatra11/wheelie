@@ -9,7 +9,6 @@ dependencies {
     api "androidx.lifecycle:lifecycle-runtime:$LIFECYCLE_VERSION"
     api "androidx.lifecycle:lifecycle-process:$LIFECYCLE_VERSION"
 
-    api project(':design-pattern')
     api project(':core')
 
     implementation group: 'androidx.fragment', name: 'fragment', version: '1.3.6'

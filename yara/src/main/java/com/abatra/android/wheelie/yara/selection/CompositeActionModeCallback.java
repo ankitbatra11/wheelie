@@ -4,8 +4,8 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.abatra.android.wheelie.designPattern.CollectionObservable;
-import com.abatra.android.wheelie.designPattern.Observable;
+import com.abatra.android.wheelie.core.designpattern.CollectionObservable;
+import com.abatra.android.wheelie.core.designpattern.Observable;
 import com.google.common.collect.Sets;
 
 import java.util.Arrays;
