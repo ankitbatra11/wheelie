@@ -4,7 +4,7 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.abatra.android.wheelie.designPattern.Observable;
+import com.abatra.android.wheelie.core.designpattern.Observable;
 import com.abatra.android.wheelie.yara.selection.actionmode.SelectionActionModeCallback;
 
 import java.util.function.Consumer;

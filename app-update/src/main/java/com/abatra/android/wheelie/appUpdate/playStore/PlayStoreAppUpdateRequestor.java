@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import com.abatra.android.wheelie.appUpdate.AppUpdateRequest;
 import com.abatra.android.wheelie.appUpdate.AppUpdateRequestResult;
 import com.abatra.android.wheelie.appUpdate.AppUpdateRequestor;
-import com.abatra.android.wheelie.designPattern.Observable;
+import com.abatra.android.wheelie.core.designpattern.Observable;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.install.InstallState;
