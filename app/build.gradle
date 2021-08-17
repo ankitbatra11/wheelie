@@ -21,6 +21,6 @@ dependencies {
     implementation project(':printer')
     implementation project(':picker')
 
-    implementation "com.github.bumptech.glide:glide:$GLIDE_VERSION"
-    annotationProcessor "com.github.bumptech.glide:compiler:$GLIDE_VERSION"
+    implementation viewDependencies.glide
+    annotationProcessor viewDependencies.glideProcessor
 }
