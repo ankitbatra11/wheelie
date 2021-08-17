@@ -10,6 +10,7 @@ ext {
         design              :   "com.google.android.material:material:1.4.0"
         startup             :   "androidx.startup:startup-runtime:1.1.0"
         playCore            :   "com.google.android.play:core:1.10.0"
+        viewModel           :   "androidx.lifecycle:lifecycle-viewmodel:${lifecycleVersion}"
         livedata            :   "androidx.lifecycle:lifecycle-livedata:${lifecycleVersion}"
         lifecycleRuntime    :   "androidx.lifecycle:lifecycle-runtime:${lifecycleVersion}"
         lifecycleProcess    :   "androidx.lifecycle:lifecycle-process:${lifecycleVersion}"
