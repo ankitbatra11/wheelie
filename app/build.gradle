@@ -1,9 +1,8 @@
+apply from: "${rootDir.path}/gradle/base.gradle"
+
 android {
     defaultConfig {
         applicationId "com.abatra.android.wheelie.demo"
-
-        minSdkVersion 16
-        targetSdkVersion 30
     }
     buildFeatures {
         dataBinding true
