@@ -1,0 +1,10 @@
+android {
+    defaultConfig {
+        minSdkVersion api_min_sdk
+        targetSdkVersion api_target_sdk
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
+}
