@@ -2,6 +2,6 @@ apply from: "${rootDir.path}/gradle/base.gradle"
 
 dependencies {
     api project(':lifecycle')
-    api "androidx.lifecycle:lifecycle-viewmodel:$LIFECYCLE_VERSION"
-    api "androidx.lifecycle:lifecycle-livedata:$LIFECYCLE_VERSION"
+    api androidDependencies.viewModel
+    api androidDependencies.liveData
 }
