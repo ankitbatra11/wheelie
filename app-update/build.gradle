@@ -3,5 +3,5 @@ apply from: "${rootDir.path}/gradle/base.gradle"
 dependencies {
     api project(':core')
     api project(':lifecycle')
-    api "com.google.android.play:core:$PLAY_CORE_VERSION"
+    api androidDependencies.playCore
 }
