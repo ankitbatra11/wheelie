@@ -2,12 +2,10 @@ plugins {
     id 'com.android.library'
 }
 
-android {
-    compileSdkVersion 30
-    defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 30
+apply from: "${rootDir.path}/gradle/base.gradle"
 
+android {
+    defaultConfig {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
