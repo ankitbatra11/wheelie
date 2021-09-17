@@ -1,9 +1,4 @@
-android {
-    defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 30
-    }
-}
+apply from: "${rootDir.path}/gradle/base.gradle"
 
 dependencies {
     api 'com.parse.bolts:bolts-tasks:1.4.0'
@@ -16,6 +11,4 @@ dependencies {
     api "com.google.android.material:material:$MATERIAL_VERSION"
 
     api group: 'androidx.navigation', name: 'navigation-fragment', version: '2.3.5'
-
-
 }
