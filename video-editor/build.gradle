@@ -1,9 +1,1 @@
-android {
-    defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 30
-    }
-}
-
-dependencies {
-}
+apply from: "${rootDir.path}/gradle/base.gradle"
