@@ -37,7 +37,7 @@ release/
 
 # Intellij
 *.iml
-.idea/
+/.idea
 
 # Keystore images
 *.jks
